@@ -26,3 +26,11 @@
 *.exe
 *.out
 *.app
+
+# A Folder
+images/
+
+# Codeblocks
+*.save
+*.layout
+*.depend

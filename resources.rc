@@ -1,0 +1,3 @@
+texture RCDATA "resources/Texture.png"
+curveicon RCDATA "resources/icon.png"
+fontdata RCDATA "resources/arial.ttf"
