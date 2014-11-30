@@ -2,7 +2,6 @@
 #ifndef CURVE_POWERUP
 #define CURVE_POWERUP
 // Needed Headers
-#include "..\curve.h"
 
 class Powerup{
     public:

@@ -3,11 +3,17 @@
 #define CURVE_SERVER
 // Needed Headers
 //#include "..\curve.h"
+// Standard headers
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 #include <thread>
 #include <iostream>
 #include <vector>
+// Class Headers
+#include "client.h"
+// Temporary
+void Config_Package(Game &game);
+//
 class Server{
     public:
         // Vars
@@ -18,7 +24,16 @@ class Server{
         bool accept_new;
         sf::TcpListener listener;
         sf::Packet packet;
-
+        // Threads
+        std::thread thread_listener;
+        std::thread thread_sender;
+        // Functions
+        void Start_Server(const Config &config,Game &game,Player player[]);
+        void Server_Listener(const Config &config,Game &game,Player player[]);
+        void Server_Sender(const Config &config,Game &game,Player player[]);
+        void Client_Init_Packages(const Config &config,Game &game,Player player[]);
+        void Process_Package(const Config &config,Game &game,Player player[],sf::Packet &packet);
+        void Shutdown();
         // Constructor
         Server(){
             started=false;

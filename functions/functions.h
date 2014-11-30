@@ -49,14 +49,14 @@ void PowerUp_Manager(const Config &config,Game &game,Player player[]);
 void PowerUp_Manager_Client(const Config &config,Game &game);
 
 // server.cpp
-void Start_Server(const Config &config,Game &game,Player player[],Server &server);
-void Server_Listener(const Config &config, Game &game,Player player[],Server &server);
-void Server_Sender(const Config &config, Game &game,Player player[],Server &server);
-void Client_Init_Packages(const Config &config,Game &game,Player player[],Server &server);
+//void Start_Server(const Config &config,Game &game,Player player[],Server &server);
+//void Server_Listener(const Config &config, Game &game,Player player[],Server &server);
+//void Server_Sender(const Config &config, Game &game,Player player[],Server &server);
+//void Client_Init_Packages(const Config &config,Game &game,Player player[],Server &server);
 void Server_Sync_Clients(const Config &config,Game &game,Player player[]);
 void Server_Start_Game(const Config &config,Game &game,Player player[]);
 void Config_Package(Game &game);
-void Server_Process_Package(const Config &config,Game &game,Player player[],Server &server,sf::Packet &packet);
+//void Server_Process_Package(const Config &config,Game &game,Player player[],Server &server,sf::Packet &packet);
 
 // client.cpp
 void Start_Client(const Config &config, Game &game,Player player[]);

@@ -1,10 +1,8 @@
 // Contains game class declaration
 #ifndef CURVE_POWERUP_EFFECT
 #define CURVE_POWERUP_EFFECT
-// Needed Headers
+// Standard Headers
 #include <SFML/Graphics.hpp>
-//#include <iostream>
-//#include <vector>
 //
 class Powerup_Effect{
     public:

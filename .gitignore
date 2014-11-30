@@ -27,10 +27,12 @@
 *.out
 *.app
 
-# A Folder
+# Folders
 images/
+obj/
 
 # Codeblocks
+*.cbp
 *.save
 *.layout
 *.depend

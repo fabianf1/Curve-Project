@@ -1,10 +1,9 @@
 // Contains config class declaration
 #ifndef CURVE_PLAYER
 #define CURVE_PLAYER
-// Needed Headers
-#include "..\curve.h"
-//#include <iostream>
-//#include <vector>
+// Class Headers
+#include "config.h"
+#include "game.h"
 //
 class Player{
     public:

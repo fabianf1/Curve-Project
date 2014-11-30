@@ -1,8 +1,10 @@
 // Contains Game Setup class declaration
 #ifndef CURVE_PENDING
 #define CURVE_PENDING
-// Needed Headers
-#include "..\curve.h"
+// Standard headers
+#include <vector>
+#include <SFML/Network.hpp>
+
 // If server send to all id's given
 // If client: ignore!
 class Pending{

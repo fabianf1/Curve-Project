@@ -1,10 +1,12 @@
 // Contains config class declaration
 #ifndef CURVE_CONFIG
 #define CURVE_CONFIG
-// Needed Headers
-#include "..\curve.h"
-//#include <iostream>
-//#include <vector>
+// Standard Headers
+#include <SFML/Graphics.hpp>
+// Class Headers
+
+// Temporary
+#include "..\defines.h"
 //
 class Config{
     public:

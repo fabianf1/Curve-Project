@@ -1,10 +1,14 @@
 // Contains game class declaration
 #ifndef CURVE_GAME
 #define CURVE_GAME
-// Needed Headers
-#include "..\curve.h"
+// Standard Headers
 //#include <iostream>
 #include <vector>
+#include <thread>
+// Class Headers
+#include "powerup.h"
+#include "powerup_effect.h"
+#include "pending.h"
 //
 class Game{
     public:
