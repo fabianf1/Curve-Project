@@ -15,8 +15,11 @@
 #include "game.h"
 #include "player.h"
 #include "server.h"
+#include "client.h"
+#include "renderer.h"
 // Temporary
 #include "../defines.h"
+#include "../functions/functions.h"
 
 //
 class Main{
@@ -26,11 +29,12 @@ class Main{
         Game game;
         Player player[MAX_PLAYERS];
         Server server;
-        sf::RenderWindow window;
+        Client client;
+        Renderer renderer;
         // Functions
 
         // Constructor
-        //Main();
+        Main() :renderer(config) {};
         // Functions
         void Curve_Project();
 };

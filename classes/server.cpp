@@ -2,7 +2,7 @@
 // Needed Header
 #include "server.h"
 // Functions
-void Server::Start_Server(const Config &config,Game &game,Player player[]){
+void Server::Start(const Config &config,Game &game,Player player[]){
     game.server[0]=false;
     // Set player for server
     game.id=0;
@@ -43,7 +43,7 @@ void Server::Server_Listener(const Config &config,Game &game,Player player[]){
         if(selector.wait(sf::milliseconds(1000))){
             // Als het de listener is
             if(selector.isReady(listener)&&game.players<MAX_PLAYERS&&game.mode!=Game::Mode::Play_MP){
-                clients.emplace_back(Client());
+                clients.emplace_back(Client_Info());
                 if (listener.accept(*clients.back().socket) != sf::Socket::Done){
                     std::cout << "Incoming connection failed.\n";
                     clients.pop_back();

@@ -1,41 +1,49 @@
-// Contains Render Functions
-#include "../curve.h"
-
+// Contains functions and constructors for the Renderer class
+// Needed Header
+#include "renderer.h"
+//
+void Renderer::Start(const Config &config,Game &game,Player player[]){
+    // Window
+    window.create(sf::VideoMode(config.window_width, config.window_height), config.title, config.window_style, sf::ContextSettings(24,8,config.window_antialising));
+    window.setIcon(202,202,config.icon.getPixelsPtr());
+    window.clear(config.window_backgroundcolor);
+    window.display();
+    // Limit fps
+    window.setFramerateLimit(config.fps);
+    // Start Render thread
+    window.setActive(false);
+    thread = std::thread(&Renderer::Thread,this,std::cref(config),std::ref(game),player);
+    // Done
+}
 // Render Thread Function
-void Render_Thread(const Config &config,Game &game,Player player[],sf::RenderWindow &window){
+void Renderer::Thread(const Config &config,Game &game,Player player[]){
     std::cout << "Render Thread Started" << std::endl;
-    // Load Variables
-    Main_Menu main_menu(config);
-    Game_Setup game_setup(config);
-    Game_Setup_MP game_setup_mp(config);
-    Game_Store game_store(config);
-    Powerup_Sprite sprite(config);
     // Start main loop
     while(window.isOpen()){
         window.clear(config.window_backgroundcolor);
         //
         if(game.mode==Game::Mode::Main_Menu){
-            Render_Main_Menu(config,game,player,window,main_menu);
+            Main_Men(config,game,player,main_menu);
         }
         else if(game.mode==Game::Mode::Server_IP){
-            Render_Main_Menu(config,game,player,window,main_menu);
-            Render_Server_IP(config,game,player,window,main_menu);
+            Main_Men(config,game,player,main_menu);
+            Server_IP(config,game,player,main_menu);
         }
         else if(game.mode==Game::Mode::Setup_SP){
-            Render_Setup_SP(config,game,player,window,game_setup);
+            Setup_SP(config,game,player,game_setup);
         }
         else if(game.mode==Game::Mode::Setup_MP){
-            Render_Setup_MP(config,game,player,window,game_setup_mp);
+            Setup_MP(config,game,player,game_setup_mp);
         }
         else if(game.mode==Game::Mode::Play){
-            Render_Game(config,game,player,window,game_store);
-            Render_Game_Status_Menu(config,game,player,window,game_store);
-            if(game.powerup_enabled){Render_PowerUp(config,game,window,sprite);}
+            Gam(config,game,player,game_store);
+            Game_Status_Menu(config,game,player,game_store);
+            if(game.powerup_enabled){PowerUp(config,game,sprite);}
         }
         else if(game.mode==Game::Mode::Play_MP){
-            Render_Game_MP(config,game,player,window,game_store);
-            Render_Game_Status_Menu(config,game,player,window,game_store);
-            Render_PowerUp(config,game,window,sprite);
+            Game_MP(config,game,player,game_store);
+            Game_Status_Menu(config,game,player,game_store);
+            PowerUp(config,game,sprite);
         }
         //
         window.display();
@@ -44,7 +52,7 @@ void Render_Thread(const Config &config,Game &game,Player player[],sf::RenderWin
     std::cout << "Render Thread Stopped" << std::endl;
 }
 //
-void Render_Main_Menu(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Main_Menu &main_menu){
+void Renderer::Main_Men(const Config &config,Game &game,Player player[],Main_Menu &main_menu){
     // Title
     window.draw(main_menu.title);
     // Buttons
@@ -74,7 +82,7 @@ void Render_Main_Menu(const Config &config,Game &game,Player player[],sf::Render
     window.draw(main_menu.quit);
 }
 //
-void Render_Server_IP(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Main_Menu &main_menu){
+void Renderer::Server_IP(const Config &config,Game &game,Player player[],Main_Menu &main_menu){
     window.draw(main_menu.outline);
     window.draw(main_menu.connect_title);
     //
@@ -88,7 +96,7 @@ void Render_Server_IP(const Config &config,Game &game,Player player[],sf::Render
     window.draw(main_menu.connect);
 }
 //
-void Render_Setup_SP(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Game_Setup &game_setup){
+void Renderer::Setup_SP(const Config &config,Game &game,Player player[],Game_Setup &game_setup){
     // Title
     window.draw(game_setup.title);
     /* Player button setup part */
@@ -231,7 +239,7 @@ void Render_Setup_SP(const Config &config,Game &game,Player player[],sf::RenderW
     window.draw(game_setup.quit);
 }
 //
-void Render_Setup_MP(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Game_Setup_MP &game_setup){
+void Renderer::Setup_MP(const Config &config,Game &game,Player player[],Game_Setup_MP &game_setup){
      // Title
     window.draw(game_setup.title);
     // Name
@@ -429,7 +437,7 @@ void Render_Setup_MP(const Config &config,Game &game,Player player[],sf::RenderW
     window.draw(game_setup.status);
 }
 //
-void Render_Game(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Game_Store &game_store){
+void Renderer::Gam(const Config &config,Game &game,Player player[],Game_Store &game_store){
     for(int i=0;i<MAX_PLAYERS;i++){
         if(!player[i].enabled){continue;}// Don't process disabled players
         window.draw(player[i].line);
@@ -481,7 +489,7 @@ void Render_Game(const Config &config,Game &game,Player player[],sf::RenderWindo
     }
 }
 //
-void Render_Game_MP(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Game_Store &game_store){
+void Renderer::Game_MP(const Config &config,Game &game,Player player[],Game_Store &game_store){
     // Draw players
     for(int i=0;i<MAX_PLAYERS;i++){
         if(!player[i].enabled){continue;}// Don't process disabled players
@@ -549,7 +557,7 @@ void Render_Game_MP(const Config &config,Game &game,Player player[],sf::RenderWi
     }
 }
 //
-void Render_PowerUp(const Config &config,Game &game,sf::RenderWindow &window,Powerup_Sprite &sprite){
+void Renderer::PowerUp(const Config &config,Game &game,Powerup_Sprite &sprite){
     for(unsigned int i=0;i<game.powerup.size();i++){
         // find opacity
         int opacity=255;
@@ -659,7 +667,7 @@ void Render_PowerUp(const Config &config,Game &game,sf::RenderWindow &window,Pow
     }
 }
 //
-void Render_Game_Status_Menu(const Config &config,Game &game, Player player[],sf::RenderWindow &window,Game_Store &game_store){
+void Renderer::Game_Status_Menu(const Config &config,Game &game, Player player[],Game_Store &game_store){
     //
     window.draw(game_store.scores);
     // Show Point and name
@@ -721,3 +729,4 @@ void Render_Game_Status_Menu(const Config &config,Game &game, Player player[],sf
     window.draw(game_store.quit);
 }
 //
+

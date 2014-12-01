@@ -9,7 +9,7 @@
 // sf::Event event
 
 // Renderer.cpp
-void Render_Thread(const Config &config,Game &game,Player player[],sf::RenderWindow &window);
+/*void Render_Thread(const Config &config,Game &game,Player player[],sf::RenderWindow &window);
 void Render_Main_Menu(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Main_Menu &main_menu);
 void Render_Server_IP(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Main_Menu &main_menu);
 void Render_Setup_SP(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Game_Setup &game_setup);
@@ -17,7 +17,7 @@ void Render_Setup_MP(const Config &config,Game &game,Player player[],sf::RenderW
 void Render_Game(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Game_Store &game_store);
 void Render_Game_MP(const Config &config,Game &game,Player player[],sf::RenderWindow &window,Game_Store &game_store);
 void Render_PowerUp(const Config &config,Game &game,sf::RenderWindow &window,Powerup_Sprite &sprite);
-void Render_Game_Status_Menu(const Config &config,Game &game, Player player[],sf::RenderWindow &window,Game_Store &game_store);
+void Render_Game_Status_Menu(const Config &config,Game &game, Player player[],sf::RenderWindow &window,Game_Store &game_store);*/
 
 // event_handler.cpp
 void Event_Handler(Config &config,Game &game,Player player[],sf::RenderWindow &window,sf::Event &event);
@@ -59,10 +59,13 @@ void Config_Package(Game &game);
 //void Server_Process_Package(const Config &config,Game &game,Player player[],Server &server,sf::Packet &packet);
 
 // client.cpp
-void Start_Client(const Config &config, Game &game,Player player[]);
+/*void Start_Client(const Config &config, Game &game,Player player[]);
 void Client_Thread(const Config &config,Game &game,Player player[]);
 void Client_Ready(Game &game,Player player[]);
-void Client_Process_Packet(const Config &config,Game &game,Player player[],sf::Packet &packet);
+void Client_Process_Packet(const Config &config,Game &game,Player player[],sf::Packet &packet);*/
+
+// Temporary
+void Client_Ready(Game &game,Player player[]);
 
 // General.cpp
 const char *getKeyName( const sf::Keyboard::Key key );

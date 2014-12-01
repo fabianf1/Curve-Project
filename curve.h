@@ -21,7 +21,7 @@
 #include "classes/pending.h"
 #include "classes/game.h"
 #include "classes/player.h"
-#include "classes/client.h"
+//#include "classes/client.h"
 #include "classes/server.h"
 #include "classes/enum.h"
 // GUI classes

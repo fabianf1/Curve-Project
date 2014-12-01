@@ -1,10 +1,13 @@
 // Contains Main_Menu class declaration
 #ifndef CURVE_MAIN_MENU
 #define CURVE_MAIN_MENU
-// Needed Headers
+// SFML Headers
 #include <SFML/Graphics.hpp>
+//
 //#include <iostream>
 //#include <vector>
+// Class headers
+#include "text_button.h"
 //
 class Main_Menu{
     public:

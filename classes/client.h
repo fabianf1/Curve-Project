@@ -1,26 +1,30 @@
-// Contains Game Setup class declaration
+// Contains Client class declaration
 #ifndef CURVE_CLIENT
 #define CURVE_CLIENT
-// Needed Headers
-#include "..\curve.h"
-
+// Standard Headers
+#include <iostream>
+#include <thread>
+// SFML Headers
+#include <SFML/Network.hpp>
+// Class Headers
+#include "config.h"
+#include "game.h"
+#include "player.h"
+#include "pending.h"
+// Temporary
+#include "../functions/functions.h"
+//
 class Client{
     public:
         // Vars
-        std::unique_ptr<sf::TcpSocket> socket;
-        int id; // Place in player array
-        sf::IpAddress ip;
-        //int error_count;
-        //bool sync;
-        bool connected;
+        std::thread thread;
+        // Functions
+        void Start(const Config &config, Game &game,Player player[]);
+        void Thread(const Config &config,Game &game,Player player[]);
+        void Ready(Game &game,Player player[]);
+        void Process_Packet(const Config &config,Game &game,Player player[],sf::Packet &packet);
         // Constructor
-        Client(): socket(new sf::TcpSocket){
-            //sync=false;
-            connected=false;
-            //error_count=0;
-        }
+        //Client();
 };
-
-#endif // CURVE_CIENT
-
-
+#endif // CURVE_CLIENT
+//

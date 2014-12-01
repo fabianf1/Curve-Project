@@ -1,8 +1,8 @@
-// Contains the client handler
-// Headers
-#include "../curve.h"
-//
-void Start_Client(const Config &config, Game &game,Player player[]){
+// Contains functions and constructors for the Client class
+// Needed Header
+#include "client.h"
+// Functions
+void Client::Start(const Config &config, Game &game,Player player[]){
     game.client[0]=false;
     for(int i=0; i<config.max_attempts&&!game.connected;i++){
         sf::Socket::Status status= game.socket.connect(sf::IpAddress(game.server_ip),config.port,sf::milliseconds(500));
@@ -19,14 +19,15 @@ void Start_Client(const Config &config, Game &game,Player player[]){
             game.socket.setBlocking(false);
             game.connected=true;
             // Start server connection thread
-            game.threads.emplace_back(Client_Thread,std::cref(config),std::ref(game),player);
+            thread = std::thread(&Client::Thread,this,std::cref(config),std::ref(game),player);
+            //thread_listener = std::thread(&Server::Server_Listener,this,std::cref(config),std::ref(game),player);
             game.client[1]=true;
             Initialize_Game_Setup_MP(config,game,player);
         }
     }
 }
 //
-void Client_Thread(const Config &config,Game &game,Player player[]){
+void Client::Thread(const Config &config,Game &game,Player player[]){
     std::cout << "Client thread started!" << std::endl;
     sf::Packet packet;
     // Main loop
@@ -34,7 +35,7 @@ void Client_Thread(const Config &config,Game &game,Player player[]){
         // Check if receiving something
         switch(game.socket.receive(packet)){
             case sf::Socket::Done:
-                Client_Process_Packet(config,game,player,packet);
+                Process_Packet(config,game,player,packet);
                 packet.clear();
                 break;
             case sf::Socket::Disconnected:
@@ -77,7 +78,7 @@ void Client_Thread(const Config &config,Game &game,Player player[]){
     std::cout << "Client thread ended!" << std::endl;
 }
 //
-void Client_Ready(Game &game,Player player[]){
+void Client::Ready(Game &game,Player player[]){
     game.keychange[1]=-1;
     // Check if keys are set
     if(!player[game.id].ready&&player[game.id].keyL!=sf::Keyboard::Unknown&&player[game.id].keyR!=sf::Keyboard::Unknown){
@@ -100,7 +101,7 @@ void Client_Ready(Game &game,Player player[]){
     }
 }
 //
-void Client_Process_Packet(const Config &config,Game &game,Player player[],sf::Packet &packet){
+void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::Packet &packet){
     //std::cout << "Hello";
     Packet type;
     //std::cout << "Hello2";
@@ -300,3 +301,4 @@ void Client_Process_Packet(const Config &config,Game &game,Player player[],sf::P
         packet >> game.countdown_int;
     }
 }
+//

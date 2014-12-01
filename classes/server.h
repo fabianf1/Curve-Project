@@ -4,20 +4,25 @@
 // Needed Headers
 //#include "..\curve.h"
 // Standard headers
-#include <SFML/Graphics.hpp>
-#include <SFML/Network.hpp>
 #include <thread>
 #include <iostream>
 #include <vector>
+// SFML Headers
+#include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
 // Class Headers
-#include "client.h"
+#include "config.h"
+#include "game.h"
+#include "player.h"
+#include "client_info.h"
 // Temporary
-void Config_Package(Game &game);
+//void Config_Package(Game &game);
+#include "../functions/functions.h"
 //
 class Server{
     public:
         // Vars
-        std::vector<Client> clients;
+        std::vector<Client_Info> clients;
         sf::SocketSelector selector;
         int client_count;
         bool started;
@@ -28,7 +33,7 @@ class Server{
         std::thread thread_listener;
         std::thread thread_sender;
         // Functions
-        void Start_Server(const Config &config,Game &game,Player player[]);
+        void Start(const Config &config,Game &game,Player player[]);
         void Server_Listener(const Config &config,Game &game,Player player[]);
         void Server_Sender(const Config &config,Game &game,Player player[]);
         void Client_Init_Packages(const Config &config,Game &game,Player player[]);
