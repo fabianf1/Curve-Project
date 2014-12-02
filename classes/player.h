@@ -1,9 +1,16 @@
 // Contains config class declaration
 #ifndef CURVE_PLAYER
 #define CURVE_PLAYER
+// SFML Headers
+//#include <SFML/Network.hpp>
+// Standard Headers
+#include <math.h>
 // Class Headers
 #include "config.h"
 #include "game.h"
+#include "pending.h"
+#include "enum.h"
+
 //
 class Player{
     public:

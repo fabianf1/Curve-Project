@@ -1,10 +1,10 @@
 // Contains game class declaration
 #ifndef CURVE_TEXT_BUTTON
 #define CURVE_TEXT_BUTTON
-// Needed Headers
+// SFML Headers
 #include <SFML/Graphics.hpp>
-//#include <iostream>
-//#include <vector>
+// Class Headers
+#include "game.h"
 //
 class Text_Button: public sf::Text{
     // Vars

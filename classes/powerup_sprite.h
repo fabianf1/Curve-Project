@@ -1,10 +1,10 @@
 // Contains powerup sprite class declaration
 #ifndef CURVE_POWERUP_SPRITE
 #define CURVE_POWERUP_SPRITE
-// Needed Headers
-#include "..\curve.h"
-//#include <iostream>
-//#include <vector>
+// SFML Headers
+#include <SFML/Graphics.hpp>
+// Class Headers
+#include "config.h"
 //
 class Powerup_Sprite{
     sf::Texture texture;// The texture that has all powerups

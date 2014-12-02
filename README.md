@@ -10,6 +10,7 @@ To-Do List
 ----------------------------
 * Clean up code
 * Separate header files
+* Change player array to vector
 * Add countdown to local
 * Add Server&Client lag detection
 * Add version check for online

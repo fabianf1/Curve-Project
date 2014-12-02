@@ -1,14 +1,6 @@
 // Contains Main class declaration
 #ifndef CURVE_MAIN
 #define CURVE_MAIN
-// Needed Headers
-//#include "..\curve.h"
-// Standard headers
-//#include <SFML/Graphics.hpp>
-//#include <SFML/Network.hpp>
-//#include <thread>
-//#include <iostream>
-//#include <vector>
 // Class Headers
 //#include "client.h"
 #include "config.h"
@@ -31,12 +23,14 @@ class Main{
         Server server;
         Client client;
         Renderer renderer;
+        sf::Event event;
         // Functions
 
         // Constructor
         Main() :renderer(config) {};
         // Functions
         void Curve_Project();
+        void Event_Handler();
 };
 
 #endif // CURVE_MAIN

@@ -1,6 +1,6 @@
 // Contains functions and constructors for the main_menu class
 // Needed Header
-#include "..\curve.h"
+#include "main_menu.h"
 
 // Constructor
 Main_Menu::Main_Menu(const Config &config){

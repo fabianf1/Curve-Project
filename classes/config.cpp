@@ -1,7 +1,8 @@
 // Contains functions and constructors for the config class
-// Needed Header
-#include "..\curve.h"
-#include <iostream>
+// Header
+#include "config.h"
+// Temporary
+#include "../functions/functions.h"
 // Constructor
 Config::Config(){
     title="Curve Project";

@@ -1,6 +1,8 @@
 // Contains functions and constructors for the powerup sprite class
 // Needed Header
-#include "..\curve.h"
+#include "powerup_sprite.h"
+// Temporary
+#include "../functions/functions.h"
 // Constructor
 Powerup_Sprite::Powerup_Sprite(const Config &config){
     sf::Image tempImage = LoadImageFromResource("texture");

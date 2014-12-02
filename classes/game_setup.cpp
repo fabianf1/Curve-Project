@@ -1,6 +1,8 @@
 // Contains functions and constructors for the game setup class
 // Needed Header
-#include "..\curve.h"
+#include "game_setup.h"
+// Temporary
+#include "../functions/functions.h"
 
 // Constructor
 Game_Setup::Game_Setup(const Config &config){

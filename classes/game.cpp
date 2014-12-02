@@ -1,6 +1,6 @@
 // Contains functions and constructors for the config class
 // Needed Header
-#include "..\curve.h"
+#include "game.h"
 // Constructor
 Game::Game(){
     frame=0;

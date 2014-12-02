@@ -107,6 +107,9 @@ void Server::Server_Listener(const Config &config,Game &game,Player player[]){
     std::cout << "Server listener ended!" << std::endl;
 }
 //
+/*
+*/
+//
 void Server::Server_Sender(const Config &config,Game &game,Player player[]){
     // Init delay
     sf::sleep(sf::milliseconds(250));
@@ -275,4 +278,15 @@ void Server::Process_Package(const Config &config,Game &game,Player player[],sf:
 void Server::Shutdown(){
     thread_listener.join();
     thread_sender.join();
+}
+//
+void Server::Sync_Clients(const Config &config,Game &game,Player player[]){
+    for(int i=0;i<MAX_PLAYERS;i++){
+        Pending pending;
+        pending.packet << Packet::Sync << i << player[i].name << player[i].enabled << player[i].ready;
+        pending.send_id.push_back(-1);
+        game.mutex.lock();
+        game.pending.push_back(pending);
+        game.mutex.unlock();
+    }
 }

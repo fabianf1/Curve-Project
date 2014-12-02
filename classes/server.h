@@ -39,6 +39,7 @@ class Server{
         void Client_Init_Packages(const Config &config,Game &game,Player player[]);
         void Process_Package(const Config &config,Game &game,Player player[],sf::Packet &packet);
         void Shutdown();
+        void Sync_Clients(const Config &config,Game &game,Player player[]);
         // Constructor
         Server(){
             started=false;

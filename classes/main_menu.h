@@ -3,11 +3,9 @@
 #define CURVE_MAIN_MENU
 // SFML Headers
 #include <SFML/Graphics.hpp>
-//
-//#include <iostream>
-//#include <vector>
 // Class headers
 #include "text_button.h"
+#include "config.h"
 //
 class Main_Menu{
     public:

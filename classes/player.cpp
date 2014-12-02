@@ -1,7 +1,7 @@
 // Contains functions and constructors for the config class
 // Needed Header
-#include "..\curve.h"
-#include <math.h>
+#include "player.h"
+
 // Constructor
 Player::Player(){
     line.setPrimitiveType(sf::Quads);

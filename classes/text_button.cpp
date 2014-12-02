@@ -1,6 +1,6 @@
 // Contains functions and constructors for the Text_Button class
 // Needed Header
-#include "..\curve.h"
+#include "text_button.h"
 // Functions
 bool Text_Button::Check(Game &game,sf::RenderWindow &window){
     // Check selected

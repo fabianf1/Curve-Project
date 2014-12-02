@@ -1,7 +1,8 @@
 // Contains functions and constructors for the game stor class
 // Needed Header
-#include "..\curve.h"
-
+#include "game_store.h"
+// Temporary
+#include "../functions/functions.h"
 // Constructor
 Game_Store::Game_Store(const Config &config){
     // Left and right whole walls, top and bottom not

@@ -1,6 +1,6 @@
 // Contains functions and constructors for the powerup effect class
 // Needed Header
-#include "..\curve.h"
+#include "powerup_effect.h"
 // Constructor
 Powerup_Effect::Powerup_Effect(const int &Type,const float &Time,const int &ID){
     type=Type;

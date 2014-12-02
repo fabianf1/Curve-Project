@@ -1,9 +1,8 @@
 // Contains config class declaration
 #ifndef CURVE_CONFIG
 #define CURVE_CONFIG
-// Standard Headers
+// SFML Headers
 #include <SFML/Graphics.hpp>
-// Class Headers
 
 // Temporary
 #include "..\defines.h"

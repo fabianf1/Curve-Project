@@ -1,6 +1,7 @@
-// Contains functions and constructors for the config class
-// Needed Header
-#include "..\curve.h"
+// Contains functions and constructors for the Powerup class
+// Header
+#include "powerup.h"
+//
 Powerup::Powerup(const int &X,const int &Y,const int &Type,const int &Impact,const float &Time,int &ID){
     x=X;
     y=Y;

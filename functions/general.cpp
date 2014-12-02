@@ -3,7 +3,7 @@
 // Standard Libraries
 #include <SFML/Graphics.hpp>
 #include <sstream>
-#include <Windows.h>
+#include <Windows.h> // I really should test on linux
 
 //
 const char *getKeyName( const sf::Keyboard::Key key ) {

@@ -2,7 +2,6 @@
 #ifndef CURVE_GAME
 #define CURVE_GAME
 // Standard Headers
-//#include <iostream>
 #include <vector>
 #include <thread>
 // Class Headers

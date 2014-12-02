@@ -1,8 +1,7 @@
-// Contains config class declaration
+// Contains Powerup class declaration
 #ifndef CURVE_POWERUP
 #define CURVE_POWERUP
-// Needed Headers
-
+// No headers needed
 class Powerup{
     public:
         // Vars

@@ -1,10 +1,13 @@
 // Contains Game Setup class declaration
 #ifndef CURVE_GAME_SETUP
 #define CURVE_GAME_SETUP
-// Needed Headers
-#include "..\curve.h"
-//#include <iostream>
-//#include <vector>
+// SFML Headers
+#include "SFML/Graphics.hpp"
+// Class Headers
+#include "text_button.h"
+#include "config.h"
+// Temporary
+#include "../defines.h"
 //
 class Game_Setup{
     public:

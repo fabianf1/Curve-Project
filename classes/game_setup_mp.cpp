@@ -1,6 +1,6 @@
 // Contains functions and constructors for the game setup class
 // Needed Header
-#include "..\curve.h"
+#include "game_setup_mp.h"
 
 // Constructor
 Game_Setup_MP::Game_Setup_MP(const Config &config){
