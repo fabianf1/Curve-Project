@@ -2,26 +2,26 @@
 // Needed Header
 #include "server.h"
 // Functions
-void Server::Start(const Config &config,Game &game,Player player[]){
+void Server::Start(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player){
     game.server[0]=false;
     // Set player for server
     game.id=0;
     game.players=1;
-    player[0].enabled=true;
+    /*player[0].enabled=true;
     player[0].ready=true;
-    player[0].place=0;
+    player[0].place=0;*/
     // Go to Game Setup screen
-    Initialize_Game_Setup_MP(config,game,player);
+    //Initialize_Game_Setup_MP(config,game,player);
     // Create Server Threads
-    thread_listener = std::thread(&Server::Server_Listener,this,std::cref(config),std::ref(game),player);
-    thread_sender = std::thread(&Server::Server_Sender,this,std::cref(config),std::ref(game),player);
+    thread_listener = std::thread(&Server::Server_Listener,this,std::cref(config),std::ref(game_setup),std::ref(game),std::ref(player));
+    thread_sender = std::thread(&Server::Server_Sender,this,std::cref(config),std::ref(game),std::ref(player));
     // Do some more things
     game.server_ip=sf::IpAddress::getLocalAddress().toString();
     // Server bootup complete
     game.server[1]=true;
 }
 //
-void Server::Server_Listener(const Config &config,Game &game,Player player[]){
+void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player){
     std::cout << "Server listener started!!" << std::endl;
     // Init
     for(int i=0; i<config.max_attempts&&!game.connected;i++){
@@ -42,7 +42,7 @@ void Server::Server_Listener(const Config &config,Game &game,Player player[]){
         // Selector
         if(selector.wait(sf::milliseconds(1000))){
             // Als het de listener is
-            if(selector.isReady(listener)&&game.players<MAX_PLAYERS&&game.mode!=Game::Mode::Play_MP){
+            if(selector.isReady(listener)&&player.size()<6&&game.mode!=Game::Mode::Play){
                 clients.emplace_back(Client_Info());
                 if (listener.accept(*clients.back().socket) != sf::Socket::Done){
                     std::cout << "Incoming connection failed.\n";
@@ -50,24 +50,22 @@ void Server::Server_Listener(const Config &config,Game &game,Player player[]){
                 }
                 else{
                     selector.add(*clients.back().socket);
-                    //(*clients.back().socket).setBlocking(false);
                     clients.back().ip=clients.back().socket->getRemoteAddress();
-                    client_count++;
-                    game.players=client_count+1;
-                    std::cout << "Remote client " + clients.back().ip.toString() + " has connected to the \n";
+                    game.players=clients.size()+1; // // //
+                    std::cout << "Remote client " + clients.back().ip.toString() + " has connected to the server. \n";
                     clients.back().connected=true;
-                    Client_Init_Packages(config,game,player);
+                    New_Client(config,game_setup,game,player);
                 }
             }
             // Loop clients
             bool stop=false; // Stop when disconnection!
-            for(int i=0;i<client_count&&!stop;i++){
+            for(unsigned int i=0;i<clients.size()&&!stop;i++){
                 if(selector.isReady(*clients[i].socket)){
                     packet.clear();
                     switch(clients[i].socket->receive(packet)){
                         case sf::Socket::Done:
                             // Process Packet
-                            Process_Package(config,game,player,packet);
+                            Process_Package(config,game,player,packet,i);
                             break;
                         case sf::Socket::NotReady:
                             std::cout << "Client not ready?!?" <<std::endl;
@@ -77,8 +75,7 @@ void Server::Server_Listener(const Config &config,Game &game,Player player[]){
                         default:
                             stop=true;
                             std::cout << "Remote client disconnected." << std::endl;
-                            client_count--;
-                            game.players=client_count+1;
+                            game.players=clients.size()+1;
                             player[clients[i].id].enabled=false;
                             // Create Packages
                             Pending pending;
@@ -88,7 +85,7 @@ void Server::Server_Listener(const Config &config,Game &game,Player player[]){
                             clients.erase(clients.begin()+i);
                             // Pend Packed
                             game.mutex.lock();
-                            game.pending.push_back(pending);
+                            game.packets.push_back(pending);
                             game.mutex.unlock();
                             break;
                     }
@@ -107,58 +104,55 @@ void Server::Server_Listener(const Config &config,Game &game,Player player[]){
     std::cout << "Server listener ended!" << std::endl;
 }
 //
-/*
-*/
-//
-void Server::Server_Sender(const Config &config,Game &game,Player player[]){
+void Server::Server_Sender(const Config &config,Game &game,std::vector<Player> &player){
     // Init delay
     sf::sleep(sf::milliseconds(250));
     std::cout << "Server Sender started!!" << std::endl;
     // Main Loop
     while(!game.server[2]){
         // Check if there are packages
-        //for(int i=game.pending.size()-1;i>=0;i--){
-        for(unsigned int i=0;i<game.pending.size();i++){
+        //for(int i=game.packets.size()-1;i>=0;i--){
+        for(unsigned int i=0;i<game.packets.size();i++){
             // Remove packet if no clients
-            if(client_count==0){
+            if(clients.size()==0){
                 game.mutex.lock();
-                game.pending.erase(game.pending.begin()+i);
+                game.packets.erase(game.packets.begin()+i);
                 game.mutex.unlock();
                 i--;
                 continue;
             }
             // Check if send id has been set
-            else if(game.pending[i].send_id.size()==0){
+            else if(game.packets[i].send_id.size()==0){
                 continue;
             }
             // Send to all if send_id[0]=-1;
-            else if(game.pending[i].send_id[0]==-1){
-                game.pending[i].send_id.clear();
-                for(int j=0;j<client_count;j++){
-                    game.pending[i].send_id.push_back(j);
+            else if(game.packets[i].send_id[0]==-1){
+                game.packets[i].send_id.clear();
+                for(unsigned int j=0;j<clients.size();j++){
+                    game.packets[i].send_id.push_back(j);
                 }
             }
             // Send loop
-            for(int j=game.pending[i].send_id.size()-1;j>=0;j--){
-                switch(clients[game.pending[i].send_id[j]].socket->send(game.pending[i].packet)){
+            for(int j=game.packets[i].send_id.size()-1;j>=0;j--){
+                switch(clients[game.packets[i].send_id[j]].socket->send(game.packets[i].packet)){
                     case sf::Socket::Done:
                         // Remove Send id
-                        game.pending[i].send_id.erase(game.pending[i].send_id.begin()+j);
+                        game.packets[i].send_id.erase(game.packets[i].send_id.begin()+j);
                         break;
                     case sf::Socket::NotReady:
-                        std::cout << "Client not ready: " << clients[game.pending[i].send_id[j]].ip.toString()  << std::endl;
+                        std::cout << "Client not ready: " << clients[game.packets[i].send_id[j]].ip.toString()  << std::endl;
                         break;
                     case sf::Socket::Disconnected:
                     case sf::Socket::Error:
                     default:
-                        std::cout << "Failed to send packet:" << clients[game.pending[i].send_id[j]].ip.toString()  << std::endl;
+                        std::cout << "Failed to send packet:" << clients[game.packets[i].send_id[j]].ip.toString()  << std::endl;
                         break;
                 } // End switch case
             } // End Send id for loop
             // Remove empty packets
-            if(game.pending[i].send_id.size()==0){
+            if(game.packets[i].send_id.size()==0){
                 game.mutex.lock();
-                game.pending.erase(game.pending.begin()+i);
+                game.packets.erase(game.packets.begin()+i);
                 game.mutex.unlock();
                 i--;
             }
@@ -169,53 +163,37 @@ void Server::Server_Sender(const Config &config,Game &game,Player player[]){
     std::cout << "Server Sender ended!" << std::endl;
 }
 //
-void Server::Client_Init_Packages(const Config &config,Game &game,Player player[]){
-    // Give Client an id
-    int id=-1;
-    for(int i=1;i<MAX_PLAYERS;i++){
-        if(!player[i].enabled){
-            //
-            id=i;
-            player[i].enabled=true;
-            player[i].id=clients.size()-1;
-            clients.back().id=i;
-            // Setup Package
-            Pending pending;
-            pending.packet << Packet::ID << i;
-            pending.send_id.push_back(clients.size()-1);
-            game.mutex.lock();
-            game.pending.push_back(pending);
-            game.mutex.unlock();
-            break;
-        }
+void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player){
+    // Add new player and synchronize positions between client_info and player vector
+    game_setup.Add_Player(config,game,player);
+    clients.back().id=player.size()-1;
+    player.back().id=clients.size()-1;
+    std::cout << clients.back().id << ";" << player.back().id << std::endl;
+    player.back().local=false;
+    player.back().server=false;
+    // Send everything to client
+    // All player information
+    Pending pending;
+    pending.packet << Packet::Sync;
+    for(unsigned int i=0;i<player.size();i++){
+        pending.packet << i << player[i].name << player[i].color << player[i].server << player[i].ready;
     }
-    // If id is found :)
-    if(id!=-1){
-        // Send SYNC packets
-        for(int i=0;i<MAX_PLAYERS;i++){
-            Pending pending;
-            pending.packet << Packet::Sync << i << player[i].name << player[i].enabled << player[i].ready;
-            if(id==i){pending.send_id.push_back(-1);}
-            else{pending.send_id.push_back(clients.size()-1);}
-            game.mutex.lock();
-            game.pending.push_back(pending);
-            game.mutex.unlock();
-        }
-        //
-        Config_Package(game);
-    }
-    // Do something if none is found
-    else{
-        // Report!
-        std::cout << "No free id found! Please restart server!" << std::endl;
-        // Remove out of list
-        int i = clients.size()-1;
-        selector.remove(*clients[i].socket);
-        clients.erase(clients.begin()+i);
-    }
+    pending.send_id.push_back(-1);
+    game.mutex.lock();
+    game.packets.push_back(pending);
+    game.mutex.unlock();
+    sf::sleep(sf::milliseconds(250)); // Fixes some errors
+    // Player given to client
+    pending.packet.clear();
+    pending.send_id.clear();
+    pending.packet << Packet::ID << (player.size()-1);
+    pending.send_id.push_back(clients.size()-1);
+    game.mutex.lock();
+    game.packets.push_back(pending);
+    game.mutex.unlock();
 }
 //
-void Server::Process_Package(const Config &config,Game &game,Player player[],sf::Packet &packet){
+void Server::Process_Package(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet, const unsigned int &n){
     Packet type;
     packet >> type;
     //
@@ -225,25 +203,32 @@ void Server::Process_Package(const Config &config,Game &game,Player player[],sf:
         // Update
         packet >> player[id].name;
         // Resend Package
-        if(client_count>1){
+        if(clients.size()>1){
             Pending pending;
             pending.packet << Packet::Name << id << player[id].name;
-            for(int j=0;j<client_count;j++){
+            for(unsigned int j=0;j<clients.size();j++){
                 if(j!=clients[j].id){
                     pending.send_id.push_back(j);
                 }
             }
             game.mutex.lock();
-            game.pending.push_back(pending);
+            game.packets.push_back(pending);
             game.mutex.unlock();
         }
     }
     else if(type==Packet::Ready){
-        int id;
-        packet >> id;
-        packet >> player[id].ready;
+        bool ready;
+        packet >> ready;
+        // Do the things
+        for(unsigned int i=0;i<player.size();i++){
+            if(clients[n].id==i&&player[i].id==n){
+                player[i].ready=ready;
+            }
+        }
+        // Do not care about resending atm
+
         // Resend Package
-        if(client_count>1){
+        /*if(client_count>1){
             Pending pending;
             pending.packet << Packet::Ready << id << player[id].ready;
             for(int j=0;j<client_count;j++){
@@ -252,9 +237,9 @@ void Server::Process_Package(const Config &config,Game &game,Player player[],sf:
                 }
             }
             game.mutex.lock();
-            game.pending.push_back(pending);
+            game.packets.push_back(pending);
             game.mutex.unlock();
-        }
+        }*/
     }
     else if(type==Packet::KeyL){
         int id;
@@ -270,23 +255,28 @@ void Server::Process_Package(const Config &config,Game &game,Player player[],sf:
         int id;
         packet >> id;
         std::cout << id << " lags";
-        Pause_Game(config,game,true);
+        //Pause_Game(config,game,true);
     }
 }
 //
 //
-void Server::Shutdown(){
-    thread_listener.join();
-    thread_sender.join();
+void Server::Shutdown(Game &game){
+    game.server[2]=true;
+    if(thread_listener.joinable()){
+        thread_listener.join();
+    }
+    if(thread_sender.joinable()){
+        thread_sender.join();
+    }
 }
 //
-void Server::Sync_Clients(const Config &config,Game &game,Player player[]){
-    for(int i=0;i<MAX_PLAYERS;i++){
+void Server::Sync_Clients(const Config &config,Game &game,std::vector<Player> &player){
+    for(unsigned int i=0;i<player.size();i++){
         Pending pending;
         pending.packet << Packet::Sync << i << player[i].name << player[i].enabled << player[i].ready;
         pending.send_id.push_back(-1);
         game.mutex.lock();
-        game.pending.push_back(pending);
+        game.packets.push_back(pending);
         game.mutex.unlock();
     }
 }

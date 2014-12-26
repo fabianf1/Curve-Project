@@ -2,38 +2,50 @@
 // Needed Header
 #include "client.h"
 // Functions
-void Client::Start(const Config &config, Game &game,Player player[]){
+void Client::Start(const Config &config, Game &game,std::vector<Player> &player){
+    if(player.size()>0){
+        player.clear();
+    }
     game.client[0]=false;
-    for(int i=0; i<config.max_attempts&&!game.connected;i++){
-        sf::Socket::Status status= game.socket.connect(sf::IpAddress(game.server_ip),config.port,sf::milliseconds(500));
+    std::cout << "Connecting!" << std::endl;
+    //for(int i=0; i<config.max_attempts&&!connected;i++){
+        sf::Socket::Status status= socket.connect(game.server_ip,config.port,sf::milliseconds(1000));
         if(status==sf::Socket::Error){
             std::cout << "Server connection Error!" << std::endl;
-            sf::sleep(sf::milliseconds(config.attempt_delay));
+            //sf::sleep(sf::milliseconds(config.attempt_delay));
         }
         else if(status==sf::Socket::NotReady){
              std::cout << "Not ready?!" << std::endl; // This happens for some reason at the first reconnect attempt
-             sf::sleep(sf::milliseconds(config.attempt_delay));
+             //sf::sleep(sf::milliseconds(config.attempt_delay));
         }
         else{
             std::cout << "Connected to server!" << std::endl;
-            game.socket.setBlocking(false);
-            game.connected=true;
+            socket.setBlocking(false);
+            sync=false;
+            ready=false;
+            //game.connected=true;
             // Start server connection thread
-            thread = std::thread(&Client::Thread,this,std::cref(config),std::ref(game),player);
+            thread = std::thread(&Client::Thread,this,std::cref(config),std::ref(game),std::ref(player));
             //thread_listener = std::thread(&Server::Server_Listener,this,std::cref(config),std::ref(game),player);
             game.client[1]=true;
-            Initialize_Game_Setup_MP(config,game,player);
+            //Initialize_Game_Setup_MP(config,game,player);
+            std::cout << "Synchronizing!" << std::endl;
+            while(!sync){
+                sf::sleep(sf::milliseconds(250));
+            }
+            std::cout << "Synchronized!" << std::endl;
+            game.Switch_Mode(Game::Mode::Setup);
         }
-    }
+    //}
 }
 //
-void Client::Thread(const Config &config,Game &game,Player player[]){
+void Client::Thread(const Config &config,Game &game,std::vector<Player> &player){
     std::cout << "Client thread started!" << std::endl;
     sf::Packet packet;
     // Main loop
     while(!game.client[2]){
         // Check if receiving something
-        switch(game.socket.receive(packet)){
+        switch(socket.receive(packet)){
             case sf::Socket::Done:
                 Process_Packet(config,game,player,packet);
                 packet.clear();
@@ -49,14 +61,14 @@ void Client::Thread(const Config &config,Game &game,Player player[]){
                 break;
         }
         // Send
-        for(int i=game.pending.size()-1;i>=0;i--){
-            switch(game.socket.send(game.pending[i].packet)){
+        for(int i=game.packets.size()-1;i>=0;i--){
+            switch(socket.send(game.packets[i].packet)){
                 case sf::Socket::Done:
                     //std::cout << "Package Send to server" << std::endl;
                     //std::cout << server.clients[0].ip.toString() << std::endl;
                     // Remove Send id
                     game.mutex.lock();
-                    game.pending.erase(game.pending.begin()+i);
+                    game.packets.erase(game.packets.begin()+i);
                     game.mutex.unlock();
                     break;
                 case sf::Socket::NotReady:
@@ -71,49 +83,88 @@ void Client::Thread(const Config &config,Game &game,Player player[]){
         }
         //sf::sleep(sf::milliseconds(5));
     }
-    game.socket.disconnect();
+    socket.disconnect();
     game.client[1]=game.client[2]=false;
     game.connected=false;
-    game.socket.setBlocking(true);
+    socket.setBlocking(true);
     std::cout << "Client thread ended!" << std::endl;
 }
 //
-void Client::Ready(Game &game,Player player[]){
-    game.keychange[1]=-1;
+void Client::Ready(Game &game,std::vector<Player> &player){
+    game.keychange[0]=-1;
     // Check if keys are set
-    if(!player[game.id].ready&&player[game.id].keyL!=sf::Keyboard::Unknown&&player[game.id].keyR!=sf::Keyboard::Unknown){
-        // Package
-        Pending pending;
-        pending.packet << Packet::Ready << game.id << true;
-        game.mutex.lock();
-        game.pending.push_back(pending);
-        game.mutex.unlock();
-        // Local
-        player[game.id].ready=true;
+    if(!ready){
+        ready=true;
+        for(unsigned int i;i<player.size();i++){
+            if(player[i].local &&( player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown) ){
+                ready=false;
+                player[i].ready=true;
+                // Return ? Break?
+            }
+        }
+        // If still ready sent to server
+        if(ready){
+            Pending pending;
+            pending.packet << Packet::Ready << true;
+            game.mutex.lock();
+            game.packets.push_back(pending);
+            game.mutex.unlock();
+        }
     }
-    else if(player[game.id].ready){
+    else{
+        ready=false;
+        for(unsigned int i;i<player.size();i++){
+            if(player[i].local){
+                player[i].ready=false;
+            }
+        }
+        //
         Pending pending;
-        pending.packet << Packet::Ready << game.id << false;
+        pending.packet << Packet::Ready << false;
         game.mutex.lock();
-        game.pending.push_back(pending);
+        game.packets.push_back(pending);
         game.mutex.unlock();
         player[game.id].ready=false;
     }
 }
 //
-void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::Packet &packet){
-    //std::cout << "Hello";
+void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet){
     Packet type;
-    //std::cout << "Hello2";
     packet >> type;
-    //std::cout << "Hello3";
     if(type==Packet::ID){
         packet >> game.id;
+        while(game.id>=player.size()){
+            player.emplace_back("",sf::Color::Black);
+            player.back().server=false;
+            player.back().ready=false;
+        }
+        player[1].local=true;
     }
     else if(type==Packet::Sync){
-        int id;
-        packet >> id;
-        player[id].Process_SYNC_Packet(packet);
+        unsigned int id;
+        sf::String name;
+        sf::Color color;
+        bool server,ready;
+        while(!packet.endOfPacket()){
+            packet >> id >> name >> color >> server >> ready;
+            // Update
+            if(id>=player.size()){
+                player.emplace_back(name,color);
+                player.back().server=server;
+                player.back().ready=ready;
+            }
+            else{
+                player[id].name=name;
+                player[id].color=color;
+                player[id].server=server;
+                player[id].ready=ready;
+            }
+        }
+        sync=true;
+        // Switch screen if still IG
+        if(game.mode==Game::Mode::Play){
+            game.Switch_Mode(Game::Mode::Setup);
+        }
     }
     else if(type==Packet::Name){
         int id;
@@ -121,16 +172,24 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
         packet >> player[id].name;
     }
     else if(type==Packet::StartGame){
-        Initialize_Game_Client(config,game,player);
+        game.Initialize(config,game,player);
         std::cout << "Starting Game!!" << std::endl;
     }
     else if(type==Packet::NewRound){
-        if(game.round_finished){
-            Initialize_New_Round_Client(config,game,player);
-        }
+        game.New_Round(config,game,player);
+        // Extract
         int id;
-        packet >> id;
-        player[id].New_Round_Client(config,game,packet);
+        while(!packet.endOfPacket()){
+            packet >> id;
+            packet >> player[id].x >> player[id].y >> player[id].heading;
+            player[id].New_Round(config,game);
+        }
+        // Send ready package
+        Pending pending;
+        pending.packet << Packet::Ready << true;
+        game.mutex.lock();
+        game.packets.push_back(pending);
+        game.mutex.unlock();
     }
     else if(type==Packet::Update){
         // Time Between packets measurement
@@ -141,7 +200,7 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
             Pending pending;
             pending.packet << Packet::Lag << game.id;
             game.mutex.lock();
-            game.pending.push_back(pending);
+            game.packets.push_back(pending);
             game.mutex.unlock();
         }
         // Unpack Basics
@@ -152,7 +211,7 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
             int id;
             while(!packet.endOfPacket()){
                 packet >> id;
-                player[id].Update_Position_Client(config,packet);
+                player[id].Update_Position(config,packet);
             }
         }
         else{
@@ -162,12 +221,12 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
     }
     else if(type==Packet::Points){
         int id;
-        std::vector<int> death_vec;
+        std::vector<unsigned int> death_vec;
         while(!packet.endOfPacket()){
             packet >> id;
             death_vec.push_back(id);
         }
-        Add_Points(player,death_vec);
+        game.Add_Points(player,death_vec);
         for(unsigned int i=0;i<death_vec.size();i++){
             player[i].death=true;
         }
@@ -181,7 +240,7 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
         game.pause=true;
         // Shutdown game thread
         if(game.update_thread[1]){
-            game.update_thread[2]=true;
+            game.Shutdown();
         }
     }
     else if(type==Packet::RoundEnd){
@@ -190,6 +249,7 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
         game.round_winner=id;
         game.round_finished=true;
         game.pause=true;
+        game.end_message_set=false;
     }
     else if(type==Packet::PowerupDelF){
         int id;
@@ -207,8 +267,8 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
         for(unsigned int i=0;i<game.player_powerup_effect.size();i++){
             if(game.player_powerup_effect[i].id==id){
                 game.player_powerup_effect.erase(game.player_powerup_effect.begin()+i);
-                for(int j=0;j<MAX_PLAYERS;j++){
-                    if(player[j].enabled&&!player[j].death){player[j].Calculate_Powerup_Effect(config,game);}
+                for(unsigned int j=0;j<player.size();j++){
+                    if(!player[j].death){player[j].Calculate_Powerup_Effect(config,game);}
                 }
                 break;
             }
@@ -252,16 +312,15 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
                 int D=0;
                 if( (game.powerup[i].type!=5&&game.powerup[i].type<7) ||game.powerup[i].type==9 ){
                     game.player_powerup_effect.emplace_back(id,game.powerup[i].type,game.powerup[i].impact,D,ID);
-                    for(int k=0;k<MAX_PLAYERS;k++){
+                    for(unsigned int k=0;k<player.size();k++){
                         // Calculate powerup effects
                         player[k].Calculate_Powerup_Effect(config,game);
                     }
                 }
                 // Clear Line
                 else if(game.powerup[i].type==5){
-                    for(unsigned int k=0;k<MAX_PLAYERS;k++){
-                        if(!player[k].enabled){continue;}
-                            player[k].line.clear();
+                    for(unsigned int k=0;k<player.size();k++){
+                        player[k].line.clear();
                     }
                 }
                 // Walls Away
@@ -298,7 +357,9 @@ void Client::Process_Packet(const Config &config,Game &game,Player player[],sf::
         packet >> game.maxpoints >> game.powerup_enabled;
     }
     else if(type==Packet::Countdown){
-        packet >> game.countdown_int;
+        game.countdown.restart();
+        game.countdown_int=3;
+        //packet >> game.countdown_int;
     }
 }
 //

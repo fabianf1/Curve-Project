@@ -11,6 +11,7 @@
 #include "game.h"
 #include "player.h"
 #include "pending.h"
+#include "color.h"
 // Temporary
 #include "../functions/functions.h"
 //
@@ -18,11 +19,15 @@ class Client{
     public:
         // Vars
         std::thread thread;
+        sf::TcpSocket socket;
+        bool connected;
+        bool sync;
+        bool ready;
         // Functions
-        void Start(const Config &config, Game &game,Player player[]);
-        void Thread(const Config &config,Game &game,Player player[]);
-        void Ready(Game &game,Player player[]);
-        void Process_Packet(const Config &config,Game &game,Player player[],sf::Packet &packet);
+        void Start(const Config &config, Game &game,std::vector<Player> &player);
+        void Thread(const Config &config,Game &game,std::vector<Player> &player);
+        void Ready(Game &game,std::vector<Player> &player);
+        void Process_Packet(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet);
         // Constructor
         //Client();
 };

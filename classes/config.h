@@ -3,9 +3,6 @@
 #define CURVE_CONFIG
 // SFML Headers
 #include <SFML/Graphics.hpp>
-
-// Temporary
-#include "..\defines.h"
 //
 class Config{
     public:
@@ -20,10 +17,6 @@ class Config{
         sf::Image icon;
         //
         int fps; // Maximum number of fps
-        //
-        sf::Font font;
-        int font_title_size;
-        int font_size;
         //
         int linewidth;
         sf::Color linecolors[6];

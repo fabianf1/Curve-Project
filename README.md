@@ -4,13 +4,14 @@ Curve Project is just a clone of Achtung die Kurve written in C++ and uses [SFML
 
 Build
 -------
-To build it look [here](http://sfml-dev.org/tutorials/2.1/) for info how to set-up SFML.
+To build it look [here](http://sfml-dev.org/tutorials/2.1/) for info how to setup SFML.
 
 To-Do List
 ----------------------------
 * Clean up code
 * Separate header files
-* Change player array to vector
+* Fix font glitch by stopping button handlers for a moment(Sorta fixed)
+* Add clean shutdown for Server
 * Add countdown to local
 * Add Server&Client lag detection
 * Add version check for online

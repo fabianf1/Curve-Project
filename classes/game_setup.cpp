@@ -1,92 +1,134 @@
-// Contains functions and constructors for the game setup class
+// Contains functions and constructors for the Game Setup class
 // Needed Header
 #include "game_setup.h"
-// Temporary
-#include "../functions/functions.h"
-
 // Constructor
-Game_Setup::Game_Setup(const Config &config){
-    // Title
-    title.setString("Game Setup");
-    title.setFont(config.font);
-    title.setCharacterSize(config.font_title_size);
-    title.setColor(sf::Color::White);
-    title.setStyle(sf::Text::Bold);
-    title.setPosition( (config.window_width/2)-(title.getLocalBounds().width/2) ,10); // Top Middle
-    // Name
-    name.setString("Name");
-    name.setFont(config.font);
-    name.setCharacterSize(config.font_size);
-    name.setColor(sf::Color::White);
-    name.setStyle(sf::Text::Bold);
-    name.setPosition(50 , 150);
-    // Left
-    left.setString("Left");
-    left.setFont(config.font);
-    left.setCharacterSize(config.font_size);
-    left.setColor(sf::Color::White);
-    left.setStyle(sf::Text::Bold);
-    left.setPosition(200 , 150);
-    // Right
-    right.setString("Right");
-    right.setFont(config.font);
-    right.setCharacterSize(config.font_size);
-    right.setColor(sf::Color::White);
-    right.setStyle(sf::Text::Bold);
-    right.setPosition(300 , 150);
-    //
-    for(int i=0;i<MAX_PLAYERS;i++){
-        //
-        names[i].setButton("Player " + int2string(i+1),config.font,config.font_size,config.linecolors[i],config.linecolors[i],sf::Text::Regular,sf::Text::Regular);
-        names[i].setPosition( 50 , 185+35*i);
-        //
-        lbutton[i].setButton("",config.font,config.font_size,config.linecolors[i],config.linecolors[i],sf::Text::Regular,sf::Text::Regular);
-        lbutton[i].setPosition(200 , 185+35*i);
-        //
-        rbutton[i].setButton("",config.font,config.font_size,config.linecolors[i],config.linecolors[i],sf::Text::Regular,sf::Text::Regular);
-        rbutton[i].setPosition(300 , 185+35*i);
+Game_Setup::Game_Setup(){
+    // Color things
+    color[0]=sf::Color::Red;
+    color[1]=sf::Color::Yellow;
+    color[2]=sf::Color::White;
+    color[3]=sf::Color::Green;
+    color[4]=sf::Color::Magenta;
+    color[5]=sf::Color::Blue;
+    for(int i=0;i<6;i++){
+        color_used[i]=false;
     }
+    // Key Change
+    key_change[0]=key_change[1]=-1;
+}
+//
+void Game_Setup::Initialize(const Config &config,Game &game,std::vector<Player> &player){
+    // Clear all
+    /*if(player.size()>0){
+        player.clear();
+    }*/
     //
-    options.setString("Options");
-    options.setFont(config.font);
-    options.setCharacterSize(config.font_size);
-    options.setColor(sf::Color::White);
-    options.setStyle(sf::Text::Bold);
-    options.setPosition(750 , 150);
-    //
-    maxpoints.setString("Max Points:");
-    maxpoints.setFont(config.font);
-    maxpoints.setCharacterSize(config.font_size);
-    maxpoints.setColor(sf::Color::White);
-    //maxpoints.setStyle(sf::Text::Regular);
-    maxpoints.setPosition(670 , 200);
-    //
-    max10.setButton("10",config.font,config.font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    max10.setPosition(830,200);
-    //
-    max20.setButton("20",config.font,config.font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    max20.setPosition(870,200);
-    //
-    max40.setButton("40",config.font,config.font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    max40.setPosition(910,200);
-    //
-    powerups.setString("Powerups:");
-    powerups.setFont(config.font);
-    powerups.setCharacterSize(config.font_size);
-    powerups.setColor(sf::Color::White);
-    //powerups.setStyle((sf::Text::Regular);
-    powerups.setPosition(670 , 240);
-    //
-    powerupon.setButton("On",config.font,config.font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    powerupon.setPosition(830,240);
-    //
-    powerupoff.setButton("Off",config.font,config.font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    powerupoff.setPosition(880,240);
-    //
-    start.setButton("Start Game",config.font,config.font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    start.setPosition(config.window_width/2-start.getLocalBounds().width/2,config.window_height-100);
-    //
-    quit.setButton("Quit",config.font,config.font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    quit.setPosition(config.window_width/2-quit.getLocalBounds().width/2,config.window_height-50);
+    if(player.size()==0){
+        color[0]=sf::Color::Red;
+        color[1]=sf::Color::Yellow;
+        color[2]=sf::Color::White;
+        color[3]=sf::Color::Green;
+        color[4]=sf::Color::Magenta;
+        color[5]=sf::Color::Blue;
+        for(int i=0;i<6;i++){
+            color_used[i]=false;
+        }
+    }
+    game.Switch_Mode(Game::Mode::Setup);
+}
+//
+void Game_Setup::Add_Player(const Config &config,Game &game,std::vector<Player> &player){
+    // Find Available color
+    int new_col;
+    for(int i=0;i<6;i++){
+        if(!color_used[i]){
+            new_col=i;
+            color_used[i]=true;
+            break;
+        }
+    }
+    sf::String str="Player";
+    player.emplace_back(str,color[new_col]);
+    // Server things
+    player.back().server=true;
+    player.back().local=true;
+    player.back().ready=false;
+    // Yeeh!
+    std::cout << "Number of players: " << player.size() << std::endl;
+}
+//
+void Game_Setup::Remove_Player(const Config &config,Game &game,std::vector<Player> &player, const int &i){
+    // Backup color
+    sf::Color col=player[i].color;
+    // Remove player
+    player.erase(player.begin()+i);
+    // Set Color Available
+    for(int i=0;i<6;i++){
+        if(col==color[i]){
+            color_used[i]=false;
+            break;
+        }
+    }
+    // Done
+    std::cout << "Number of players: " << player.size() << std::endl;
+}
+//
+bool Game_Setup::Key_Available(std::vector<Player> &player,sf::Keyboard::Key key){
+    // Space and escape are not allowed!
+    if(key==sf::Keyboard::Escape||key==sf::Keyboard::Space){
+        return false;
+    }
+    // Check if a player already has that key
+    for(unsigned int i=0;i<player.size();i++){
+        if(player[i].keyL==key||player[i].keyR==key){
+            return false;
+        }
+    }
+    return true;
+}
+//
+void Game_Setup::Join(const Config &config,Game &game,std::vector<Player> &player){
+    // Clear all
+    /*if(player.size()>0){
+        player.clear();
+    }*/
+    // Try connecting
 
 }
+//
+void Game_Setup::Quit(const Config &config,Game &game,std::vector<Player> &player){
+    // Quit Server and Client and clear up
+    //
+    game.Switch_Mode(Game::Mode::Main_Menu);
+}
+//
+void Game_Setup::Start_Game(const Config &config,Game &game,std::vector<Player> &player){
+    // Check if there are at least two players
+    if(player.size()<2){
+            std::cout << "Not enough players!" << std::endl;
+        return;
+    }
+    // Check if buttons are set
+    for(unsigned int i=0;i<player.size();i++){
+        if( (player[i].local&&(player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown)) || (!player[i].local&&!player[i].ready) ){
+            std::cout << "Keys not set or someone is not ready!" << std::endl;
+            return;
+        }
+    }
+    // If they are start init
+    game.Initialize(config,game,player);
+}
+//
+void Game_Setup::Auto_Add_Players(const Config &config,Game &game,std::vector<Player> &player){
+    if(player.size()>0){
+        return;
+    }
+    Add_Player(config,game,player);
+    player[0].keyL=sf::Keyboard::Left;
+    player[0].keyR=sf::Keyboard::Right;
+    Add_Player(config,game,player);
+    player[1].keyL=sf::Keyboard::Z;
+    player[1].keyR=sf::Keyboard::X;
+}
+
+//

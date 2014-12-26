@@ -16,13 +16,6 @@ Config::Config(){
     fps=60;
     // Icon
     icon = LoadImageFromResource("curveicon");
-    // Font Settings
-    font=LoadFont("fontdata");
-//    if(!font.loadFromFile("arial.ttf")){
-//        std::cout << "Font Error";
-//    }
-    font_title_size=50;
-    font_size=30;
     // Line Settings
     linewidth=8;
     linecolors[0]=sf::Color::Red;
@@ -37,14 +30,14 @@ Config::Config(){
     safespawn=5; // Extra separation between wall and line at start
     wallcolor=sf::Color::White;
     // Speed Settings
-    shift=75; // Per second
-    turn=shift*3/2;
+    shift=50; //75; // Per second
+    turn=shift*13/8;
     // Powerup Settings
-    slow_multiplier=0.75;
-    fast_multiplier=1.5;
+    slow_multiplier=0.70;
+    fast_multiplier=1.75;
     small_multiplier=0.6;
     big_multiplier=1.75;
-    powerup_spawn_chance=5;// % per 0.5 second
+    powerup_spawn_chance=10; //5;// % per 0.5 second
     powerup_spawn_check=0.5;
     powerup_scale=0.4; // Textures are 100x100
     powerup_radius=40/2; // 40 is full width
@@ -53,7 +46,7 @@ Config::Config(){
     powerup_effect_min_disappear=5;
     powerup_effect_rand_disappear=7500;
     powerup_more_powerup_delay=2.0;
-    powerup_spawn_delay=2.6;
+    powerup_spawn_delay=1; //2.6;
     powerup_fade_time=2.0;
     powerup_safe_d=shift;
     powerup_safe_radius=powerup_radius+30;

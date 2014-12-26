@@ -5,125 +5,140 @@
 // Constructor
 Player::Player(){
     line.setPrimitiveType(sf::Quads);
+    keyL=keyR=sf::Keyboard::Unknown;
+    local=server=false;
+}
+//
+Player::Player(const sf::String &Name,const sf::Color &Color){
+    name=Name;
+    color=Color;
+    circle.setFillColor(color);
+    line.setPrimitiveType(sf::Quads);
+    keyL=keyR=sf::Keyboard::Unknown;
+    local=server=false;
 }
 // Functions
-void Player::New_Round(const Config &config,const Game &game){
-    //
-    x=config.wallwidth+linewidth+config.safespawn + rand() % (config.window_width-config.statuswidth-2*config.wallwidth-linewidth-config.safespawn*2+1); // Rand x position within walls
-    y=config.wallwidth+linewidth+config.safespawn + rand() % (config.window_height-2*config.wallwidth-linewidth-config.safespawn*2+1);
-    // Safe Heading :D
-    // Left Top
-    if(x<config.wallwidth+config.safeheading&&y<config.wallwidth+config.safeheading){
-        h=rand() % (90+1);
+void Player::New_Game(const Config &config,Game &game){
+    // Set points
+    points=0;
+    // Call New round
+    //New_Round(config,game);
+}
+//
+void Player::New_Round(const Config &config,Game &game){
+    Calculate_Powerup_Effect(config,game);
+    if(!game.client[1]){
+        // Set position
+        x=config.wallwidth+linewidth+config.safespawn + rand() % (config.window_width-config.statuswidth-2*config.wallwidth-linewidth-config.safespawn*2+1);
+        y=config.wallwidth+linewidth+config.safespawn + rand() % (config.window_height-2*config.wallwidth-linewidth-config.safespawn*2+1);
+        // Set Heading
+        // Left Top
+        if(x<config.wallwidth+config.safeheading&&y<config.wallwidth+config.safeheading){
+            heading=rand() % (90+1);
+        }
+        // Right top
+        else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading&&y<config.wallwidth+config.safeheading){
+            heading=rand() % (90+1)+90;
+        }
+        // Right Bottom
+        else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading&&y>config.window_height-config.wallwidth-config.safeheading){
+            heading=rand() % (90+1)+180;
+        }
+        // Left Bottom
+        else if(x<config.wallwidth+config.safeheading&&y>config.window_height-config.wallwidth-config.safeheading){
+            heading=rand() % (90+1)+270;
+        }
+        // Left
+        else if(x<config.wallwidth+config.safeheading){
+            heading=rand() % (180+1)-90;
+        }
+        // Top
+        else if(y<config.wallwidth+config.safeheading){
+            heading=rand() % (180+1);
+        }
+        // Right
+        else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading){
+            heading=rand() % (180+1)+90;
+        }
+        // Bottom
+        else if(y>config.window_height-config.wallwidth-config.safeheading){
+            heading=rand() % (180+1)+180;
+        }
+        // Anywhere else
+        else{
+            heading=rand() % (360+1);
+        }
+        Calculate_Gap(config);
+        //
+        ready=false;
     }
-    // Right top
-    else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading&&y<config.wallwidth+config.safeheading){
-        h=rand() % (90+1)+90;
-    }
-    // Right Bottom
-    else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading&&y>config.window_height-config.wallwidth-config.safeheading){
-        h=rand() % (90+1)+180;
-    }
-    // Left Bottom
-    else if(x<config.wallwidth+config.safeheading&&y>config.window_height-config.wallwidth-config.safeheading){
-        h=rand() % (90+1)+270;
-    }
-    // Left
-    else if(x<config.wallwidth+config.safeheading){
-        h=rand() % (180+1)-90;
-    }
-    // Top
-    else if(y<config.wallwidth+config.safeheading){
-        h=rand() % (180+1);
-    }
-    // Right
-    else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading){
-        h=rand() % (180+1)+90;
-    }
-    // Bottom
-    else if(y>config.window_height-config.wallwidth-config.safeheading){
-        h=rand() % (180+1)+180;
-    }
-    // Anywhere else
     else{
-        h=rand() % (360+1);
+        ready=true;
     }
-    //
+    // Reset other vars
     line.clear();
     death=false;
     deathframe=0;
-    Calculate_Powerup_Effect(config,game);
-    Calculate_Gap(config);
     circle.setPosition(x-linewidth/2,y-linewidth/2);
     circle.setRadius(linewidth/2);
-    //keyrelease=false;
-}
-//
-void Player::New_Round_Server(const Config &config,Game &game,int i){
-    New_Round(config,game);
-    Pending pending;
-    pending.packet << Packet::NewRound << i << x << y << h;
-    pending.send_id.push_back(-1);
-    game.mutex.lock();
-    game.pending.push_back(pending);
-    game.mutex.unlock();
+    // Lower two are for server things?
     noline=false;
     sendlast=false;
-    //wall=false;
+    // Client part
+
 }
 //
-void Player::New_Round_Client(const Config &config,Game &game,sf::Packet &packet){
-    // Unpack
-    packet >> x >> y >> h;
-    //
-    ready=true;
-    line.clear();
-    Calculate_Powerup_Effect(config,game);
-    circle.setPosition(x-linewidth/2,y-linewidth/2);
-    circle.setRadius(linewidth/2); // Error HEre!!!!!!
+void Player::Draw(sf::RenderWindow &window){
+    window.draw(line);
+    window.draw(circle);
 }
 //
 void Player::Update_Position(const Config &config, Game &game){
+    // Check keys
+    if(local){
+        left=sf::Keyboard::isKeyPressed(keyL);
+        right=sf::Keyboard::isKeyPressed(keyR);
+    }
     // Check keyrelease
     if(keyrelease==false&&!left&&!right){
         keyrelease=true;
     }
     // Heading Change
-    hOLD=h;
+    hOLD=heading;
     if(!rightangle){
         // Move left
         if( (left&&!inverted) || (right&&inverted) ){
-            h-=(turn*game.elapsed);
+            heading-=(turn*game.elapsed);
         }
         // Move right
         if( (right&&!inverted) || (left&&inverted) ){
-            h+=(turn*game.elapsed);
+            heading+=(turn*game.elapsed);
         }
     }
     else{
         if( ( (left&&!inverted) || (right&&inverted) ) && keyrelease){
-            h-=90;
+            heading-=90;
             keyrelease=false;
         }
         // Move right
         if( ( (right&&!inverted) || (left&&inverted) ) && keyrelease){
-            h+=90;
+            heading+=90;
             keyrelease=false;
         }
     }
     // Force between 0-360 degrees
-    if(h>360){
+    /*if(h>360){
         h-=360;
     }
     else if(h<0){
         h+=360;
-    }
+    }*/
     //
     // Save new X and Y, but keep old ones for a while
     xOLD=x;
     yOLD=y;
-    x+=cos(h*PI/180.0)*(shift*game.elapsed);
-    y+=sin(h*PI/180.0)*(shift*game.elapsed);
+    x+=cos(heading*PI/180.0)*(shift*game.elapsed);
+    y+=sin(heading*PI/180.0)*(shift*game.elapsed);
     // Update Line
     // Normal
     if(!invisible){
@@ -132,7 +147,7 @@ void Player::Update_Position(const Config &config, Game &game){
         if(gap[0]<0.0){
             if(gap[1]<0.0){
                 Calculate_Gap(config);
-                Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
+                Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
             }
             else{
                 gap[1]-=game.elapsed;
@@ -140,7 +155,7 @@ void Player::Update_Position(const Config &config, Game &game){
         }
         // Non gapping normal line add
         else{
-            Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
+            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
     }
     // Do some extra things if outside playfield, which means if hitdetector works walls away is active
@@ -151,7 +166,7 @@ void Player::Update_Position(const Config &config, Game &game){
         // Draw extra thing if not invisible
         if(!invisible){
             // Set quad points
-            Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
+            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
     }
     // Top
@@ -161,7 +176,7 @@ void Player::Update_Position(const Config &config, Game &game){
         // Draw extra thing if not invisible
         if(!invisible){
             // Set quad points
-            Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
+            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
     }
     // Right
@@ -171,7 +186,7 @@ void Player::Update_Position(const Config &config, Game &game){
         // Draw extra thing if not invisible
         if(!invisible){
             // Set quad points
-            Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
+            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
     }
     // Bottom
@@ -181,97 +196,27 @@ void Player::Update_Position(const Config &config, Game &game){
         // Draw extra thing if not invisible
         if(!invisible){
             // Set quad points
-            Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
+            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
     }
     // Update Circle
     circle.setPosition(x-linewidth/2,y-linewidth/2);
 }
 //
-void Player::Update_Position_Local(const Config &config, Game &game){
-    left=sf::Keyboard::isKeyPressed(keyL);
-    right=sf::Keyboard::isKeyPressed(keyR);
-    Update_Position(config,game);
-}
-//
-/*void Player::Update_Position_Server(const Config &config, Game &game,int i){
-    Update_Position(config,game);
-    // Big package if last position was not sent to make sure gapwidth is the same by players
-    if( ( (!noline && (invisible||gap[0]<0.0) ) || (noline&& !invisible && gap[0]>0.0) ) && send ){
-        noline=!noline;
-        // Send Big Package
-        packetnumber++;
-        Pending pending;
-        pending.send_id.push_back(-1);
-        pending.packet << Packet::Update2 << i << xOLD << yOLD << hOLD << !noline << packetnumber << x << y << h << noline;
-        game.mutex.lock();
-        game.pending.push_back(pending);
-        game.mutex.unlock();
-        send=false;
-    }
-    else{
-        if( (!noline&& (invisible||gap[0]<0.0) ) || (noline&&!invisible&&gap[0]>0.0) ){
-            noline=!noline;
-            send=true;
-        }
-        // Send Normal Package
-        if(send){
-            packetnumber++;
-            Pending pending;
-            pending.send_id.push_back(-1);
-            pending.packet << Packet::Update << i << x << y << h << noline << packetnumber;
-            game.mutex.lock();
-            game.pending.push_back(pending);
-            game.mutex.unlock();
-            send=false;
-        }
-        else{
-            send=true;
-        }
-    }
-}*/
-//
-void Player::Update_Position_Client(const Config &config, sf::Packet &packet){
+void Player::Update_Position(const Config &config, sf::Packet &packet){
     xOLD=x;
     yOLD=y;
-    hOLD=h;
-    packet >> x >> y >> h >> noline;
+    hOLD=heading;
+    packet >> x >> y >> heading >> noline;
     //
     int maxdiffw=config.window_width-config.statuswidth-4*config.wallwidth;
     int maxdiffh=config.window_height-4*config.wallwidth;
     if(!noline&& abs(x-xOLD)<maxdiffw && abs(y-yOLD)<maxdiffh){
-        Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
+        Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
     }
     // Circle
     circle.setPosition(x-linewidth/2,y-linewidth/2);
 }
-//
-/*void Player::Update_Position_Client2(const Config &config, sf::Packet &packet){
-    xOLD=x;
-    yOLD=y;
-    hOLD=h;
-    int number;
-    packet >> x >> y >> h >> noline >> number;
-    if(number>packetnumber){
-        // Phase 1
-        int maxdiffw=config.window_width-config.statuswidth-4*config.wallwidth;
-        int maxdiffh=config.window_height-4*config.wallwidth;
-        if(!noline&& abs(x-xOLD)<maxdiffw && abs(y-yOLD)<maxdiffh){
-            Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
-        }
-        // Phase 2
-        xOLD=x;
-        yOLD=y;
-        hOLD=h;
-        packet >> x >> y >> h >> noline;
-        if(!noline&& abs(x-xOLD)<maxdiffw && abs(y-yOLD)<maxdiffh){
-            Add_Line(xOLD,x,yOLD,y,h,hOLD,linewidth);
-        }
-    }
-    else{
-        std::cout << "Very Bad Packet mixup!! " << number << "," << packetnumber << " , " << x << ", " << y << ", " << h << std::endl;
-    }
-}*/
 //
 void Player::Add_Line(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &linewidth){
     sf::Vertex quad;
@@ -288,6 +233,11 @@ void Player::Add_Line(const float &X1,const float &X2,const float &Y1,const floa
     //
     quad.position = sf::Vector2f( X2+sin(H1*PI/180.0)*linewidth/2.0, Y2-cos(H1*PI/180.0)*linewidth/2.0);
     line.append(quad);
+}
+//
+void Player::Calculate_Gap(const Config &config){
+    gap[0]=config.min_to_gap + ( rand() % (config.rand_to_gap+1) ) / 1000.0;
+    gap[1]=config.min_width_gap + ( ( rand() % (config.rand_width_gap+1) ) / 1000.0 );
 }
 //
 void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
@@ -356,13 +306,13 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
     }
     else if(line_size<0){
         linewidth*=pow(config.small_multiplier,(-1)*line_size);
-        if(linewidth==0){
+        if(linewidth<1){
             linewidth=1;
         }
     }
     // Circle Style
     if(inverted){
-        circle.setFillColor(sf::Color::Blue);
+        circle.setFillColor(sf::Color::Blue); // Bugged for some reason
     }
     else{
         circle.setFillColor(color);
@@ -370,25 +320,3 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
     circle.setRadius(linewidth/2);
 }
 //
-void Player::Calculate_Gap(const Config &config){
-    gap[0]=config.min_to_gap + ( rand() % (config.rand_to_gap+1) ) / 1000.0;
-    gap[1]=config.min_width_gap + ( ( rand() % (config.rand_width_gap+1) ) / 1000.0 );
-}
-//
-void Player::Process_SYNC_Packet(sf::Packet &packet){
-    packet >> name >> enabled >> ready;
-}
-//
-void Player::Name_Packet(Game &game){
-    //
-    if(name.isEmpty()){
-        name="Player";
-    }
-    //
-    Pending pending;
-    pending.packet << Packet::Name << game.id << name;
-    pending.send_id.push_back(-1);
-    game.mutex.lock();
-    game.pending.push_back(pending);
-    game.mutex.unlock();
-}

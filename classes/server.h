@@ -13,8 +13,10 @@
 // Class Headers
 #include "config.h"
 #include "game.h"
+#include "game_setup.h"
 #include "player.h"
 #include "client_info.h"
+#include "color.h"
 // Temporary
 //void Config_Package(Game &game);
 #include "../functions/functions.h"
@@ -24,7 +26,6 @@ class Server{
         // Vars
         std::vector<Client_Info> clients;
         sf::SocketSelector selector;
-        int client_count;
         bool started;
         bool accept_new;
         sf::TcpListener listener;
@@ -33,17 +34,17 @@ class Server{
         std::thread thread_listener;
         std::thread thread_sender;
         // Functions
-        void Start(const Config &config,Game &game,Player player[]);
-        void Server_Listener(const Config &config,Game &game,Player player[]);
-        void Server_Sender(const Config &config,Game &game,Player player[]);
-        void Client_Init_Packages(const Config &config,Game &game,Player player[]);
-        void Process_Package(const Config &config,Game &game,Player player[],sf::Packet &packet);
-        void Shutdown();
-        void Sync_Clients(const Config &config,Game &game,Player player[]);
+        void Start(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
+        void Server_Listener(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
+        void Server_Sender(const Config &config,Game &game,std::vector<Player> &player);
+        void New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
+        //void Client_Init_Packages(const Config &config,Game &game,std::vector<Player> player);
+        void Process_Package(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
+        void Shutdown(Game &game);
+        void Sync_Clients(const Config &config,Game &game,std::vector<Player> &player);
         // Constructor
         Server(){
             started=false;
-            client_count=0;
             accept_new=true;
         }
         // Functions

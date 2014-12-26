@@ -8,7 +8,7 @@ class Client_Info{
     public:
         // Vars
         std::unique_ptr<sf::TcpSocket> socket;
-        int id; // Place in player array
+        unsigned int id; // Place in player array
         sf::IpAddress ip;
         //int error_count;
         //bool sync;

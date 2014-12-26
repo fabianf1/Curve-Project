@@ -2,36 +2,38 @@
 #ifndef CURVE_GAME_SETUP
 #define CURVE_GAME_SETUP
 // SFML Headers
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
+// Standard headers
+#include <vector>
+#include <iostream>
 // Class Headers
-#include "text_button.h"
 #include "config.h"
+#include "game.h"
+#include "player.h"
+//#include "text_button.h"
 // Temporary
-#include "../defines.h"
+//#include "../defines.h"
+//#include "../functions/functions.h"
+
 //
 class Game_Setup{
     public:
-        // Vars
-        sf::Text title;
-        sf::Text name;
-        sf::Text left;
-        sf::Text right;
+        // Variables
+        sf::Color color[6];
+        bool color_used[6];
         //
-        Text_Button names[MAX_PLAYERS];
-        Text_Button lbutton[MAX_PLAYERS];
-        Text_Button rbutton[MAX_PLAYERS];
-        //
-        sf::Text options;
-        sf::Text maxpoints;
-        Text_Button max10,max20,max40;
-        sf::Text powerups;
-        Text_Button powerupon,powerupoff;
-        //
-        Text_Button start;
-        Text_Button quit;
+        int key_change[2]; // [0] for key: 0 is left, 1 is right; [1] for player
         // Constructor
-        Game_Setup(const Config &config);
+        Game_Setup();
+        // Functions
+        void Initialize(const Config &config,Game &game,std::vector<Player> &player);
+        void Add_Player(const Config &config,Game &game,std::vector<Player> &player);
+        void Remove_Player(const Config &config,Game &game,std::vector<Player> &player, const int &i);
+        bool Key_Available(std::vector<Player> &player,sf::Keyboard::Key key);
+        void Join(const Config &config,Game &game,std::vector<Player> &player);
+        void Quit(const Config &config,Game &game,std::vector<Player> &player);
+        void Start_Game(const Config &config,Game &game,std::vector<Player> &player);
+        void Auto_Add_Players(const Config &config,Game &game,std::vector<Player> &player);
 };
+
 #endif // CURVE_GAME_SETUP
-
-
