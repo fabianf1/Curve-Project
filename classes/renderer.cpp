@@ -62,7 +62,7 @@ void Renderer::Setup(const Config &config,Game &game,std::vector<Player> &player
     window.draw(objects.s_right);
     // Vectors
     for(unsigned int i=0;i<objects.vector_length;i++){
-        window.draw(objects.s_names[i]);
+        objects.s_names[i].Draw(window);
         if(player[i].local){
             window.draw(objects.s_lbutton[i]);
             window.draw(objects.s_rbutton[i]);
@@ -223,6 +223,7 @@ void Renderer::PowerUp(const Config &config,Game &game){
 }
 //
 void Renderer::Shutdown(){
+    window.close();
     if(thread.joinable()){
         thread.join();
     }

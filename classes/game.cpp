@@ -4,10 +4,9 @@
 // Constructor
 Game::Game(){
     frame=0;
-    lastclick=0;
     keychange[0]=-1;
-    name_change=false;
-    maxpoints=5;
+    name_change=-1;
+    maxpoints=10;
     mode=Mode::Main_Menu;
     powerup_enabled=true;
     player_switched=false;
@@ -15,7 +14,6 @@ Game::Game(){
     update_thread[0]=update_thread[1]=update_thread[2]=false;
     server[0]=server[1]=server[2]=false;
     client[0]=client[1]=client[2]=false;
-    online=false;
     connected=false;
     server_ip=sf::IpAddress::getLocalAddress().toString();
     countdown_int=0;
@@ -111,7 +109,6 @@ void Game::Thread(const Config &config,Game &game,std::vector<Player> &player){
                 game.mutex.lock();
                 game.packets.push_back(pending);
                 game.mutex.unlock();
-                game.send=false;
                 //
                 game.packettime=game.packetclock.restart().asSeconds();
             }

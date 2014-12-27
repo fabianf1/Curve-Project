@@ -23,11 +23,13 @@ class Client{
         bool connected;
         bool sync;
         bool ready;
+        sf::Packet packet;
         // Functions
         void Start(const Config &config, Game &game,std::vector<Player> &player);
         void Thread(const Config &config,Game &game,std::vector<Player> &player);
         void Ready(Game &game,std::vector<Player> &player);
         void Process_Packet(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet);
+        void Shutdown(Game &game);
         // Constructor
         //Client();
 };

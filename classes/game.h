@@ -22,10 +22,9 @@ class Game{
         //
         int frame; // Keeps track of current frame
         //unsigned int game_frame;
-        int lastclick; // Keeps track of lastclick
         enum class Mode : int {Main_Menu,Setup,Play} mode; // Keeps track of current modus
-        int keychange[2]; // Keeps track of keychanges, 0 is player, 1 is key(left or right)
-        bool name_change;
+        int keychange[2]; // Keeps track of keychanges, 1 is player, 0 is key(left=0 or right=1)
+        int name_change;
         int maxpoints;
         bool powerup_enabled;
         bool player_switched;
@@ -53,12 +52,9 @@ class Game{
         bool update_thread[3];// 0=start,1=running,2=shutdown;
         bool server[3];// 0=start,1=running,2=shutdown;
         bool client[3];
-        bool online;
         bool connected;
         unsigned int id;
         sf::IpAddress server_ip;
-        //sf::TcpSocket socket;
-        bool send;
         int packetnumber;
         float packettime;
         //

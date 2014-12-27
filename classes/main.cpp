@@ -12,49 +12,24 @@ void Main::Curve_Project(){
             Event_Handler();
         }
         // Process other events
-        //if(game.mode_lock.try_lock()){
-            if(game.mode==Game::Mode::Main_Menu){
-                Main_Menu_Handler();
-            }
-            else if(game.mode==Game::Mode::Setup){
-                Game_Setup_Handler();
-            }
-            else if(game.mode==Game::Mode::Play){
-                Play_Handler();
-            }
-            //game.mode_lock.unlock();
-        //}
-        // Check if things need to be started
-        /*if(game.update_thread[0]&&!game.update_thread[1]){
-            //Start_Game_Update(config,game,player);
+        if(game.mode==Game::Mode::Main_Menu){
+            Main_Menu_Handler();
         }
-        else if(game.server[0]&&!game.server[1]){
-            //server.Start(config,game,player);
+        else if(game.mode==Game::Mode::Setup){
+            Game_Setup_Handler();
         }
-        else if(game.client[0]&&!game.client[1]){
-            //client.Start(config,game,player);
-        }*/
+        else if(game.mode==Game::Mode::Play){
+            Play_Handler();
+        }
         // Check if new player is added
         if(renderer.objects.vector_length<player.size()||renderer.objects.vector_length>player.size()){
             renderer.objects.Sync_Players(config,game,player);
         }
-        // Delay function
-        Sleep(config.main_thread_min_time,game.main_thread_clock);
-        //
-        /* When switching it goes wrong somewhere I think. No I am sure. Stop the handlers for a brief moment when switching to solve!*/
-        /*if(game.packetclock.getElapsedTime().asSeconds()>4.0&&game.packetclock.getElapsedTime().asSeconds()<4.5){
-            game.mode=Game::Mode::Setup;
-        }*/
     }
     // Shutdown procedure
-    game.update_thread[0]=false;
-    game.server[0]=false;
-    game.client[0]=false;
-    game.update_thread[2]=true;
-    game.server[2]=true;
-    game.client[2]=true;
-    //game.Shutdown();
+    game.Shutdown();
     server.Shutdown(game);
+    client.Shutdown(game);
     renderer.Shutdown();
     std::cout << "All Threads Finished!" << std::endl;
 }
@@ -69,10 +44,6 @@ void Main::Event_Handler(){
     else if(event.type == sf::Event::LostFocus&&!game.client[1]&&!game.server[1]){
         game.Pause(config,true);
     }
-    // Regain Focus
-    /*else if(event.type == sf::Event::GainedFocus){
-        Pause_Game(config,game,window,false);
-    }*/
     // Client connect
     else if(game.mode==Game::Mode::Main_Menu){
         renderer.objects.m_ip_prompt.Event(event);
@@ -83,19 +54,19 @@ void Main::Event_Handler(){
         if(game_setup.key_change[0]!=-1){
             if(event.type==sf::Event::KeyPressed){
                 if(event.key.code==sf::Keyboard::Escape){
-                    game_setup.key_change[0]=-1;
+                    Change_Button(-1,0);
                 }
                 else if(game_setup.key_change[0]==0){
                     // Check availability
                     if(game_setup.Key_Available(player,event.key.code)){
                         player[game_setup.key_change[1]].keyL=event.key.code;
-                        game.keychange[0]=-1;
+                        Change_Button(-1,0);
                     }
                 }
                 else if(game_setup.key_change[0]==1){
                     if(game_setup.Key_Available(player,event.key.code)){
                         player[game_setup.key_change[1]].keyR=event.key.code;
-                        game_setup.key_change[0]=-1;
+                        Change_Button(-1,0);
                     }
                 }
                 // Update renderer.objects
@@ -110,6 +81,26 @@ void Main::Event_Handler(){
             renderer.objects.Sync_Players(config,game,player);
         }
         #endif
+        // Name Changer
+        if(game.name_change>-1&&event.type==sf::Event::KeyPressed&& (event.key.code==sf::Keyboard::Escape) ){
+            renderer.objects.s_names[game.name_change].setActive(false);
+            game.name_change=-1;
+            // Reset
+            renderer.objects.Sync_Players(config,game,player);
+        }
+        else if(game.name_change>-1&&event.type==sf::Event::KeyPressed&& (event.key.code==sf::Keyboard::Return) ){
+            if(renderer.objects.s_names[game.name_change].getString().getSize()==0){
+                renderer.objects.Sync_Players(config,game,player);
+            }
+            else{
+                player[game.name_change].name=renderer.objects.s_names[game.name_change].getString();
+            }
+            renderer.objects.s_names[game.name_change].setActive(false);
+            game.name_change=-1;
+        }
+        else if(game.name_change>-1){
+            renderer.objects.s_names[game.name_change].Event(event);
+        }
     }
     // Play Game
     else if(game.mode==Game::Mode::Play){
@@ -174,6 +165,7 @@ void Main::Event_Handler(){
 void Main::Main_Menu_Handler(){
     // Create Button
     if(renderer.objects.m_create.Check(renderer.window)){
+        renderer.objects.setOptions(game);
         game_setup.Initialize(config,game,player);
         return;
     }
@@ -192,7 +184,6 @@ void Main::Main_Menu_Handler(){
     }
     // Quit
     if(renderer.objects.m_quit.Check(renderer.window)){
-        sf::sleep(sf::milliseconds(500));
         renderer.window.close();
     }
 }
@@ -202,14 +193,33 @@ void Main::Game_Setup_Handler(){
     for(unsigned int i=0;i<player.size()&&i<renderer.objects.vector_length;i++){
         if(renderer.objects.s_names[i].Check(renderer.window)){
             // Name Change
+            if(game.name_change==i){
+                if(renderer.objects.s_names[i].getString().getSize()==0){
+                    renderer.objects.Sync_Players(config,game,player);
+                }
+                else{
+                    player[i].name=renderer.objects.s_names[i].getString();
+                }
+                renderer.objects.s_names[i].setActive(false);
+                game.name_change=-1;
+            }
+            else if(game.name_change>-1){
+                renderer.objects.s_names[game.name_change].setActive(false);
+                game.name_change=i;
+                renderer.objects.s_names[i].setActive(true);
+            }
+            else{
+                game.name_change=i;
+                renderer.objects.s_names[i].setActive(true);
+            }
         }
         if(renderer.objects.s_lbutton[i].Check(renderer.window)){
-            game_setup.key_change[0]=0;
-            game_setup.key_change[1]=i;
+            Change_Button(0,i);
         }
         if(renderer.objects.s_rbutton[i].Check(renderer.window)){
             game_setup.key_change[0]=1;
             game_setup.key_change[1]=i;
+            Change_Button(1,i);
         }
         if(renderer.objects.s_kick[i].Check(renderer.window)){
             game_setup.Remove_Player(config,game,player,i);
@@ -228,19 +238,24 @@ void Main::Game_Setup_Handler(){
     }
     // Options
     if(renderer.objects.s_max10.Check(renderer.window)){
-
+        game.maxpoints=10;
+        renderer.objects.setOptions(game);
     }
     if(renderer.objects.s_max20.Check(renderer.window)){
-
+        game.maxpoints=20;
+        renderer.objects.setOptions(game);
     }
     if(renderer.objects.s_max40.Check(renderer.window)){
-
+        game.maxpoints=40;
+        renderer.objects.setOptions(game);
     }
     if(renderer.objects.s_powerupoff.Check(renderer.window)){
-
+        game.powerup_enabled=false;
+        renderer.objects.setOptions(game);
     }
     if(renderer.objects.s_powerupon.Check(renderer.window)){
-
+        game.powerup_enabled=true;
+        renderer.objects.setOptions(game);
     }
     // Buttons
     if(renderer.objects.s_add.Check(renderer.window)){
@@ -298,6 +313,29 @@ void Main::Game_Setup_Handler(){
     if(renderer.objects.s_quit.Check(renderer.window)){
         // To main menu
         game_setup.Quit(config,game,player);
+    }
+}
+//
+void Main::Change_Button(const int &button,unsigned const int &pl){
+    // Set game variables
+    game_setup.key_change[0]=button;
+    game_setup.key_change[1]=pl;
+    // Set graphics
+    for(unsigned int i=0;i<player.size()&&i<renderer.objects.vector_length;i++){
+        if(button!=-1&&pl==i){
+            if(button==0){
+                renderer.objects.s_lbutton[i].setActive(true);
+                renderer.objects.s_rbutton[i].setActive(false);
+            }
+            else{
+                renderer.objects.s_lbutton[i].setActive(false);
+                renderer.objects.s_rbutton[i].setActive(true);
+            }
+        }
+        else{
+            renderer.objects.s_lbutton[i].setActive(false);
+            renderer.objects.s_rbutton[i].setActive(false);
+        }
     }
 }
 //

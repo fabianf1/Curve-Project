@@ -10,9 +10,9 @@
 // Class Headers
 #include "config.h"
 #include "text_button.h"
+#include "text_box.h"
 #include "prompt.h"
 #include "player.h"
-//#include "../functions/functions.h"
 //
 sf::String int2string(int x);
 
@@ -41,12 +41,11 @@ class Renderer_Objects{
         sf::Text s_left;
         sf::Text s_right;
         // Player Things
-        std::vector<Text_Button> s_names;
+        std::vector<Text_Box> s_names;
         std::vector<Text_Button> s_lbutton;
         std::vector<Text_Button> s_rbutton;
         std::vector<sf::Text> s_status;
         std::vector<Text_Button> s_kick;
-        sf::Text s_name_pointer; // When typing name
         Text_Button s_add;
         Text_Button s_server;
         // Options
@@ -81,6 +80,8 @@ class Renderer_Objects{
         // Vector things
         void Sync_Players(const Config &config,Game &game,const std::vector<Player> &player);
         void Add_Player(const Config &config,const std::vector<Player> &player);
+        //
+        void setOptions(const Game &game);
         // Other Functions
         sf::Font LoadFont(const std::string& name);
         const char* getKeyName( const sf::Keyboard::Key &key );

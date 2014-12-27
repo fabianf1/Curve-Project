@@ -10,7 +10,12 @@ bool Text_Button::Check(sf::RenderWindow &window){
     // Check selected
     if(getGlobalBounds().contains(sf::Mouse::getPosition(window).x,sf::Mouse::getPosition(window).y)){
         setColor(selected_color);
-        setStyle(selected_style);
+        if(!activated){
+            setStyle(selected_style);
+        }
+        else{
+            setStyle(selected_style|activated_style);
+        }
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left)&&last_click.getElapsedTime().asSeconds()>0.2){
             last_click.restart();
             return true;
@@ -19,7 +24,12 @@ bool Text_Button::Check(sf::RenderWindow &window){
     }
     else{
         setColor(normal_color);
-        setStyle(normal_style);
+        if(!activated){
+            setStyle(normal_style);
+        }
+        else{
+            setStyle(normal_style|activated_style);
+        }
     }
     return false;
 }
@@ -40,5 +50,10 @@ void Text_Button::setButton(sf::String str,const sf::Font &font,int fontsize,sf:
     setCharacterSize(fontsize);
     setColors(col,selected_col);
     setStyles(sty,selected_sty);
+    activated_style=sf::Text::Bold|sf::Text::Underlined ;
+    activated=false;
 }
 //
+ void Text_Button::setActive(const bool &active){
+     activated=active;
+ }

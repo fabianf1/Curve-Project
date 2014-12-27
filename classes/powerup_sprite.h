@@ -5,6 +5,8 @@
 #include <SFML/Graphics.hpp>
 // Class Headers
 #include "config.h"
+// LoadImageFromRecource
+#include "../functions/functions.h"
 //
 class Powerup_Sprite{
     sf::Texture texture;// The texture that has all powerups

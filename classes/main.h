@@ -36,6 +36,7 @@ class Main{
         void Event_Handler();
         void Main_Menu_Handler();
         void Game_Setup_Handler();
+        void Change_Button(const int &button,unsigned const int &pl);
         void Play_Handler();
 };
 

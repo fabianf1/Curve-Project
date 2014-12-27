@@ -41,7 +41,6 @@ void Client::Start(const Config &config, Game &game,std::vector<Player> &player)
 //
 void Client::Thread(const Config &config,Game &game,std::vector<Player> &player){
     std::cout << "Client thread started!" << std::endl;
-    sf::Packet packet;
     // Main loop
     while(!game.client[2]){
         // Check if receiving something
@@ -64,8 +63,6 @@ void Client::Thread(const Config &config,Game &game,std::vector<Player> &player)
         for(int i=game.packets.size()-1;i>=0;i--){
             switch(socket.send(game.packets[i].packet)){
                 case sf::Socket::Done:
-                    //std::cout << "Package Send to server" << std::endl;
-                    //std::cout << server.clients[0].ip.toString() << std::endl;
                     // Remove Send id
                     game.mutex.lock();
                     game.packets.erase(game.packets.begin()+i);
@@ -86,7 +83,6 @@ void Client::Thread(const Config &config,Game &game,std::vector<Player> &player)
     socket.disconnect();
     game.client[1]=game.client[2]=false;
     game.connected=false;
-    socket.setBlocking(true);
     std::cout << "Client thread ended!" << std::endl;
 }
 //
@@ -95,7 +91,7 @@ void Client::Ready(Game &game,std::vector<Player> &player){
     // Check if keys are set
     if(!ready){
         ready=true;
-        for(unsigned int i;i<player.size();i++){
+        for(unsigned int i=0;i<player.size();i++){
             if(player[i].local &&( player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown) ){
                 ready=false;
                 player[i].ready=true;
@@ -113,7 +109,7 @@ void Client::Ready(Game &game,std::vector<Player> &player){
     }
     else{
         ready=false;
-        for(unsigned int i;i<player.size();i++){
+        for(unsigned int i=0;i<player.size();i++){
             if(player[i].local){
                 player[i].ready=false;
             }
@@ -363,3 +359,9 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
     }
 }
 //
+void Client::Shutdown(Game &game){
+    game.client[2]=true;
+    if(thread.joinable()){
+        thread.join();
+    }
+}

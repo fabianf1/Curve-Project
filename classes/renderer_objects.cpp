@@ -71,12 +71,6 @@ void Renderer_Objects::Init_Game_Setup(const Config &config){
     s_right.setStyle(sf::Text::Bold);
     s_right.setPosition(300 , 150);
     // Player things
-    s_name_pointer.setString("|");
-    s_name_pointer.setFont(font);
-    s_name_pointer.setCharacterSize(font_size);
-    s_name_pointer.setColor(sf::Color::White);
-    s_name_pointer.setStyle(sf::Text::Bold);
-    s_name_pointer.setPosition(50 , 150);
     //
     s_add.setButton("Add",font,font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
     s_add.setPosition(50,150+30*1.5);
@@ -290,6 +284,36 @@ void Renderer_Objects::Add_Player(const Config &config,const std::vector<Player>
     g_score[vector_length].setPosition(config.window_width-30,50+vector_length*30);
     //
     vector_length++;
+}
+//
+void Renderer_Objects::setOptions(const Game &game){
+    //
+    // Points
+    if(game.maxpoints==10){
+        s_max10.setActive(true);
+        s_max20.setActive(false);
+        s_max40.setActive(false);
+    }
+    else if(game.maxpoints==20){
+        s_max10.setActive(false);
+        s_max20.setActive(true);
+        s_max40.setActive(false);
+    }
+    else if(game.maxpoints==40){
+        s_max10.setActive(false);
+        s_max20.setActive(false);
+        s_max40.setActive(true);
+    }
+    //
+    // Powerup
+    if(game.powerup_enabled){
+        s_powerupon.setActive(true);
+        s_powerupoff.setActive(false);
+    }
+    else{
+        s_powerupon.setActive(false);
+        s_powerupoff.setActive(true);
+    }
 }
 // Font Loader
 sf::Font Renderer_Objects::LoadFont(const std::string& name){
