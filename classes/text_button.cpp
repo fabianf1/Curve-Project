@@ -2,8 +2,8 @@
 // Needed Header
 #include "text_button.h"
 // Constructor
-Text_Button::Text_Button(sf::String str,const sf::Font &font,int fontsize,sf::Color col,sf::Color selected_col,int sty,int selected_sty){
-    setButton(str,font,fontsize,col,selected_col,sty,selected_sty);
+Text_Button::Text_Button(const sf::String &str,const sf::Font &font,const unsigned int &fontsize,const sf::Color &n_col,const sf::Color &s_col,const int n_sty,const int s_sty){
+    setButton(str,font,fontsize,n_col,s_col,n_sty,s_sty);
 }
 // Functions
 bool Text_Button::Check(sf::RenderWindow &window){
@@ -34,26 +34,30 @@ bool Text_Button::Check(sf::RenderWindow &window){
     return false;
 }
 //
-void Text_Button::setColors(sf::Color color, sf::Color s_color){
+void Text_Button::setColors(const sf::Color &color,const sf::Color &s_color){
     normal_color=color;
     selected_color=s_color;
 }
 //
-void Text_Button::setStyles(int style, int s_style){
+void Text_Button::setStyles(const int &style,const int &s_style){
     normal_style=style;
     selected_style=s_style;
 }
 //
-void Text_Button::setButton(sf::String str,const sf::Font &font,int fontsize,sf::Color col,sf::Color selected_col,int sty,int selected_sty){
+void Text_Button::setButton(const sf::String &str,const sf::Font &font,const unsigned int &fontsize,const sf::Color &n_col,const sf::Color &s_col,const int n_sty,const int s_sty){
     setString(str);
     setFont(font);
     setCharacterSize(fontsize);
-    setColors(col,selected_col);
-    setStyles(sty,selected_sty);
+    setColors(n_col,s_col);
+    setStyles(n_sty,s_sty);
     activated_style=sf::Text::Bold|sf::Text::Underlined ;
     activated=false;
 }
 //
  void Text_Button::setActive(const bool &active){
      activated=active;
+ }
+ //
+ bool Text_Button::getActive(){
+    return activated;
  }

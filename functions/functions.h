@@ -9,7 +9,6 @@
 
 // General.cpp
 sf::String int2string(int x);
-void Sleep(const int &frame_time,sf::Clock &clock);
 sf::Image LoadImageFromResource(const std::string& name);
 
 #endif // CURVE_FUNCTIONS

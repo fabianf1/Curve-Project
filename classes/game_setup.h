@@ -10,10 +10,6 @@
 #include "config.h"
 #include "game.h"
 #include "player.h"
-//#include "text_button.h"
-// Temporary
-//#include "../defines.h"
-//#include "../functions/functions.h"
 
 //
 class Game_Setup{
@@ -29,7 +25,7 @@ class Game_Setup{
         void Initialize(const Config &config,Game &game,std::vector<Player> &player);
         void Add_Player(const Config &config,Game &game,std::vector<Player> &player);
         void Remove_Player(const Config &config,Game &game,std::vector<Player> &player, const int &i);
-        bool Key_Available(std::vector<Player> &player,sf::Keyboard::Key key);
+        bool Key_Available(const std::vector<Player> &player,const sf::Keyboard::Key &key);
         void Join(const Config &config,Game &game,std::vector<Player> &player);
         void Quit(const Config &config,Game &game,std::vector<Player> &player);
         void Start_Game(const Config &config,Game &game,std::vector<Player> &player);

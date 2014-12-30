@@ -12,6 +12,7 @@
 #include "powerup_effect.h"
 #include "pending.h"
 #include "player.h"
+#include "pacer.h"
 // Temporary
 void Sleep(const int &frame_time,sf::Clock &clock);
 //
@@ -40,6 +41,8 @@ class Game{
         int countdown_int;
         sf::Clock countdown;
         //
+        bool refresh_players;
+        //
         bool wallsaway;
         int morepowerups;
         float elapsed;
@@ -66,23 +69,22 @@ class Game{
         sf::Clock randclock; //.For initializing the rand();
         sf::Clock fps_clock; // For calculating fps
         sf::Clock game_clock; // For game update
-        sf::Clock game_update_thread_clock; // For limiting game_update thread
-        sf::Clock main_thread_clock; // For limiting main thread
         sf::Clock packetclock; // Measuring time between packets;
+        //
+        Pacer game_pacer;
         // Constructor
-        Game();
+        Game(const Config &config);
         // Functions
         void Switch_Mode(const Game::Mode &Mode);
-        void Initialize(const Config &config,Game &game,std::vector<Player> &player);
-        void Thread(const Config &config,Game &game,std::vector<Player> &player);
-        void New_Round(const Config &config,Game &game,std::vector<Player> &player);
+        void Initialize(const Config &config,std::vector<Player> &player);
+        void Thread(const Config &config,std::vector<Player> &player);
+        void New_Round(const Config &config,std::vector<Player> &player);
         void Hit_Detector(const Config &config,std::vector<Player> &player);
-        void Player_Death(std::vector<Player> &player,std::vector<unsigned int> &death_vec);
-        void Add_Points(std::vector<Player> &player, std::vector<unsigned int> &death_vec);
+        void Player_Death(std::vector<Player> &player,const std::vector<unsigned int> &death_vec);
         void End_Round(const Config &config,std::vector<Player> &player);
         void Quit(const Config &config,std::vector<Player> &player);
-        void PowerUp_Manager(const Config &config,Game &game,std::vector<Player> &player);
-        void PowerUp_Manager(const Config &config,Game &game);
+        void PowerUp_Manager(const Config &config,std::vector<Player> &player);
+        void PowerUp_Manager(const Config &config);
         void Pause(const Config &config, const bool &Pause);
         void Shutdown();
 };

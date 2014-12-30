@@ -22,9 +22,12 @@ void Main::Curve_Project(){
             Play_Handler();
         }
         // Check if new player is added
-        if(renderer.objects.vector_length<player.size()||renderer.objects.vector_length>player.size()){
+        if(renderer.objects.vector_length<player.size()||renderer.objects.vector_length>player.size()||game.refresh_players){
             renderer.objects.Sync_Players(config,game,player);
+            game.refresh_players=false;
         }
+        // Delay function
+        thread_pacer.Pace();
     }
     // Shutdown procedure
     game.Shutdown();
@@ -94,6 +97,15 @@ void Main::Event_Handler(){
             }
             else{
                 player[game.name_change].name=renderer.objects.s_names[game.name_change].getString();
+                // Send to others
+                if(game.server[1]||game.client[1]){
+                    Pending pending;
+                    pending.packet << Packet::Name << game.name_change << player[game.name_change].name;
+                    pending.send_id.push_back(-1);
+                    game.mutex.lock();
+                    game.packets.push_back(pending);
+                    game.mutex.unlock();
+                }
             }
             renderer.objects.s_names[game.name_change].setActive(false);
             game.name_change=-1;
@@ -123,43 +135,14 @@ void Main::Event_Handler(){
         }
         // New Round
         else if(game.round_finished&&!game.client[1]&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
-            game.New_Round(config,game,player);
-            // Update round number
-            //renderer.objects.g_round[1].setString(int2string(game.round));
+            game.New_Round(config,player);
         }
         // Pause
-        else if(!game.server[1]&&!game.client[1]&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
+        else if(!game.client[1]&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             game.pause=!game.pause;
             game.game_clock.restart();
-            /*if(game.pause){Pause_Game(config,game,false);}
-            else{Pause_Game(config,game,true);}*/
         }
     }
-/*
-    // Setup screen MP
-    else if(game.mode==Game::Mode::Setup_MP){
-        if(event.type==sf::Event::KeyPressed&&(event.key.code==sf::Keyboard::Return||event.key.code==sf::Keyboard::Escape)){
-            if(game.name_change){
-                player[game.id].Name_Packet(game);
-                game.name_change=false;
-            }
-            game.keychange[1]=-1;
-        }
-        // Name Change
-        else if(game.name_change){
-            // Text Entered
-            if(event.type==sf::Event::TextEntered){
-                if(event.text.unicode==8&&player[game.id].name.getSize()>0){
-                    player[game.id].name.erase(player[game.id].name.getSize()-1,1);
-                }
-                else if(event.text.unicode>31&&event.text.unicode < 127&&player[game.id].name.getSize()<16&&player[game.id].name.getSize()<=10){
-                    player[game.id].name+=static_cast<char>(event.text.unicode);
-                }
-            } // End Textentered
-        }
-        // End Name Change
-    }
-    */
 }
 //
 void Main::Main_Menu_Handler(){
@@ -193,37 +176,43 @@ void Main::Game_Setup_Handler(){
     for(unsigned int i=0;i<player.size()&&i<renderer.objects.vector_length;i++){
         if(renderer.objects.s_names[i].Check(renderer.window)){
             // Name Change
-            if(game.name_change==i){
-                if(renderer.objects.s_names[i].getString().getSize()==0){
-                    renderer.objects.Sync_Players(config,game,player);
+            if(player[i].local){
+                if(game.name_change==i){
+                    if(renderer.objects.s_names[i].getString().getSize()==0){
+                        renderer.objects.Sync_Players(config,game,player);
+                    }
+                    else{
+                        player[i].name=renderer.objects.s_names[i].getString();
+                        if(game.server[1]||game.client[1]){
+                            Pending pending;
+                            pending.packet << Packet::Name << i << player[i].name;
+                            pending.send_id.push_back(-1);
+                            game.mutex.lock();
+                            game.packets.push_back(pending);
+                            game.mutex.unlock();
+                        }
+                    }
+                    renderer.objects.s_names[i].setActive(false);
+                    game.name_change=-1;
+                }
+                else if(game.name_change>-1){
+                    renderer.objects.s_names[game.name_change].setActive(false);
+                    game.name_change=i;
+                    renderer.objects.s_names[i].setActive(true);
                 }
                 else{
-                    player[i].name=renderer.objects.s_names[i].getString();
+                    game.name_change=i;
+                    renderer.objects.s_names[i].setActive(true);
                 }
-                renderer.objects.s_names[i].setActive(false);
-                game.name_change=-1;
-            }
-            else if(game.name_change>-1){
-                renderer.objects.s_names[game.name_change].setActive(false);
-                game.name_change=i;
-                renderer.objects.s_names[i].setActive(true);
-            }
-            else{
-                game.name_change=i;
-                renderer.objects.s_names[i].setActive(true);
             }
         }
-        if(renderer.objects.s_lbutton[i].Check(renderer.window)){
-            Change_Button(0,i);
-        }
-        if(renderer.objects.s_rbutton[i].Check(renderer.window)){
-            game_setup.key_change[0]=1;
-            game_setup.key_change[1]=i;
-            Change_Button(1,i);
-        }
-        if(renderer.objects.s_kick[i].Check(renderer.window)){
-            game_setup.Remove_Player(config,game,player,i);
-            renderer.objects.Sync_Players(config,game,player);
+        if(player[i].local){
+            if(renderer.objects.s_lbutton[i].Check(renderer.window)){
+                Change_Button(0,i);
+            }
+            if(renderer.objects.s_rbutton[i].Check(renderer.window)){
+                Change_Button(1,i);
+            }
         }
         // Status
         if(player[i].server&&renderer.objects.s_status[i].getString()!="Server"){
@@ -234,6 +223,23 @@ void Main::Game_Setup_Handler(){
         }
         else if(!player[i].server&&!player[i].local&&player[i].ready&&renderer.objects.s_status[i].getString()!="Ready"){
             renderer.objects.s_status[i].setString("Ready");
+        }
+        // Kick
+        if(!game.client[1]&& (!player[i].server||!game.server[1]) &&renderer.objects.s_kick[i].Check(renderer.window)){
+            game_setup.Remove_Player(config,game,player,i);
+            renderer.objects.Sync_Players(config,game,player);
+            // Remove from server
+            if(game.server[1]){
+                server.selector.remove(*server.clients[player[i].id].socket);
+                server.clients.erase(server.clients.begin()+player[i].id);
+                Pending pending;
+                pending.packet << Packet::DCon << i;
+                pending.send_id.push_back(-1);
+                game.mutex.lock();
+                game.packets.push_back(pending);
+                game.mutex.unlock();
+            }
+            break;
         }
     }
     // Options
@@ -258,15 +264,10 @@ void Main::Game_Setup_Handler(){
         renderer.objects.setOptions(game);
     }
     // Buttons
-    if(renderer.objects.s_add.Check(renderer.window)){
+    if(!game.client[1]&&!game.server[1]&&renderer.objects.s_add.Check(renderer.window)){
         // Add new player
-        if(!game.client[1]){
-            game_setup.Add_Player(config,game,player);
-            renderer.objects.Sync_Players(config,game,player);
-        }
-        else{
-            //
-        }
+        game_setup.Add_Player(config,game,player);
+        renderer.objects.Sync_Players(config,game,player);
     }
     // Server Text
     if(game.server[1]&&renderer.objects.s_server.getString()=="Start Server"){
@@ -370,7 +371,7 @@ void Main::Play_Handler(){
             renderer.objects.g_countdown.setColor(sf::Color::Green);
         }
     }
-    // Maybe add set marker so it isn't set every time; No Do it
+    //
     if(game.round_finished&&!game.end_message_set){
         if(game.game_finished){
             renderer.objects.g_end_round_message.setString(player[game.round_winner].name + " has won the game!");

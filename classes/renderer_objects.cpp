@@ -55,7 +55,7 @@ void Renderer_Objects::Init_Game_Setup(const Config &config){
     s_name.setCharacterSize(font_size);
     s_name.setColor(sf::Color::White);
     s_name.setStyle(sf::Text::Bold);
-    s_name.setPosition(50 , 150); // Left Semi-top
+    s_name.setPosition(40 , 150); // Left Semi-top
     // Left
     s_left.setString("Left");
     s_left.setFont(font);
@@ -73,12 +73,12 @@ void Renderer_Objects::Init_Game_Setup(const Config &config){
     // Player things
     //
     s_add.setButton("Add",font,font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_add.setPosition(50,150+30*1.5);
+    s_add.setPosition(40,150+30*1.5);
 
     // Vectors initialized when a player is added!
     //
     s_server.setButton("Start Server",font,font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_server.setPosition(50,config.window_height-50);
+    s_server.setPosition(40,config.window_height-50);
     // Options are on the right side
     s_options.setString("Options");
     s_options.setFont(font);
@@ -221,7 +221,7 @@ void Renderer_Objects::Sync_Players(const Config &config,Game &game,const std::v
     for(unsigned int i=0;i<vector_length;i++){
         s_names[i].setString(player[i].name);
         s_names[i].setColors(player[i].color,player[i].color);
-        s_names[i].setPosition(50,195+(i)*45);
+        s_names[i].setPosition(40,195+(i)*45);
         //
         s_lbutton[i].setString(getKeyName(player[i].keyL));
         s_lbutton[i].setColors(player[i].color,player[i].color);
@@ -231,8 +231,11 @@ void Renderer_Objects::Sync_Players(const Config &config,Game &game,const std::v
         s_rbutton[i].setColors(player[i].color,player[i].color);
         s_rbutton[i].setPosition(300,195+(i)*45);
         //
-        if(!player[i].local&&!player[i].server){
-            s_status[i].setString("Client");
+        if(!player[i].local&&!player[i].server&&!player[i].ready){
+            s_status[i].setString("Not ready");
+        }
+        else if(!player[i].local&&!player[i].server&&player[i].ready){
+            s_status[i].setString("Ready");
         }
         else if(player[i].server){
             s_status[i].setString("Server");
@@ -253,13 +256,13 @@ void Renderer_Objects::Sync_Players(const Config &config,Game &game,const std::v
         g_score[i].setPosition(config.window_width-30,50+i*30);
     }
     // Set position of add button
-    s_add.setPosition(50,150+30*1.5+45*vector_length);
+    s_add.setPosition(40,150+30*1.5+45*vector_length);
 }
 //
 void Renderer_Objects::Add_Player(const Config &config,const std::vector<Player> &player){
     // Game Setup
-    s_names.emplace_back(player[vector_length].name,font,font_size,player[vector_length].color,player[vector_length].color,sf::Text::Regular,sf::Text::Italic);
-    s_names[vector_length].setPosition(50,195+(vector_length)*45 );;
+    s_names.emplace_back(player[vector_length].name,font,font_size,player[vector_length].color,player[vector_length].color,sf::Text::Regular,sf::Text::Italic,8);
+    s_names[vector_length].setPosition(40,195+(vector_length)*45 );;
     //
     s_lbutton.emplace_back("None",font,font_size,player[vector_length].color,player[vector_length].color,sf::Text::Regular,sf::Text::Italic);
     s_lbutton[vector_length].setPosition(200,195+(vector_length)*45 );

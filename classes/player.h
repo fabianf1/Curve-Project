@@ -49,6 +49,7 @@ class Player{
         bool server;
         bool left,right;
         bool sendlast;
+        bool disconnected;
         // Constructor
         Player();
         Player(const sf::String &Name,const sf::Color &Color);
@@ -61,19 +62,6 @@ class Player{
         void Add_Line(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &linewidth);
         void Calculate_Gap(const Config &config);
         void Calculate_Powerup_Effect(const Config &config,const Game &game);
-        /*void New_Round(const Config &config,const Game &game);
-        void New_Round_Server(const Config &config,Game &game,int i);
-        void New_Round_Client(const Config &config,Game &game,sf::Packet &packet);
-        void Update_Position(const Config &config, Game &game);
-        void Update_Position_Local(const Config &config, Game &game);
-        //void Update_Position_Server(const Config &config, Game &game,int i);
-        void Update_Position_Client(const Config &config, sf::Packet &packet);
-        //void Update_Position_Client2(const Config &config, sf::Packet &packet); // Handles the bigger update package
-        void Add_Line(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1,const float &H2,const int &linewidth);
-        void Calculate_Powerup_Effect(const Config &config,const Game &game);
-        void Calculate_Gap(const Config &config);
-        void Process_SYNC_Packet(sf::Packet &packet);
-        void Name_Packet(Game &game);*/
 };
 //
 #include "game.h"

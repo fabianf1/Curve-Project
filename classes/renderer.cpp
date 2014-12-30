@@ -70,10 +70,10 @@ void Renderer::Setup(const Config &config,Game &game,std::vector<Player> &player
         else{
             window.draw(objects.s_status[i]);
         }
-        if(!game.client[1]){window.draw(objects.s_kick[i]);}
+        if(!game.client[1]&& (!player[i].server||!game.server[1]) ){window.draw(objects.s_kick[i]);}
     }
     // More
-    if(objects.vector_length<6&&!game.client[1]){
+    if(objects.vector_length<6&&!game.client[1]&&!game.server[1]){
         window.draw(objects.s_add);
     }
     //window.draw(objects.s_name_pointer);

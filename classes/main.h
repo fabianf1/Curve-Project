@@ -12,8 +12,7 @@
 #include "server.h"
 #include "client.h"
 #include "renderer.h"
-// Temporary
-#include "../functions/functions.h"
+#include "pacer.h"
 
 //
 class Main{
@@ -27,10 +26,11 @@ class Main{
         Client client;
         Renderer renderer;
         sf::Event event;
+        Pacer thread_pacer;
         // Functions
 
         // Constructor
-        Main() :renderer(config) {};
+        Main() :game(config), renderer(config),thread_pacer(config.main_thread_min_time) {};
         // Functions
         void Curve_Project();
         void Event_Handler();

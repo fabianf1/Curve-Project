@@ -14,11 +14,12 @@ class Text_Box{
     sf::Text pointer;
     sf::Clock pointer_clock;
     bool typing;
-
+    int pos_x,pos_y;
+    unsigned int max_size;
     public:
         // Constructor
         Text_Box();
-        Text_Box(const sf::String &str,const sf::Font &font,const int &fontsize, const sf::Color &n_col, const sf::Color &s_col,const int &n_sty, const int &s_sty);
+        Text_Box(const sf::String &str,const sf::Font &font,const int &fontsize, const sf::Color &n_col, const sf::Color &s_col,const int &n_sty, const int &s_sty,const unsigned int &m_size);
         // Functions
         void setPosition(const float &x, const float &y);
         //void setPointer(const float &x, const float &y);
@@ -28,7 +29,7 @@ class Text_Box{
         void setActive(const bool &active); // HERE
         void Switch();
         bool Check(sf::RenderWindow &window);
-        void Event(sf::Event &event);
+        void Event(const sf::Event &event);
         void Draw(sf::RenderWindow &window);
 
 };

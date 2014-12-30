@@ -6,13 +6,6 @@ sf::String int2string(int x){
     type << x;
     return type.str();
 }
-//
-void Sleep(const int &frame_time,sf::Clock &clock){
-    int wait=frame_time-clock.restart().asMilliseconds();
-    if(wait>0){
-        sf::sleep(sf::milliseconds(wait));
-    }
-}
 // Thank https://github.com/LaurentGomila/SFML/wiki/Source:-Load-Image-From-Resource
 sf::Image LoadImageFromResource(const std::string& name){
     HRSRC rsrcData = FindResource(NULL, name.c_str(), RT_RCDATA);

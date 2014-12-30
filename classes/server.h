@@ -17,8 +17,8 @@
 #include "player.h"
 #include "client_info.h"
 #include "color.h"
+#include "pacer.h"
 // Temporary
-//void Config_Package(Game &game);
 #include "../functions/functions.h"
 //
 class Server{
@@ -26,10 +26,9 @@ class Server{
         // Vars
         std::vector<Client_Info> clients;
         sf::SocketSelector selector;
-        bool started;
-        bool accept_new;
         sf::TcpListener listener;
         sf::Packet packet;
+        Pacer sender_pacer;
         // Threads
         std::thread thread_listener;
         std::thread thread_sender;
@@ -38,15 +37,11 @@ class Server{
         void Server_Listener(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
         void Server_Sender(const Config &config,Game &game,std::vector<Player> &player);
         void New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
-        //void Client_Init_Packages(const Config &config,Game &game,std::vector<Player> player);
         void Process_Package(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
         void Shutdown(Game &game);
         void Sync_Clients(const Config &config,Game &game,std::vector<Player> &player);
         // Constructor
-        Server(){
-            started=false;
-            accept_new=true;
-        }
+        Server(): sender_pacer(25){}
         // Functions
 };
 

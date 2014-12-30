@@ -134,7 +134,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
             player.back().server=false;
             player.back().ready=false;
         }
-        player[1].local=true;
+        player[game.id].local=true;
     }
     else if(type==Packet::Sync){
         unsigned int id;
@@ -166,13 +166,14 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         int id;
         packet >> id;
         packet >> player[id].name;
+        game.refresh_players=true;
     }
     else if(type==Packet::StartGame){
-        game.Initialize(config,game,player);
+        game.Initialize(config,player);
         std::cout << "Starting Game!!" << std::endl;
     }
     else if(type==Packet::NewRound){
-        game.New_Round(config,game,player);
+        game.New_Round(config,player);
         // Extract
         int id;
         while(!packet.endOfPacket()){
@@ -222,10 +223,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
             packet >> id;
             death_vec.push_back(id);
         }
-        game.Add_Points(player,death_vec);
-        for(unsigned int i=0;i<death_vec.size();i++){
-            player[i].death=true;
-        }
+        game.Player_Death(player,death_vec);
     }
     else if(type==Packet::GameEnd){
         int id;
@@ -342,12 +340,15 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
     else if(type==Packet::DCon){
         int id;
         packet >> id;
-        player[id].enabled=false;
+        // Remove from list
+        player.erase(player.begin()+id);
+        game.refresh_players=true;
     }
     else if(type==Packet::Ready){
         int id;
         packet >> id;
         packet >> player[id].ready;
+        game.refresh_players=true;
     }
     else if(type==Packet::Config){
         packet >> game.maxpoints >> game.powerup_enabled;

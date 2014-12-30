@@ -73,7 +73,7 @@ void Game_Setup::Remove_Player(const Config &config,Game &game,std::vector<Playe
     std::cout << "Number of players: " << player.size() << std::endl;
 }
 //
-bool Game_Setup::Key_Available(std::vector<Player> &player,sf::Keyboard::Key key){
+bool Game_Setup::Key_Available(const std::vector<Player> &player,const sf::Keyboard::Key &key){
     // Space and escape are not allowed!
     if(key==sf::Keyboard::Escape||key==sf::Keyboard::Space){
         return false;
@@ -116,7 +116,7 @@ void Game_Setup::Start_Game(const Config &config,Game &game,std::vector<Player> 
         }
     }
     // If they are start init
-    game.Initialize(config,game,player);
+    game.Initialize(config,player);
 }
 //
 void Game_Setup::Auto_Add_Players(const Config &config,Game &game,std::vector<Player> &player){

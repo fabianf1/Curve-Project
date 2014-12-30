@@ -2,7 +2,7 @@
 // Needed Header
 #include "prompt.h"
 // Functions
-void Prompt::setPrompt(sf::String field,const sf::Font &font,int fontsize,int X, int Y){
+void Prompt::setPrompt(const sf::String &field,const sf::Font &font,const unsigned int &fontsize,const int &X,const int &Y){
     x=X;
     y=Y;
     //

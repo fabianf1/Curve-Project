@@ -7,6 +7,7 @@ Player::Player(){
     line.setPrimitiveType(sf::Quads);
     keyL=keyR=sf::Keyboard::Unknown;
     local=server=false;
+    disconnected=false;
 }
 //
 Player::Player(const sf::String &Name,const sf::Color &Color){
@@ -16,6 +17,7 @@ Player::Player(const sf::String &Name,const sf::Color &Color){
     line.setPrimitiveType(sf::Quads);
     keyL=keyR=sf::Keyboard::Unknown;
     local=server=false;
+    disconnected=false;
 }
 // Functions
 void Player::New_Game(const Config &config,Game &game){
@@ -76,6 +78,7 @@ void Player::New_Round(const Config &config,Game &game){
         ready=true;
     }
     // Reset other vars
+    left=right=false;
     line.clear();
     death=false;
     deathframe=0;

@@ -18,7 +18,7 @@ class Prompt{
     Text_Button confirm;
     public:
         // Functions
-        void setPrompt(sf::String field,const sf::Font &font,int fontsize,int x, int y); // color and style hardcoded;
+        void setPrompt(const sf::String &field,const sf::Font &font,const unsigned int &fontsize,const int &X,const int &Y); // color and style hardcoded;
         void Empty(); // To empty the fields
         void Draw(sf::RenderWindow &window);
         void Event(sf::Event &event);
