@@ -107,7 +107,6 @@ void Renderer_Objects::Init_Game_Setup(const Config &config){
     s_powerups.setFont(font);
     s_powerups.setCharacterSize(font_size*0.75);
     s_powerups.setColor(sf::Color::White);
-    //s_powerups.setStyle(sf::Text::Regular);
     s_powerups.setPosition(670 , 240);
     //
     s_powerupon.setButton("On",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
@@ -115,6 +114,18 @@ void Renderer_Objects::Init_Game_Setup(const Config &config){
     //
     s_powerupoff.setButton("Off",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
     s_powerupoff.setPosition(880,240);
+    //
+    s_countdown.setString("Countdown:");
+    s_countdown.setFont(font);
+    s_countdown.setCharacterSize(font_size*0.75);
+    s_countdown.setColor(sf::Color::White);
+    s_countdown.setPosition(670 , 280);
+    //
+    s_countdownon.setButton("On",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
+    s_countdownon.setPosition(830,280);
+    //
+    s_countdownoff.setButton("Off",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
+    s_countdownoff.setPosition(880,280);
     // Buttons :D
     s_start.setButton("Start Game",font,font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
     s_start.setPosition(config.window_width/2-s_start.getLocalBounds().width/2,config.window_height-100); // Middle Bottom
@@ -316,6 +327,15 @@ void Renderer_Objects::setOptions(const Game &game){
     else{
         s_powerupon.setActive(false);
         s_powerupoff.setActive(true);
+    }
+    // Countdown
+    if(game.countdown_enabled){
+        s_countdownon.setActive(true);
+        s_countdownoff.setActive(false);
+    }
+    else{
+        s_countdownon.setActive(false);
+        s_countdownoff.setActive(true);
     }
 }
 // Font Loader

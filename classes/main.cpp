@@ -138,7 +138,7 @@ void Main::Event_Handler(){
             game.New_Round(config,player);
         }
         // Pause
-        else if(!game.client[1]&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
+        else if(!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             game.pause=!game.pause;
             game.game_clock.restart();
         }
@@ -263,6 +263,14 @@ void Main::Game_Setup_Handler(){
         game.powerup_enabled=true;
         renderer.objects.setOptions(game);
     }
+    if(renderer.objects.s_countdownoff.Check(renderer.window)){
+        game.countdown_enabled=false;
+        renderer.objects.setOptions(game);
+    }
+    if(renderer.objects.s_countdownon.Check(renderer.window)){
+        game.countdown_enabled=true;
+        renderer.objects.setOptions(game);
+    }
     // Buttons
     if(!game.client[1]&&!game.server[1]&&renderer.objects.s_add.Check(renderer.window)){
         // Add new player
@@ -352,10 +360,6 @@ void Main::Play_Handler(){
         // Update round number
         renderer.objects.g_round[1].setString(int2string(game.round));
         renderer.objects.g_frame[1].setString(int2string(game.frame));
-        // Set FPS
-        /*sf::Time elapsed = game.fps_clock.restart();
-        game.last_fps=int ( 30/ (elapsed.asSeconds()) );
-        renderer.objects.g_fps[1].setString(int2string(game.last_fps));*/
     }
     // Countdown timer
     if(game.countdown_int>0){

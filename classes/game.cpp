@@ -9,7 +9,7 @@ Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time)
     maxpoints=10;
     mode=Mode::Main_Menu;
     powerup_enabled=true;
-    player_switched=false;
+    countdown_enabled=false;
     morepowerups=0;
     update_thread[0]=update_thread[1]=update_thread[2]=false;
     server[0]=server[1]=server[2]=false;
@@ -210,7 +210,10 @@ void Game::New_Round(const Config &config,std::vector<Player> &player){
         packets.push_back(pending);
         mutex.unlock();
     }
-    // Could implement client side countdown here
+    else if(!client[1]&&countdown_enabled){
+        countdown.restart();
+        countdown_int=3;
+    }
 }
 //
 void Game::Hit_Detector(const Config &config,std::vector<Player> &player){

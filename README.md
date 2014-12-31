@@ -9,9 +9,7 @@ To build it look [here](http://sfml-dev.org/tutorials/2.1/) for info how to setu
 To-Do List
 ----------------------------
 * Clean up code
-* Add countdown to local
 * Add Server&Client lag detection
 * Add version check
-* Complete server people handling
 * Add AI
-* Multiple player per server/client
+* Multiple players per server/client

@@ -6,7 +6,6 @@ void Server::Start(const Config &config,Game_Setup &game_setup,Game &game,std::v
     game.server[0]=false;
     // Set player for server
     game.id=0;
-    game.players=1;
     //
     if(player.size()>1){
         player.clear();
@@ -56,7 +55,6 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
                 else{
                     selector.add(*clients.back().socket);
                     clients.back().ip=clients.back().socket->getRemoteAddress();
-                    game.players=clients.size()+1; // // //
                     std::cout << "Remote client " + clients.back().ip.toString() + " has connected to the server. \n";
                     clients.back().connected=true;
                     New_Client(config,game_setup,game,player);
@@ -80,7 +78,6 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
                         default:
                             stop=true;
                             std::cout << "Remote client disconnected." << std::endl;
-                            game.players=clients.size()+1;
                             // Create Packages
                             Pending pending;
                             pending.packet << Packet::DCon << clients[i].id;

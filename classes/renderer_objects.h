@@ -54,6 +54,8 @@ class Renderer_Objects{
         Text_Button s_max10,s_max20,s_max40;
         sf::Text s_powerups;
         Text_Button s_powerupon,s_powerupoff;
+        sf::Text s_countdown;
+        Text_Button s_countdownon,s_countdownoff;
         // Buttons :D
         Text_Button s_start;
         Text_Button s_quit;

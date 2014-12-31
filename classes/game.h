@@ -28,9 +28,8 @@ class Game{
         int name_change;
         int maxpoints;
         bool powerup_enabled;
-        bool player_switched;
+        bool countdown_enabled;
         bool pause;
-        int players;
         unsigned int round;
         unsigned int deathcount;
         bool round_finished;
@@ -66,7 +65,6 @@ class Game{
         //
         //std::mutex mode_lock;
         // Clocks
-        sf::Clock randclock; //.For initializing the rand();
         sf::Clock fps_clock; // For calculating fps
         sf::Clock game_clock; // For game update
         sf::Clock packetclock; // Measuring time between packets;

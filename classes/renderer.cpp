@@ -36,6 +36,10 @@ void Renderer::Thread(const Config &config,Game &game,std::vector<Player> &playe
         //
         window.display();
         game.frame++;
+        // FPS
+        if(game.frame%(config.fps)==0){
+            objects.g_fps[1].setString(int2string( (1.0/game.fps_clock.restart().asSeconds())*(config.fps) ));
+        }
     }
     std::cout << "Render Thread Stopped" << std::endl;
 }
@@ -86,6 +90,11 @@ void Renderer::Setup(const Config &config,Game &game,std::vector<Player> &player
     window.draw(objects.s_powerups);
     window.draw(objects.s_powerupon);
     window.draw(objects.s_powerupoff);
+    if(!game.client[1]&&!game.server[1]){
+        window.draw(objects.s_countdown);
+        window.draw(objects.s_countdownon);
+        window.draw(objects.s_countdownoff);
+    }
     // Buttons
     window.draw(objects.s_server);
     window.draw(objects.s_start);

@@ -5,7 +5,6 @@
 Powerup_Sprite::Powerup_Sprite(const Config &config){
     sf::Image tempImage = LoadImageFromResource("texture");
     texture.loadFromImage(tempImage);
-    //texture.loadFromFile("Texture.png");
     texture.setSmooth(true);
     // Fast sprites
     fastgreen.setTexture(texture);
