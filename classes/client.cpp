@@ -211,8 +211,17 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                 player[id].Update_Position(config,packet);
             }
         }
+        else if(number<game.packetnumber-5){
+            std::cout << "Large packet mixup!! Pausing game!" << ", " << number << ", " << game.packetnumber << std::endl;
+            // Send packet
+            Pending pending;
+            pending.packet << Packet::Lag << game.id;
+            game.mutex.lock();
+            game.packets.push_back(pending);
+            game.mutex.unlock();
+        }
         else{
-            std::cout << "Packet Mixup!!" << ", " << number << ", " << game.packetnumber << std::endl;
+            std::cout << "Packet mixup!!" << ", " << number << ", " << game.packetnumber << std::endl;
         }
 
     }

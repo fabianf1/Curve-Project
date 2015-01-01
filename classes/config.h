@@ -3,6 +3,8 @@
 #define CURVE_CONFIG
 // SFML Headers
 #include <SFML/Graphics.hpp>
+// For LoadImageFromResource
+#include "../functions/functions.h"
 //
 class Config{
     public:
@@ -28,9 +30,16 @@ class Config{
         //
         int shift;
         int turn;
+        //Powerup Things
+        float slow_scaling;
+        float slow_min_multiplier;
+        float slow_turn_scaling;
+        float slow_turn_min_multiplier;
         //
-        float slow_multiplier;
-        float fast_multiplier;
+        float fast_scaling;
+        float fast_max_multiplier;
+        float fast_turn_scaling;
+        float fast_turn_max_multiplier;
         float small_multiplier;
         float big_multiplier;
         float powerup_scale;

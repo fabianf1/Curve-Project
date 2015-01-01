@@ -129,13 +129,6 @@ void Player::Update_Position(const Config &config, Game &game){
             keyrelease=false;
         }
     }
-    // Force between 0-360 degrees
-    /*if(h>360){
-        h-=360;
-    }
-    else if(h<0){
-        h+=360;
-    }*/
     //
     // Save new X and Y, but keep old ones for a while
     xOLD=x;
@@ -161,7 +154,7 @@ void Player::Update_Position(const Config &config, Game &game){
             Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
     }
-    // Do some extra things if outside playfield, which means if hitdetector works walls away is active
+    // Do some extra things if outside playfield, which means walls away is active
     // Left
     if(x<config.wallwidth/2){
         xOLD+=config.window_width-config.statuswidth-config.wallwidth;
@@ -287,24 +280,18 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
     // Do speed and line size effects
     //
     if(speed>0){
-        // Making sure speed doesn't get too high
-        if(speed>3){
-            speed=3;
-        }
-        shift*=pow(config.fast_multiplier,speed);
-        turn*=pow(config.fast_multiplier,speed);
+        // To make sure it won't go to fast I could use a function like max*(1-exp(-a*x)). Max is the maximum speed multiplier and a is a scaling factor
+        shift*=config.fast_max_multiplier * ( 1 - exp( - config.fast_scaling * speed ) ); // 2.1742    3.5606    4.4446 (max=6&a=0.45)
+        turn*=config.fast_turn_max_multiplier * ( 1 - exp( - config.fast_turn_scaling * speed ) ); // Maybe 7/8 or 7/9
     }
     else if(speed<0){
-        // Making sure speed doesn't get too low
-        if(speed<-3){
-            speed=-3;
-        }
-        shift*=pow(config.slow_multiplier,(-1)*speed);
-        turn*=pow(config.slow_multiplier,(-1)*speed);
+        // Function min+exp(a*x); min is the minimum multiplier and a is a scaling factor. As x is already negative no minus sign is needed.
+        //float multiplier=config.min_slow_multiplier+exp(config.slow_scaling*speed); // -1=0.6;-2=0.36;-3=0.22 (min=0&a=0.5)
+        shift*=config.slow_min_multiplier+exp(config.slow_scaling*speed);;
+        turn*=config.slow_turn_min_multiplier+exp(config.slow_turn_scaling*speed);;
     }
     //
     if(line_size>0){
-        // No limit on linewidth :D
         linewidth*=pow(config.big_multiplier,line_size);
     }
     else if(line_size<0){

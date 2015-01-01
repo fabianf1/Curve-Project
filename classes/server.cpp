@@ -39,7 +39,7 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
     }
     if(!game.connected){
         game.server[2]=true;
-        std::cout << "Can't bind! Shutting down server." << std::endl;
+        std::cout << "Can't bind! Please restart program." << std::endl;
     }
     // Main Loop
     while(!game.server[2]){
@@ -260,8 +260,8 @@ void Server::Process_Package(const Config &config,Game &game,std::vector<Player>
     else if(type==Packet::Lag){
         int id;
         packet >> id;
-        std::cout << id << " lags";
-        //Pause_Game(config,game,true);
+        std::cout << player[id].name.toAnsiString() << "(" << id << ") " << " lags";
+        game.pause=true;
     }
 }
 //

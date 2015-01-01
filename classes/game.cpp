@@ -53,6 +53,7 @@ void Game::Initialize(const Config &config, std::vector<Player> &player){
     }
     round=0;
     packetnumber=0;
+    pause=true;
     // Start update thread
     thread = std::thread(&Game::Thread,this,std::cref(config),std::ref(player));
     // At last switch to game screen
@@ -86,6 +87,7 @@ void Game::Thread(const Config &config,std::vector<Player> &player){
             elapsed=game_clock.restart().asSeconds();
             if(elapsed>config.max_dt){
                 elapsed=config.max_dt;
+                std::cout << "Slow execution!" << std::endl;
             }
             // End Elapsed
             // Powerup
@@ -231,7 +233,7 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
         }
         else{
             // Line hit check
-            // Only when not gapping
+            // Only when not gapping or invisible
             if(player[i].gap[0]>0.0&&!player[i].invisible){
                 float diffx,diffy;
                 //
@@ -263,18 +265,27 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
 
                     }
                     // Own line
-                    else if(j==i&&player[j].line.getVertexCount()>30){
-                        // Safety feature if big and small
-                        int delay=30;
-                        if(player[j].linewidth>config.linewidth&&player[j].shift<config.shift&&player[j].line.getVertexCount()>45){
-                            delay=45;
+                    else if(j==i){
+                        // Delay should be depending on speed and line width
+                        unsigned int delay=config.shift;
+                        // Linewidth scaling
+                        if(player[j].linewidth>config.linewidth){
+                            delay*=player[j].linewidth/config.linewidth;
                         }
-                        for(unsigned int k=0;k<player[j].line.getVertexCount()-delay;k++){
-                            diffx=x-player[j].line[k].position.x;
-                            diffy=y-player[j].line[k].position.y;
-                            if( (diffx*diffx) + (diffy*diffy) < player[i].linewidth*player[i].linewidth/4 ){
-                                death_vec.emplace_back(i);
-                                break;
+                        // Speed scaling
+                        if(player[j].shift<config.shift){
+                            delay*=config.shift/player[j].shift;
+                        }
+                        // Note that it is possible that having a very slow speed and then accelerating fast could maybe also trigger a hit
+                        // This is to check if the line is long enough. I think I could better add this to player::powerup_effect.
+                        if(player[j].line.getVertexCount()>delay){
+                            for(unsigned int k=0;k<player[j].line.getVertexCount()-delay;k++){
+                                diffx=x-player[j].line[k].position.x;
+                                diffy=y-player[j].line[k].position.y;
+                                if( (diffx*diffx) + (diffy*diffy) < player[i].linewidth*player[i].linewidth/4 ){
+                                    death_vec.emplace_back(i);
+                                    break;
+                                }
                             }
                         }
                     } // End own line hit check
@@ -521,8 +532,8 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                         break;
                     }
                 }
-                // Other Powerups hit check
-                if(spawn){
+                // Other Powerups hit check; I should remove this.
+                /*if(spawn){
                     for(unsigned int j=0;j<powerup.size();j++){
                         float dx=powerup[j].x-X;
                         float dy=powerup[j].y-Y;
@@ -531,7 +542,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                             spawn=false;
                         }
                     }
-                }
+                }*/
                 iter++;
             }
             //
@@ -556,7 +567,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                 impact=1;
             }
             //
-            int id=rand()%50000;
+            int id=std::time(nullptr);
             // Store powerup
             Powerup temp(X,Y,type,impact,D,id);
             powerup.push_back(temp);

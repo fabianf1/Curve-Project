@@ -1,8 +1,6 @@
 // Contains functions and constructors for the config class
 // Header
 #include "config.h"
-// Temporary
-#include "../functions/functions.h"
 // Constructor
 Config::Config(){
     title="Curve Project";
@@ -33,26 +31,36 @@ Config::Config(){
     shift=50; //75; // Per second
     turn=shift*13/8;
     // Powerup Settings
-    slow_multiplier=0.70;
-    fast_multiplier=1.75;
+    // Slow
+    slow_scaling=0.5; // How fast it will go to the minimum speed;
+    slow_min_multiplier=0.01; // The minimum multiplier it can reach
+    slow_turn_scaling=0.25;
+    slow_turn_min_multiplier=0.01;
+    // Fast
+    fast_scaling=0.4;
+    fast_max_multiplier=6;
+    fast_turn_scaling=0.275; // At faster speeds turning will also go slower(if fast_turn_scaling<fast_scaling)
+    fast_turn_max_multiplier=6;
+    // Line size
     small_multiplier=0.6;
     big_multiplier=1.75;
-    powerup_spawn_chance=10; //5;// % per 0.5 second
+    //
+    powerup_spawn_chance=10; //5;// % per powerup_spawn_check second
     powerup_spawn_check=0.5;
     powerup_scale=0.4; // Textures are 100x100
     powerup_radius=40/2; // 40 is full width
     powerup_min_disappear=15.0;
     powerup_rand_disappear=15000;
-    powerup_effect_min_disappear=5;
-    powerup_effect_rand_disappear=7500;
+    powerup_effect_min_disappear=10.0; // In seconds
+    powerup_effect_rand_disappear=5000; // In milliseconds
     powerup_more_powerup_delay=2.0;
     powerup_spawn_delay=1; //2.6;
-    powerup_fade_time=2.0;
+    powerup_fade_time=2.0; // Time it takes for a powerup to fade in or out
     powerup_safe_d=shift;
-    powerup_safe_radius=powerup_radius+30;
+    powerup_safe_radius=powerup_radius*5/2;
     // Gap Settings
-    min_to_gap=5.0;
-    rand_to_gap=10000;
+    min_to_gap=5.0; // In seconds
+    rand_to_gap=10000; // In milliseconds
     min_width_gap=0.2;
     rand_width_gap=300;
     //
@@ -63,5 +71,5 @@ Config::Config(){
     port=55003;
     max_attempts=3;
     attempt_delay=500;
-    lagtime=1.5;
+    lagtime=1.0;
 }

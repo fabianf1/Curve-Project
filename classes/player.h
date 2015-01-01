@@ -35,8 +35,8 @@ class Player{
         bool keyrelease;
         //
         int linewidth;
-        int shift;
-        int turn;
+        float shift;
+        float turn;
         bool rightangle;
         bool invisible;
         bool inverted;
