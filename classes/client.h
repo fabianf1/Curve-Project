@@ -12,6 +12,7 @@
 #include "player.h"
 #include "pending.h"
 #include "color.h"
+#include "powerup.h"
 // Temporary
 #include "../functions/functions.h"
 //

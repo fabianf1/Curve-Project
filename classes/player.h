@@ -10,6 +10,7 @@
 //#include "game.h"
 #include "pending.h"
 #include "enum.h"
+#include "powerup.h"
 // Define
 #define PI 3.14159265359
 // Extra

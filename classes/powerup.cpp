@@ -1,13 +1,32 @@
-// Contains functions and constructors for the Powerup class
 // Header
 #include "powerup.h"
-//
-Powerup::Powerup(const int &X,const int &Y,const int &Type,const int &Impact,const float &Time,int &ID){
-    x=X;
-    y=Y;
+// Constructor
+Powerup::Powerup(const Powerup::Type &Type,const Powerup::Impact &Impact, const int &Chance, const int &Min, const int &Rand){
     type=Type;
     impact=Impact;
-    time1=0;
-    time2=Time;
-    id=ID;
+    spawn_chance=Chance;
+    effect_min_disappear=Min;
+    effect_rand_disappear=Rand;
 }
+// Overloads
+sf::Packet& operator <<(sf::Packet& packet, const Powerup::Type &j){
+    //int i=static_cast<int>(j);
+    return packet << static_cast<int>(j);
+}
+sf::Packet& operator >>(sf::Packet& packet, Powerup::Type &j){
+    int i;
+    packet >> i;
+    j=(Powerup::Type) i;
+    return packet;
+}
+sf::Packet& operator <<(sf::Packet& packet, const Powerup::Impact &j){
+    //int i=static_cast<int>(j);
+    return packet << static_cast<int>(j);
+}
+sf::Packet& operator >>(sf::Packet& packet, Powerup::Impact &j){
+    int i;
+    packet >> i;
+    j=(Powerup::Impact) i;
+    return packet;
+}
+

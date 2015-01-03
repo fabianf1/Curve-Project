@@ -248,31 +248,33 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
     int line_size=0;
     // Check for effects
     for(unsigned int i=0;i<game.player_powerup_effect.size();i++){
-        if(game.player_powerup_effect[i].impact==2||(game.player_powerup_effect[i].impact==1&&game.player_powerup_effect[i].player!=place)||(game.player_powerup_effect[i].impact==0&&game.player_powerup_effect[i].player==place)){
+        if(game.player_powerup_effect[i].impact==Powerup::Impact::All
+           ||(game.player_powerup_effect[i].impact==Powerup::Impact::Other&&game.player_powerup_effect[i].player!=place)
+           ||(game.player_powerup_effect[i].impact==Powerup::Impact::Self&&game.player_powerup_effect[i].player==place)){
             // Speed
-            if(game.player_powerup_effect[i].type==0){
+            if(game.player_powerup_effect[i].type==Powerup::Type::Fast){
                 speed++;
             }
-            else if(game.player_powerup_effect[i].type==1){
+            else if(game.player_powerup_effect[i].type==Powerup::Type::Slow){
                 speed--;
             }
             // Linewidth
-            else if(game.player_powerup_effect[i].type==2){
+            else if(game.player_powerup_effect[i].type==Powerup::Type::Small){
                 line_size--;
             }
-            else if(game.player_powerup_effect[i].type==3){
+            else if(game.player_powerup_effect[i].type==Powerup::Type::Big){
                 line_size++;
             }
             // Right Angle
-            else if(game.player_powerup_effect[i].type==4){
+            else if(game.player_powerup_effect[i].type==Powerup::Type::Right_Angle){
                 rightangle=true;
             }
             // Invisible
-            else if(game.player_powerup_effect[i].type==6){
+            else if(game.player_powerup_effect[i].type==Powerup::Type::Invisible){
                 invisible=true;
             }
             // Invert directions
-            else if(game.player_powerup_effect[i].type==9){
+            else if(game.player_powerup_effect[i].type==Powerup::Type::Invert_Keys){
                 inverted=true;
             }
         }
@@ -282,7 +284,7 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
     if(speed>0){
         // To make sure it won't go to fast I could use a function like max*(1-exp(-a*x)). Max is the maximum speed multiplier and a is a scaling factor
         shift*=config.fast_max_multiplier * ( 1 - exp( - config.fast_scaling * speed ) ); // 2.1742    3.5606    4.4446 (max=6&a=0.45)
-        turn*=config.fast_turn_max_multiplier * ( 1 - exp( - config.fast_turn_scaling * speed ) ); // Maybe 7/8 or 7/9
+        turn*=config.fast_turn_max_multiplier * ( 1 - exp( - config.fast_turn_scaling * speed ) );
     }
     else if(speed<0){
         // Function min+exp(a*x); min is the minimum multiplier and a is a scaling factor. As x is already negative no minus sign is needed.

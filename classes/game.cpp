@@ -19,6 +19,39 @@ Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time)
     countdown_int=0;
     srand (std::time(nullptr));
     refresh_players=false;
+    // Set the different powerups
+    // Slow
+    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Self,100,10,5000);
+    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Other,100,10,5000);
+    //powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::All,100,10,5000);
+    // Fast
+    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Self,100,10,5000);
+    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Other,100,10,5000);
+    //powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::All,100,10,5000);
+    // Small
+    powerups.emplace_back(Powerup::Type::Small,Powerup::Impact::Self,100,10,5000);
+    // Big
+    powerups.emplace_back(Powerup::Type::Big,Powerup::Impact::Other,100,10,5000);
+    // Right Angles
+    powerups.emplace_back(Powerup::Type::Right_Angle,Powerup::Impact::Self,50,10,5000);
+    powerups.emplace_back(Powerup::Type::Right_Angle,Powerup::Impact::Other,100,10,5000);
+    // Clear
+    powerups.emplace_back(Powerup::Type::Clear,Powerup::Impact::All,100,10,5000);
+    // Invisible
+    powerups.emplace_back(Powerup::Type::Invisible,Powerup::Impact::Self,100,10,5000);
+    // Walls Away
+    powerups.emplace_back(Powerup::Type::Walls_Away,Powerup::Impact::All,100,10,5000);
+    // More Powerups
+    powerups.emplace_back(Powerup::Type::More_Powerups,Powerup::Impact::All,100,10,5000);
+    // Invert Keys
+    powerups.emplace_back(Powerup::Type::Invert_Keys,Powerup::Impact::Other,100,10,5000);
+    //
+    powerups.emplace_back(Powerup::Type::Question_Mark,Powerup::Impact::Other,25,10,5000);
+    // Calculate total chance
+    total_chance=0;
+    for(unsigned int i=0;i<powerups.size();i++){
+        total_chance+=powerups[i].spawn_chance;
+    }
 }
 // Functions
 void Game::Switch_Mode(const Game::Mode &Mode){
@@ -59,9 +92,7 @@ void Game::Initialize(const Config &config, std::vector<Player> &player){
     // At last switch to game screen
     Switch_Mode(Game::Mode::Play);
     //
-    //if(!client[1]){
-        New_Round(config,player);
-    //}
+    New_Round(config,player);
 }
 //
 void Game::Thread(const Config &config,std::vector<Player> &player){
@@ -184,7 +215,7 @@ void Game::New_Round(const Config &config,std::vector<Player> &player){
     end_message_set=false;
     pause=true; // Pause_Game(config,game,window,true);
     round++;
-    powerup.clear();
+    powerup_field.clear();
     powerup_effect.clear();
     wallsaway=false;
     morepowerups=0;
@@ -271,6 +302,10 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                         // Linewidth scaling
                         if(player[j].linewidth>config.linewidth){
                             delay*=player[j].linewidth/config.linewidth;
+                        }
+                        // Right Angles
+                        if(player[j].rightangle){
+                            delay*=1.5;
                         }
                         // Speed scaling
                         if(player[j].shift<config.shift){
@@ -409,40 +444,22 @@ void Game::Shutdown(){
 }
 //
 void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
-    /*  Powerup List
-            0=Fast
-            1=Slow
-            2=Small
-            3=Big
-            4=Right Angles
-            5=Clear
-            6=Invisible
-            7=Walls away
-            8=More Powerups
-            9=Invert Keys
-            Total=10
-        Powerup Color
-            0=Green=self
-            1=Red=enemy
-            2=Blue=all
-            yellow=random?
-    */
     // Deletes Powerups that are on the end of their lives
-    for(unsigned int i=0;i<powerup.size();i++){
-        powerup[i].time1+=elapsed;
-        powerup[i].time2-=elapsed;
-        if(powerup[i].time2<0.0){
+    for(unsigned int i=0;i<powerup_field.size();i++){
+        powerup_field[i].time1+=elapsed;
+        powerup_field[i].time2-=elapsed;
+        if(powerup_field[i].time2<0.0){
             //
             if(server[1]){
                 Pending pending;
-                pending.packet << Packet::PowerupDelF << powerup[i].id;
+                pending.packet << Packet::PowerupDelF << powerup_field[i].id;
                 pending.send_id.push_back(-1);
                 mutex.lock();
                 packets.push_back(pending);
                 mutex.unlock();
             }
             //
-            powerup.erase(powerup.begin()+i);
+            powerup_field.erase(powerup_field.begin()+i);
         }
     }
     // Remove Powerups for players
@@ -467,9 +484,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
     // If del then recalculate effects
     if(del){
         for(unsigned int i=0;i<player.size();i++){
-            //if(!player[i].death){
-                    player[i].Calculate_Powerup_Effect(config,*this);
-            //}
+                player[i].Calculate_Powerup_Effect(config,*this);
         }
     }
     // Remove powerup effects that effect whole game
@@ -477,7 +492,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
         powerup_effect[j].time-=elapsed;
         if(powerup_effect[j].time<0.0){
             //
-            if(powerup_effect[j].type==7){
+            if(powerup_effect[j].type==Powerup::Type::Walls_Away){
                 wallsaway=false;
                 if(server[1]){
                     Pending pending;
@@ -488,7 +503,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                     mutex.unlock();
                 }
             }
-            else if(powerup_effect[j].type==8){
+            else if(powerup_effect[j].type==Powerup::Type::More_Powerups){
                 morepowerups=3;
             }
             powerup_effect.erase(powerup_effect.begin()+j);
@@ -545,32 +560,16 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                 }*/
                 iter++;
             }
-            //
+            // Choose a powerup
+            Powerup::Type type;
+            Powerup::Impact impact;
+            Choose_PowerUp(type,impact);
+            // Calculate disappear time
             float D=config.powerup_min_disappear + ( ( rand() % (config.powerup_rand_disappear+1) ) / 1000.0 ); // Disappear Time
-            int type = rand() % 10;
-            // Impact
-            int impact;
-            // Green or Red
-            if(type==0||type==1||type==2||type==3||type==4){
-                impact=rand() % 2;// Green or red / 0 or 1
-            }
-            // Only Blue
-            else if(type==5||type==7||type==8){
-                impact=2;
-            }
-            // Only green
-            else if(type==6){
-                impact=0;
-            }
-            // Only Red
-            else if(type==9){
-                impact=1;
-            }
-            //
+            // Set ID so it easier to identify
             int id=std::time(nullptr);
             // Store powerup
-            Powerup temp(X,Y,type,impact,D,id);
-            powerup.push_back(temp);
+            powerup_field.emplace_back(X,Y,type,impact,D,id);
             //
             if(server[1]){
                 Pending pending;
@@ -589,41 +588,49 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
     // k=player within effect for enemy's or all
     for(unsigned int i=0;i<player.size();i++){
         if(player[i].death){continue;}
-        for(unsigned int j=0;j<powerup.size();j++){
-            float dx=player[i].x-powerup[j].x;
-            float dy=player[i].y-powerup[j].y;
+        for(unsigned int j=0;j<powerup_field.size();j++){
+            float dx=player[i].x-powerup_field[j].x;
+            float dy=player[i].y-powerup_field[j].y;
             float radius = config.powerup_radius + player[i].linewidth/2.0;
             if( (dx*dx) + (dy*dy) < radius*radius ) {
                 // Effect Time
                 int D=config.powerup_effect_min_disappear + ( ( rand() % (config.powerup_effect_rand_disappear+1) ) / 1000.0 );
                 //
-                int id=powerup[j].id;
+                int id=powerup_field[j].id;
+                // Question Mark
+                while(powerup_field[j].type==Powerup::Type::Question_Mark){
+                    Choose_PowerUp(powerup_field[j].type,powerup_field[j].impact);
+                }
                 // Effecter
                 // Player Effects
-                if((powerup[j].type!=5&&powerup[j].type<7)||powerup[j].type==9){
-                    player_powerup_effect.emplace_back(i,powerup[j].type,powerup[j].impact,D,id);
-                    for(unsigned int k=0;k<player.size();k++){
-                        // Calculate powerup effects
-                        player[k].Calculate_Powerup_Effect(config,*this);
-                    }
-                }
-                // Clear
-                else if(powerup[j].type==5){
-                    for(unsigned int k=0;k<player.size();k++){
-                        player[k].line.clear();
-                    }
-                }
-                // Walls Away
-                else if(powerup[j].type==7){
-                    Powerup_Effect effect(powerup[j].type,D,id);
-                    powerup_effect.push_back(effect);
-                    wallsaway=true;
-                }
-                // More powerups
-                else if(powerup[j].type==8){
-                    D=config.powerup_more_powerup_delay;
-                    Powerup_Effect effect(powerup[j].type,D,id);
-                    powerup_effect.push_back(effect);
+                switch (powerup_field[j].type){
+                    case Powerup::Type::Slow:
+                    case Powerup::Type::Fast:
+                    case Powerup::Type::Small:
+                    case Powerup::Type::Big:
+                    case Powerup::Type::Right_Angle:
+                    case Powerup::Type::Invisible:
+                    case Powerup::Type::Invert_Keys:
+                        player_powerup_effect.emplace_back(i,powerup_field[j].type,powerup_field[j].impact,D,id);
+                        for(unsigned int k=0;k<player.size();k++){
+                            // Calculate powerup effects
+                            player[k].Calculate_Powerup_Effect(config,*this);
+                        }
+                        break;
+                    case Powerup::Type::Clear:
+                        for(unsigned int k=0;k<player.size();k++){
+                            player[k].line.clear();
+                        }
+                        break;
+                    case Powerup::Type::Walls_Away:
+                        powerup_effect.emplace_back(Powerup::Type::Walls_Away,D,id);
+                        wallsaway=true;
+                        break;
+                    case Powerup::Type::More_Powerups:
+                        powerup_effect.emplace_back(Powerup::Type::More_Powerups,config.powerup_more_powerup_delay,id);
+                        break;
+                    default:
+                        break;
                 }
                 //
                 if(server[1]){
@@ -636,7 +643,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                 }
                 //
                 // Remove powerup!
-                powerup.erase(powerup.begin()+j);
+                powerup_field.erase(powerup_field.begin()+j);
             } // End within radius check
         }// End powerup loop
     }// End player Hit Check
@@ -644,9 +651,24 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
 }
 //
 void Game::PowerUp_Manager(const Config &config){
-    for(unsigned int i=0;i<powerup.size();i++){
-        powerup[i].time1+=elapsed;
-        powerup[i].time2-=elapsed;
+    for(unsigned int i=0;i<powerup_field.size();i++){
+        powerup_field[i].time1+=elapsed;
+        powerup_field[i].time2-=elapsed;
+    }
+}
+//
+void Game::Choose_PowerUp(Powerup::Type &type, Powerup::Impact &impact){
+    int random=rand() % total_chance;
+    int low=0;
+    for(unsigned int i=0;i<powerups.size();i++){
+        if( random>=low && random<(low+powerups[i].spawn_chance) ){
+            type=powerups[i].type;
+            impact=powerups[i].impact;
+            return;
+        }
+        else{
+            low+=powerups[i].spawn_chance;
+        }
     }
 }
 //

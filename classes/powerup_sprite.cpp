@@ -61,4 +61,8 @@ Powerup_Sprite::Powerup_Sprite(const Config &config){
     invertedred.setTexture(texture);
     invertedred.setTextureRect(sf::IntRect(200, 300, 100, 100));
     invertedred.setScale(config.powerup_scale,config.powerup_scale);
+    // Question Mark Blue
+    questionblue.setTexture(texture);
+    questionblue.setTextureRect(sf::IntRect(300, 300, 100, 100));
+    questionblue.setScale(config.powerup_scale,config.powerup_scale);
 }

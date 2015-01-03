@@ -146,85 +146,89 @@ void Renderer::Play(const Config &config,Game &game,std::vector<Player> &player)
 }
 //
 void Renderer::PowerUp(const Config &config,Game &game){
-    for(unsigned int i=0;i<game.powerup.size();i++){
+    for(unsigned int i=0;i<game.powerup_field.size();i++){
         // find opacity
         int opacity=255;
-        if(game.powerup[i].time1<config.powerup_fade_time){
-            opacity=(game.powerup[i].time1/config.powerup_fade_time)*255;
+        if(game.powerup_field[i].time1<config.powerup_fade_time){
+            opacity=(game.powerup_field[i].time1/config.powerup_fade_time)*255;
         }
-        else if(game.powerup[i].time2<config.powerup_fade_time){
-            opacity=(game.powerup[i].time2/config.powerup_fade_time)*255;
+        else if(game.powerup_field[i].time2<config.powerup_fade_time){
+            opacity=(game.powerup_field[i].time2/config.powerup_fade_time)*255;
         }
         sf::Color color(255,255,255,opacity);
         // Choose Sprite
         sf::Sprite *draw;
         // Fast
-        if(game.powerup[i].type==0){
-            if(game.powerup[i].impact==0){
+        if(game.powerup_field[i].type==Powerup::Type::Fast){
+            if(game.powerup_field[i].impact==Powerup::Impact::Self){
                 draw=&sprite.fastgreen;
             }
-            else if(game.powerup[i].impact==1){
+            else if(game.powerup_field[i].impact==Powerup::Impact::Other){
                 draw=&sprite.fastred;
             }
         }
         // Slow
-        else if(game.powerup[i].type==1){
-            if(game.powerup[i].impact==0){
+        else if(game.powerup_field[i].type==Powerup::Type::Slow){
+            if(game.powerup_field[i].impact==Powerup::Impact::Self){
                 draw=&sprite.slowgreen;
             }
-            else if(game.powerup[i].impact==1){
+            else if(game.powerup_field[i].impact==Powerup::Impact::Other){
                 draw=&sprite.slowred;
             }
         }
         // Small
-        else if(game.powerup[i].type==2){
-            if(game.powerup[i].impact==0){
+        else if(game.powerup_field[i].type==Powerup::Type::Small){
+            if(game.powerup_field[i].impact==Powerup::Impact::Self){
                 draw=&sprite.smallgreen;
             }
-            else if(game.powerup[i].impact==1){
+            else if(game.powerup_field[i].impact==Powerup::Impact::Other){
                 draw=&sprite.smallred;
             }
         }
         // Big
-        else if(game.powerup[i].type==3){
-            if(game.powerup[i].impact==0){
+        else if(game.powerup_field[i].type==Powerup::Type::Big){
+            if(game.powerup_field[i].impact==Powerup::Impact::Self){
                 draw=&sprite.biggreen;
             }
-            else if(game.powerup[i].impact==1){
+            else if(game.powerup_field[i].impact==Powerup::Impact::Other){
                 draw=&sprite.bigred;
             }
         }
         // Right Angle
-        else if(game.powerup[i].type==4){
-            if(game.powerup[i].impact==0){
+        else if(game.powerup_field[i].type==Powerup::Type::Right_Angle){
+            if(game.powerup_field[i].impact==Powerup::Impact::Self){
                 draw=&sprite.anglegreen;
             }
-            else if(game.powerup[i].impact==1){
+            else if(game.powerup_field[i].impact==Powerup::Impact::Other){
                 draw=&sprite.anglered;
             }
         }
         // Clear
-        else if(game.powerup[i].type==5){
+        else if(game.powerup_field[i].type==Powerup::Type::Clear){
             draw=&sprite.clearblue;
         }
         // Invisible
-        else if(game.powerup[i].type==6){
+        else if(game.powerup_field[i].type==Powerup::Type::Invisible){
             draw=&sprite.invisiblegreen;
         }
         // Walls Away
-        else if(game.powerup[i].type==7){
+        else if(game.powerup_field[i].type==Powerup::Type::Walls_Away){
             draw=&sprite.wallsawayblue;
         }
         // More
-        else if(game.powerup[i].type==8){
+        else if(game.powerup_field[i].type==Powerup::Type::More_Powerups){
             draw=&sprite.morepowerblue;
         }
         // Inverted
-        else if(game.powerup[i].type==9){
+        else if(game.powerup_field[i].type==Powerup::Type::Invert_Keys){
             draw=&sprite.invertedred;
         }
+        // Question Mark
+        else if(game.powerup_field[i].type==Powerup::Type::Question_Mark){
+            draw=&sprite.questionblue;
+        }
         // Do the things
-        draw->setPosition( game.powerup[i].x-config.powerup_radius , game.powerup[i].y-config.powerup_radius );
+        draw->setPosition( game.powerup_field[i].x-config.powerup_radius , game.powerup_field[i].y-config.powerup_radius );
         draw->setColor(color);
         window.draw(*draw);
     }

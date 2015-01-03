@@ -257,9 +257,9 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
     else if(type==Packet::PowerupDelF){
         int id;
         packet >> id;
-        for(unsigned int i=0;i<game.powerup.size();i++){
-            if(game.powerup[i].id==id){
-                game.powerup.erase(game.powerup.begin()+i);
+        for(unsigned int i=0;i<game.powerup_field.size();i++){
+            if(game.powerup_field[i].id==id){
+                game.powerup_field.erase(game.powerup_field.begin()+i);
                 break;
             }
         }
@@ -283,7 +283,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         for(unsigned int i=0;i<game.powerup_effect.size();i++){
             if(game.powerup_effect[i].id==id){
                 // Check probably not needed anymore
-                if(game.powerup_effect[i].type==7){
+                if(game.powerup_effect[i].type==Powerup::Type::Walls_Away){
                     game.wallsaway=false;
                 }
                 //
@@ -296,10 +296,12 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         int id;
         packet >> id;
         float D;
-        int X,Y,type,impact;
+        int X,Y;
+        Powerup::Type type;
+        Powerup::Impact impact;
         packet >> X >> Y >> type >> impact >> D;
-        Powerup powerup(X,Y,type,impact,D,id);
-        game.powerup.push_back(powerup);
+        Powerup_Field powerup(X,Y,type,impact,D,id);
+        game.powerup_field.push_back(powerup);
     }
     else if(type==Packet::PowerupHit){
         // Player id that hit the powerup
@@ -309,31 +311,38 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         int ID;
         packet >> ID;
         // Find and process
-        for(unsigned int i=0;i<game.powerup.size();i++){
-            if(game.powerup[i].id==ID){
+        for(unsigned int i=0;i<game.powerup_field.size();i++){
+            if(game.powerup_field[i].id==ID){
                 // Actions
                 int D=0;
-                if( (game.powerup[i].type!=5&&game.powerup[i].type<7) ||game.powerup[i].type==9 ){
-                    game.player_powerup_effect.emplace_back(id,game.powerup[i].type,game.powerup[i].impact,D,ID);
-                    for(unsigned int k=0;k<player.size();k++){
-                        // Calculate powerup effects
-                        player[k].Calculate_Powerup_Effect(config,game);
-                    }
-                }
-                // Clear Line
-                else if(game.powerup[i].type==5){
-                    for(unsigned int k=0;k<player.size();k++){
-                        player[k].line.clear();
-                    }
-                }
-                // Walls Away
-                else if(game.powerup[i].type==7){
-                    Powerup_Effect effect(game.powerup[i].type,D,game.powerup[i].id);
-                    game.powerup_effect.push_back(effect);
-                    game.wallsaway=true;
+                switch (game.powerup_field[i].type){
+                    case Powerup::Type::Slow:
+                    case Powerup::Type::Fast:
+                    case Powerup::Type::Small:
+                    case Powerup::Type::Big:
+                    case Powerup::Type::Right_Angle:
+                    case Powerup::Type::Invisible:
+                    case Powerup::Type::Invert_Keys:
+                        game.player_powerup_effect.emplace_back(id,game.powerup_field[i].type,game.powerup_field[i].impact,D,ID);
+                        for(unsigned int k=0;k<player.size();k++){
+                            // Calculate powerup effects
+                            player[k].Calculate_Powerup_Effect(config,game);
+                        }
+                        break;
+                    case Powerup::Type::Clear:
+                        for(unsigned int k=0;k<player.size();k++){
+                            player[k].line.clear();
+                        }
+                        break;
+                    case Powerup::Type::Walls_Away:
+                        game.powerup_effect.emplace_back(Powerup::Type::Walls_Away,D,id);
+                        game.wallsaway=true;
+                        break;
+                    default:
+                        break;
                 }
                 // Delete
-                game.powerup.erase(game.powerup.begin()+i);
+                game.powerup_field.erase(game.powerup_field.begin()+i);
                 break;
             }
         }

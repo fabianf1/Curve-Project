@@ -13,3 +13,10 @@ To-Do List
 * Add AI
 * Multiple players per server/client
 * Make sharp angles really sharp
+* Add more powerups
+    * Lots of gaps
+    * Darkness, only things within R from the players are visible
+    * TNT, lines and powerups within R are blown away
+    * Sinusoidal speed/linewidth
+    * Question mark, a random powerup
+    * Jumping line, line teleports forward instead of moving
