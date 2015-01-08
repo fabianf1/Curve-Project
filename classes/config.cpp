@@ -45,6 +45,9 @@ Config::Config(){
     small_multiplier=0.6;
     big_multiplier=1.75;
     //
+    darkness_radius=125;
+    bomb_radius=250;
+    //
     powerup_spawn_chance=10; //5;// % per powerup_spawn_check second
     powerup_spawn_check=0.5;
     powerup_scale=0.4; // Textures are 100x100
@@ -61,6 +64,8 @@ Config::Config(){
     // Gap Settings
     min_to_gap=5.0; // In seconds
     rand_to_gap=10000; // In milliseconds
+    min_to_gap_powerup=0.05; // In seconds
+    rand_to_gap_powerup=500; // In milliseconds
     min_width_gap=0.2;
     rand_width_gap=300;
     //

@@ -40,8 +40,13 @@ class Config{
         float fast_max_multiplier;
         float fast_turn_scaling;
         float fast_turn_max_multiplier;
+        //
         float small_multiplier;
         float big_multiplier;
+        //
+        int darkness_radius;
+        int bomb_radius;
+        //
         float powerup_scale;
         float powerup_radius;
         int powerup_spawn_chance;
@@ -58,6 +63,8 @@ class Config{
         //
         float min_to_gap; // seconds
         int rand_to_gap; // ms
+        float min_to_gap_powerup; // seconds
+        int rand_to_gap_powerup; // ms
         float min_width_gap;
         int rand_width_gap;
         //

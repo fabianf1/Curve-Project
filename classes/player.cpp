@@ -232,7 +232,12 @@ void Player::Add_Line(const float &X1,const float &X2,const float &Y1,const floa
 }
 //
 void Player::Calculate_Gap(const Config &config){
-    gap[0]=config.min_to_gap + ( rand() % (config.rand_to_gap+1) ) / 1000.0;
+    if(!gapping){
+        gap[0]=config.min_to_gap + ( rand() % (config.rand_to_gap+1) ) / 1000.0;
+    }
+    else{
+        gap[0]=config.min_to_gap_powerup + ( rand() % (config.rand_to_gap_powerup+1) ) / 1000.0;
+    }
     gap[1]=config.min_width_gap + ( ( rand() % (config.rand_width_gap+1) ) / 1000.0 );
 }
 //
@@ -244,6 +249,7 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
     rightangle=false;
     invisible=false;
     inverted=false;
+    gapping=false;
     int speed=0;
     int line_size=0;
     // Check for effects
@@ -276,6 +282,11 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
             // Invert directions
             else if(game.player_powerup_effect[i].type==Powerup::Type::Invert_Keys){
                 inverted=true;
+            }
+            // Gapping
+            else if(game.player_powerup_effect[i].type==Powerup::Type::Gap){
+                gapping=true;
+                gap[0]=0;
             }
         }
     }

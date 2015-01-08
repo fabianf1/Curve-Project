@@ -13,6 +13,7 @@
 #include "pending.h"
 #include "color.h"
 #include "powerup.h"
+#include "pacer.h"
 // Temporary
 #include "../functions/functions.h"
 //
@@ -25,6 +26,7 @@ class Client{
         bool sync;
         bool ready;
         sf::Packet packet;
+        Pacer pacer;
         // Functions
         void Start(const Config &config, Game &game,std::vector<Player> &player);
         void Thread(const Config &config,Game &game,std::vector<Player> &player);
@@ -32,7 +34,7 @@ class Client{
         void Process_Packet(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet);
         void Shutdown(Game &game);
         // Constructor
-        //Client();
+        Client(): pacer(25){}
 };
 #endif // CURVE_CLIENT
 //

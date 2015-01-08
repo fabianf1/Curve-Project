@@ -14,8 +14,6 @@
 #include "pending.h"
 #include "player.h"
 #include "pacer.h"
-// Temporary
-void Sleep(const int &frame_time,sf::Clock &clock);
 //
 class Game{
     public:
@@ -44,6 +42,7 @@ class Game{
         bool refresh_players;
         //
         bool wallsaway;
+        bool darkness;
         int morepowerups;
         float elapsed;
         float powerup_spawn_time;

@@ -4,7 +4,6 @@
 // Standard Headers
 #include <vector>
 // Class Headers
-//#include "client.h"
 #include "config.h"
 #include "game.h"
 #include "game_setup.h"

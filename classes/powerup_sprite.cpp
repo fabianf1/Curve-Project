@@ -65,4 +65,20 @@ Powerup_Sprite::Powerup_Sprite(const Config &config){
     questionblue.setTexture(texture);
     questionblue.setTextureRect(sf::IntRect(300, 300, 100, 100));
     questionblue.setScale(config.powerup_scale,config.powerup_scale);
+    // Darkness Blue
+    darknessblue.setTexture(texture);
+    darknessblue.setTextureRect(sf::IntRect(0, 400, 100, 100));
+    darknessblue.setScale(config.powerup_scale,config.powerup_scale);
+    // Gap Red
+    gapred.setTexture(texture);
+    gapred.setTextureRect(sf::IntRect(100, 400, 100, 100));
+    gapred.setScale(config.powerup_scale,config.powerup_scale);
+    // Bomb Blue
+    bombblue.setTexture(texture);
+    bombblue.setTextureRect(sf::IntRect(200, 400, 100, 100));
+    bombblue.setScale(config.powerup_scale,config.powerup_scale);
+    // Sine Red
+    sinered.setTexture(texture);
+    sinered.setTextureRect(sf::IntRect(300, 400, 100, 100));
+    sinered.setScale(config.powerup_scale,config.powerup_scale);
 }

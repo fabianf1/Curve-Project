@@ -18,7 +18,7 @@
 #include "client_info.h"
 #include "color.h"
 #include "pacer.h"
-// Temporary
+//
 #include "../functions/functions.h"
 //
 class Server{

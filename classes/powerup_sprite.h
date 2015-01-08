@@ -22,6 +22,10 @@ public:
     sf::Sprite morepowerblue;
     sf::Sprite invertedred;
     sf::Sprite questionblue;
+    sf::Sprite darknessblue;
+    sf::Sprite gapred;
+    sf::Sprite bombblue;
+    sf::Sprite sinered;
     //sf::Sprite allpowerups;
     // Constructor
     Powerup_Sprite(const Config &config);

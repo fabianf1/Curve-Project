@@ -38,7 +38,9 @@ void Renderer::Thread(const Config &config,Game &game,std::vector<Player> &playe
         game.frame++;
         // FPS
         if(game.frame%(config.fps)==0){
-            objects.g_fps[1].setString(int2string( (1.0/game.fps_clock.restart().asSeconds())*(config.fps) ));
+            sf::Time temp=game.fps_clock.restart();
+            std::cout << temp.asSeconds() << std::endl;
+            objects.g_fps[1].setString(int2string( (1.0/temp.asSeconds())*(config.fps) ));
         }
     }
     std::cout << "Render Thread Stopped" << std::endl;
@@ -101,10 +103,53 @@ void Renderer::Setup(const Config &config,Game &game,std::vector<Player> &player
     window.draw(objects.s_quit);
 }
 //
-void Renderer::Play(const Config &config,Game &game,std::vector<Player> &player){
+void Renderer::Play(const Config &config,const Game &game,const std::vector<Player> &player){
     // Draw Player Things
     for(unsigned int i=0;i<player.size();i++){
-        player[i].Draw(window);
+        //player[i].Draw(window);
+        if(!game.darkness){
+            window.draw(player[i].line);
+            window.draw(player[i].circle);
+        }
+        else{
+            // Line
+            int xc;
+            int yc;
+            // create a quad; Maybe change it to pointers;
+            sf::VertexArray quad(sf::Quads, 4);
+            quad[0].color=player[i].color;
+            quad[1].color=player[i].color;
+            quad[2].color=player[i].color;
+            quad[3].color=player[i].color;
+            //
+            for(unsigned int j=0;j+3<player[i].line.getVertexCount();j=j+4){
+                xc=(player[i].line[j].position.x+player[i].line[j+1].position.x+player[i].line[j+2].position.x+player[i].line[j+3].position.x)/4;
+                yc=(player[i].line[j].position.y+player[i].line[j+1].position.y+player[i].line[j+2].position.y+player[i].line[j+3].position.y)/4;
+                for(unsigned int k=0;k<player.size();k++){
+                    // Calculate center
+                    if( (xc-player[k].x)*(xc-player[k].x) + (yc-player[k].y)*(yc-player[k].y) < (config.darkness_radius*config.darkness_radius)/4 ){
+                        quad[0].position = sf::Vector2f(player[i].line[j].position.x, player[i].line[j].position.y);
+                        quad[1].position = sf::Vector2f(player[i].line[j+1].position.x, player[i].line[j+1].position.y);
+                        quad[2].position = sf::Vector2f(player[i].line[j+2].position.x, player[i].line[j+2].position.y);
+                        quad[3].position = sf::Vector2f(player[i].line[j+3].position.x, player[i].line[j+3].position.y);
+                        window.draw(quad);
+                        break;
+                    }
+                }
+            }
+            // Circle
+            for(unsigned int k=0;k<player.size();k++){
+                if(k==i){
+                    window.draw(player[i].circle);
+                }
+                else{
+                    if( (player[i].x-player[k].x)*(player[i].x-player[k].x) + (player[i].y-player[k].y)*(player[i].y-player[k].y) < (config.darkness_radius*config.darkness_radius)/4 ){
+                        window.draw(player[i].circle);
+                        break;
+                    }
+                }
+            }
+        }
     }
     // Check if walls away effect is there and change wallcolor(Decouple from fps?)
     sf::Color color=config.wallcolor;
@@ -145,7 +190,7 @@ void Renderer::Play(const Config &config,Game &game,std::vector<Player> &player)
     if(game.countdown_int>0){window.draw(objects.g_countdown);}
 }
 //
-void Renderer::PowerUp(const Config &config,Game &game){
+void Renderer::PowerUp(const Config &config,const Game &game){
     for(unsigned int i=0;i<game.powerup_field.size();i++){
         // find opacity
         int opacity=255;
@@ -225,6 +270,26 @@ void Renderer::PowerUp(const Config &config,Game &game){
         }
         // Question Mark
         else if(game.powerup_field[i].type==Powerup::Type::Question_Mark){
+            draw=&sprite.questionblue;
+        }
+        // Darkness
+        else if(game.powerup_field[i].type==Powerup::Type::Darkness){
+            draw=&sprite.darknessblue;
+        }
+        // Gap
+        else if(game.powerup_field[i].type==Powerup::Type::Gap){
+            draw=&sprite.gapred;
+        }
+        // Bomb
+        else if(game.powerup_field[i].type==Powerup::Type::Bomb){
+            draw=&sprite.bombblue;
+        }
+        // Sine
+        else if(game.powerup_field[i].type==Powerup::Type::Sine){
+            draw=&sprite.sinered;
+        }
+        else{
+            std::cout << "Error! No sprite!" << std::endl;
             draw=&sprite.questionblue;
         }
         // Do the things

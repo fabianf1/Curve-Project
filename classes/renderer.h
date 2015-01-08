@@ -35,16 +35,9 @@ class Renderer{
         void Thread(const Config &config,Game &game,std::vector<Player> &player);
         void Main_Menu(const Config &config,Game &game,std::vector<Player> &player);
         void Setup(const Config &config,Game &game,std::vector<Player> &player);
-        void Play(const Config &config,Game &game,std::vector<Player> &player);
-        void PowerUp(const Config &config,Game &game);
+        void Play(const Config &config,const Game &game,const std::vector<Player> &player);
+        void PowerUp(const Config &config,const Game &game);
         void Shutdown();
-
-        //void Setup_SP(const Config &config,Game &game,Player player[],Game_Setup &game_setup);
-        //void Setup_MP(const Config &config,Game &game,Player player[],Game_Setup_MP &game_setup);
-        //void Gam(const Config &config,Game &game,Player player[],Game_Store &game_store);
-        //void Game_MP(const Config &config,Game &game,Player player[],Game_Store &game_store);
-        //void PowerUp(const Config &config,Game &game,Powerup_Sprite &sprite);
-        //void Game_Status_Menu(const Config &config,Game &game, Player player[],Game_Store &game_store);
 };
 
 #endif // CURVE_RENDER

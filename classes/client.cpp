@@ -78,7 +78,8 @@ void Client::Thread(const Config &config,Game &game,std::vector<Player> &player)
                     break;
             } // End switch case
         }
-        //sf::sleep(sf::milliseconds(5));
+        //
+        pacer.Pace();
     }
     socket.disconnect();
     game.client[1]=game.client[2]=false;
@@ -211,15 +212,6 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                 player[id].Update_Position(config,packet);
             }
         }
-        else if(number<game.packetnumber-5){
-            std::cout << "Large packet mixup!! Pausing game!" << ", " << number << ", " << game.packetnumber << std::endl;
-            // Send packet
-            Pending pending;
-            pending.packet << Packet::Lag << game.id;
-            game.mutex.lock();
-            game.packets.push_back(pending);
-            game.mutex.unlock();
-        }
         else{
             std::cout << "Packet mixup!!" << ", " << number << ", " << game.packetnumber << std::endl;
         }
@@ -286,6 +278,9 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                 if(game.powerup_effect[i].type==Powerup::Type::Walls_Away){
                     game.wallsaway=false;
                 }
+                else if(game.powerup_effect[i].type==Powerup::Type::Darkness){
+                    game.darkness=false;
+                }
                 //
                 game.powerup_effect.erase(game.powerup_effect.begin()+i);
                 break;
@@ -323,6 +318,8 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                     case Powerup::Type::Right_Angle:
                     case Powerup::Type::Invisible:
                     case Powerup::Type::Invert_Keys:
+                    case Powerup::Type::Sine:
+                    case Powerup::Type::Gap:
                         game.player_powerup_effect.emplace_back(id,game.powerup_field[i].type,game.powerup_field[i].impact,D,ID);
                         for(unsigned int k=0;k<player.size();k++){
                             // Calculate powerup effects
@@ -337,6 +334,10 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                     case Powerup::Type::Walls_Away:
                         game.powerup_effect.emplace_back(Powerup::Type::Walls_Away,D,id);
                         game.wallsaway=true;
+                        break;
+                    case Powerup::Type::Darkness:
+                        game.powerup_effect.emplace_back(Powerup::Type::Darkness,D,id);
+                        game.darkness=true;
                         break;
                     default:
                         break;

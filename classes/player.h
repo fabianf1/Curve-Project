@@ -42,7 +42,8 @@ class Player{
         bool invisible;
         bool inverted;
         bool noline;
-        bool wall;
+        bool gapping;
+        //bool wall;
         //
         unsigned int id; // Place in client vector;
         int place; // Place in player array

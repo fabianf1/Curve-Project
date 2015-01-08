@@ -45,8 +45,16 @@ Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time)
     powerups.emplace_back(Powerup::Type::More_Powerups,Powerup::Impact::All,100,10,5000);
     // Invert Keys
     powerups.emplace_back(Powerup::Type::Invert_Keys,Powerup::Impact::Other,100,10,5000);
-    //
+    // ?
     powerups.emplace_back(Powerup::Type::Question_Mark,Powerup::Impact::Other,25,10,5000);
+    // Darkness
+    powerups.emplace_back(Powerup::Type::Darkness,Powerup::Impact::All,25,10,5000);
+    // Gap
+    powerups.emplace_back(Powerup::Type::Gap,Powerup::Impact::Other,75,10,5000);
+    // Bomb
+    powerups.emplace_back(Powerup::Type::Bomb,Powerup::Impact::All,50,10,5000);
+    // Sine
+    //powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::All,5000,10,5000);
     // Calculate total chance
     total_chance=0;
     for(unsigned int i=0;i<powerups.size();i++){
@@ -218,6 +226,7 @@ void Game::New_Round(const Config &config,std::vector<Player> &player){
     powerup_field.clear();
     powerup_effect.clear();
     wallsaway=false;
+    darkness=false;
     morepowerups=0;
     powerup_spawn_time=config.powerup_spawn_delay;
     // Ready 'm up!
@@ -375,6 +384,8 @@ void Game::Player_Death(std::vector<Player> &player,const std::vector<unsigned i
 }
 //
 void Game::End_Round(const Config &config,std::vector<Player> &player){
+    // Show everything again
+    darkness=false;
     // Round is always finished so set the var
     round_finished=true;
     // Check if someone won the game
@@ -506,6 +517,17 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
             else if(powerup_effect[j].type==Powerup::Type::More_Powerups){
                 morepowerups=3;
             }
+            else if(powerup_effect[j].type==Powerup::Type::Darkness){
+                darkness=false;
+                if(server[1]){
+                    Pending pending;
+                    pending.packet << Packet::PowerupDelG << powerup_effect[j].id;
+                    pending.send_id.push_back(-1);
+                    mutex.lock();
+                    packets.push_back(pending);
+                    mutex.unlock();
+                }
+            }
             powerup_effect.erase(powerup_effect.begin()+j);
         }
     }
@@ -547,17 +569,6 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                         break;
                     }
                 }
-                // Other Powerups hit check; I should remove this.
-                /*if(spawn){
-                    for(unsigned int j=0;j<powerup.size();j++){
-                        float dx=powerup[j].x-X;
-                        float dy=powerup[j].y-Y;
-                        float radius = config.powerup_radius*2;
-                        if( (dx*dx) + (dy*dy) < radius*radius ) {
-                            spawn=false;
-                        }
-                    }
-                }*/
                 iter++;
             }
             // Choose a powerup
@@ -611,6 +622,8 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                     case Powerup::Type::Right_Angle:
                     case Powerup::Type::Invisible:
                     case Powerup::Type::Invert_Keys:
+                    case Powerup::Type::Sine:
+                    case Powerup::Type::Gap:
                         player_powerup_effect.emplace_back(i,powerup_field[j].type,powerup_field[j].impact,D,id);
                         for(unsigned int k=0;k<player.size();k++){
                             // Calculate powerup effects
@@ -628,6 +641,42 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                         break;
                     case Powerup::Type::More_Powerups:
                         powerup_effect.emplace_back(Powerup::Type::More_Powerups,config.powerup_more_powerup_delay,id);
+                        break;
+                    case Powerup::Type::Darkness:
+                        powerup_effect.emplace_back(Powerup::Type::Darkness,D,id);
+                        darkness=true;
+                        break;
+                    case Powerup::Type::Bomb:
+                        // Remove lines
+                        int xc,yc;
+                        for(unsigned int k=0;k<player.size();k++){
+                            for(unsigned int l=0;l+3<player[k].line.getVertexCount();l=l+4){
+                                // Find out if within blast radius
+                                xc=(player[k].line[l].position.x+player[k].line[l+1].position.x+player[k].line[l+2].position.x+player[k].line[l+3].position.x)/4;
+                                yc=(player[k].line[l].position.y+player[k].line[l+1].position.y+player[k].line[l+2].position.y+player[k].line[l+3].position.y)/4;
+                                if( (xc-player[i].x)*(xc-player[i].x) + (yc-player[i].y)*(yc-player[i].y) < config.bomb_radius*config.bomb_radius/4 ){
+                                    // Remove; Erase doesn't work due to the wrapper. I just move the lines out of sight for now;
+                                    // Fix would be to use std::vector<sf::Vertex>
+                                    /*player[k].line.erase(player[k].line.begin()+l);
+                                    player[k].line.erase(player[k].line.begin()+l+1);
+                                    player[k].line.erase(player[k].line.begin()+l+2);
+                                    player[k].line.erase(player[k].line.begin()+l+3);
+                                    l=l-4;*/
+                                    player[k].line[l].position=sf::Vector2f(0, 0);
+                                    player[k].line[l+1].position=sf::Vector2f(0, 0);
+                                    player[k].line[l+2].position=sf::Vector2f(0, 0);
+                                    player[k].line[l+3].position=sf::Vector2f(0, 0);
+                                }
+                            }
+                        }
+                        // Remove Powerups
+                        for(unsigned int k=0;k<powerup_field.size();k++){
+                            xc=player[i].x-powerup_field[k].x;
+                            yc=player[i].y-powerup_field[k].y;
+                            if( xc*xc + yc*yc < config.bomb_radius*config.bomb_radius/4 ){
+                                powerup_field.erase(powerup_field.begin()+k);
+                            }
+                        }
                         break;
                     default:
                         break;
