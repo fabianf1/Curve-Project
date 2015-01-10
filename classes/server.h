@@ -39,7 +39,7 @@ class Server{
         void New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
         void Process_Package(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
         void Shutdown(Game &game);
-        void Sync_Clients(const Config &config,Game &game,std::vector<Player> &player);
+        void Sync_Clients(const Config &config,Game &game,const std::vector<Player> &player);
         // Constructor
         Server(): sender_pacer(25){}
         // Functions

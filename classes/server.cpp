@@ -275,7 +275,7 @@ void Server::Shutdown(Game &game){
     }
 }
 //
-void Server::Sync_Clients(const Config &config,Game &game,std::vector<Player> &player){
+void Server::Sync_Clients(const Config &config,Game &game,const std::vector<Player> &player){
     for(unsigned int i=0;i<player.size();i++){
         Pending pending;
         pending.packet << Packet::Sync << i << player[i].name << player[i].enabled << player[i].ready;

@@ -80,13 +80,13 @@ class Renderer_Objects{
         void Init_Game_Setup(const Config &config);
         void Init_Game(const Config &config);
         // Vector things
-        void Sync_Players(const Config &config,Game &game,const std::vector<Player> &player);
+        void Sync_Players(const Config &config,const std::vector<Player> &player);
         void Add_Player(const Config &config,const std::vector<Player> &player);
         //
         void setOptions(const Game &game);
         // Other Functions
         sf::Font LoadFont(const std::string& name);
-        const char* getKeyName( const sf::Keyboard::Key &key );
+        const char* getKeyName(const sf::Keyboard::Key &key );
 };
 
 #endif // CURVE_RENDER_OBJECT

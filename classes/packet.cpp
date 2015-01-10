@@ -1,4 +1,4 @@
-#include "enum.h"
+#include "packet.h"
 
 sf::Packet& operator <<(sf::Packet& packet, const Packet &j){
     //int i=static_cast<int>(j);

@@ -23,7 +23,7 @@ void Main::Curve_Project(){
         }
         // Check if new player is added
         if(renderer.objects.vector_length<player.size()||renderer.objects.vector_length>player.size()||game.refresh_players){
-            renderer.objects.Sync_Players(config,game,player);
+            renderer.objects.Sync_Players(config,player);
             game.refresh_players=false;
         }
         // Delay function
@@ -73,7 +73,7 @@ void Main::Event_Handler(){
                     }
                 }
                 // Update renderer.objects
-                renderer.objects.Sync_Players(config,game,player);
+                renderer.objects.Sync_Players(config,player);
             }
         }
         // End key-changer
@@ -81,7 +81,7 @@ void Main::Event_Handler(){
         // Auto adder, only in debug
         else if(event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             game_setup.Auto_Add_Players(config,game,player);
-            renderer.objects.Sync_Players(config,game,player);
+            renderer.objects.Sync_Players(config,player);
         }
         #endif
         // Name Changer
@@ -89,11 +89,11 @@ void Main::Event_Handler(){
             renderer.objects.s_names[game.name_change].setActive(false);
             game.name_change=-1;
             // Reset
-            renderer.objects.Sync_Players(config,game,player);
+            renderer.objects.Sync_Players(config,player);
         }
         else if(game.name_change>-1&&event.type==sf::Event::KeyPressed&& (event.key.code==sf::Keyboard::Return) ){
             if(renderer.objects.s_names[game.name_change].getString().getSize()==0){
-                renderer.objects.Sync_Players(config,game,player);
+                renderer.objects.Sync_Players(config,player);
             }
             else{
                 player[game.name_change].name=renderer.objects.s_names[game.name_change].getString();
@@ -118,7 +118,7 @@ void Main::Event_Handler(){
     else if(game.mode==Game::Mode::Play){
         // End game
         if(game.game_finished&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
-            game.Quit(config,player);
+            game.Quit(config);
             if(game.server[1]){
                 // SEND THE SYNCER!
                 // All player information
@@ -179,7 +179,7 @@ void Main::Game_Setup_Handler(){
             if(player[i].local){
                 if(game.name_change==i){
                     if(renderer.objects.s_names[i].getString().getSize()==0){
-                        renderer.objects.Sync_Players(config,game,player);
+                        renderer.objects.Sync_Players(config,player);
                     }
                     else{
                         player[i].name=renderer.objects.s_names[i].getString();
@@ -227,7 +227,7 @@ void Main::Game_Setup_Handler(){
         // Kick
         if(!game.client[1]&& (!player[i].server||!game.server[1]) &&renderer.objects.s_kick[i].Check(renderer.window)){
             game_setup.Remove_Player(config,game,player,i);
-            renderer.objects.Sync_Players(config,game,player);
+            renderer.objects.Sync_Players(config,player);
             // Remove from server
             if(game.server[1]){
                 server.selector.remove(*server.clients[player[i].id].socket);
@@ -275,7 +275,7 @@ void Main::Game_Setup_Handler(){
     if(!game.client[1]&&!game.server[1]&&renderer.objects.s_add.Check(renderer.window)){
         // Add new player
         game_setup.Add_Player(config,game,player);
-        renderer.objects.Sync_Players(config,game,player);
+        renderer.objects.Sync_Players(config,player);
     }
     // Server Text
     if(game.server[1]&&renderer.objects.s_server.getString()=="Start Server"){
@@ -350,7 +350,7 @@ void Main::Change_Button(const int &button,unsigned const int &pl){
 //
 void Main::Play_Handler(){
     if(renderer.objects.g_quit.Check(renderer.window)){
-        game.Quit(config,player);
+        game.Quit(config);
     }
     // Change render objects
     for(unsigned int i=0;i<player.size()&&i<renderer.objects.vector_length;i++){

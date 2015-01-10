@@ -13,7 +13,6 @@
 #include "config.h"
 #include "game.h"
 #include "player.h"
-//#include "server.h"
 #include "client.h"
 #include "renderer_objects.h"
 #include "powerup_sprite.h"
@@ -31,10 +30,10 @@ class Renderer{
         // Constructor
         Renderer(const Config &config) : objects(config), sprite(config){};
         // Functions
-        void Start(const Config &config,Game &game,std::vector<Player> &player);
-        void Thread(const Config &config,Game &game,std::vector<Player> &player);
-        void Main_Menu(const Config &config,Game &game,std::vector<Player> &player);
-        void Setup(const Config &config,Game &game,std::vector<Player> &player);
+        void Start(const Config &config,Game &game,const std::vector<Player> &player);
+        void Thread(const Config &config,Game &game,const std::vector<Player> &player);
+        void Main_Menu();
+        void Setup(const Config &config,const Game &game,const std::vector<Player> &player);
         void Play(const Config &config,const Game &game,const std::vector<Player> &player);
         void PowerUp(const Config &config,const Game &game);
         void Shutdown();

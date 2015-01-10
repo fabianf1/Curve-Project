@@ -14,6 +14,7 @@
 #include "pending.h"
 #include "player.h"
 #include "pacer.h"
+#include "packet.h"
 //
 class Game{
     public:
@@ -82,7 +83,7 @@ class Game{
         void Hit_Detector(const Config &config,std::vector<Player> &player);
         void Player_Death(std::vector<Player> &player,const std::vector<unsigned int> &death_vec);
         void End_Round(const Config &config,std::vector<Player> &player);
-        void Quit(const Config &config,std::vector<Player> &player);
+        void Quit(const Config &config);
         void PowerUp_Manager(const Config &config,std::vector<Player> &player);
         void PowerUp_Manager(const Config &config);
         void Choose_PowerUp(Powerup::Type &type, Powerup::Impact &impact, int &place);

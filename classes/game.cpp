@@ -87,10 +87,8 @@ void Game::Initialize(const Config &config, std::vector<Player> &player){
     // Make players ready for new game
     for(unsigned int i=0;i<player.size();i++){
         if(!client[1]){
-            player[i].New_Game(config,*this);
+            player[i].New_Game();
         }
-        player[i].ready=false;
-        player[i].points=0;
     }
     round=0;
     packetnumber=0;
@@ -440,7 +438,7 @@ void Game::End_Round(const Config &config,std::vector<Player> &player){
     }
 }
 //
-void Game::Quit(const Config &config,std::vector<Player> &player){
+void Game::Quit(const Config &config){
     Shutdown();
     Switch_Mode(Game::Mode::Setup);
 }

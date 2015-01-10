@@ -14,6 +14,7 @@
 #include "color.h"
 #include "powerup.h"
 #include "pacer.h"
+#include "packet.h"
 // Temporary
 #include "../functions/functions.h"
 //

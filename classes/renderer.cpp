@@ -2,7 +2,7 @@
 // Needed Header
 #include "renderer.h"
 //
-void Renderer::Start(const Config &config,Game &game,std::vector<Player> &player){
+void Renderer::Start(const Config &config,Game &game,const std::vector<Player> &player){
     // Window
     window.create(sf::VideoMode(config.window_width, config.window_height), config.title, config.window_style, sf::ContextSettings(24,8,config.window_antialising));
     window.setIcon(202,202,config.icon.getPixelsPtr());
@@ -12,11 +12,11 @@ void Renderer::Start(const Config &config,Game &game,std::vector<Player> &player
     window.setFramerateLimit(config.fps);
     // Start Render thread
     window.setActive(false);
-    thread = std::thread(&Renderer::Thread,this,std::cref(config),std::ref(game),std::ref(player));
+    thread = std::thread(&Renderer::Thread,this,std::cref(config),std::ref(game),std::cref(player));
     // Done
 }
 // Render Thread Function
-void Renderer::Thread(const Config &config,Game &game,std::vector<Player> &player){
+void Renderer::Thread(const Config &config,Game &game,const std::vector<Player> &player){
     std::cout << "Render Thread Started" << std::endl;
     sf::sleep(sf::milliseconds(1000));
     // Start main loop
@@ -24,7 +24,7 @@ void Renderer::Thread(const Config &config,Game &game,std::vector<Player> &playe
         window.clear(config.window_backgroundcolor);
         //
         if(game.mode==Game::Mode::Main_Menu){
-            Main_Menu(config,game,player);
+            Main_Menu();
         }
         else if(game.mode==Game::Mode::Setup){
             Setup(config,game,player);
@@ -46,7 +46,7 @@ void Renderer::Thread(const Config &config,Game &game,std::vector<Player> &playe
     std::cout << "Render Thread Stopped" << std::endl;
 }
 //
-void Renderer::Main_Menu(const Config &config,Game &game,std::vector<Player> &player){
+void Renderer::Main_Menu(){
     // Title
     window.draw(objects.m_title);
     // Buttons
@@ -60,7 +60,7 @@ void Renderer::Main_Menu(const Config &config,Game &game,std::vector<Player> &pl
     objects.m_ip_prompt.Draw(window);
 }
 //
-void Renderer::Setup(const Config &config,Game &game,std::vector<Player> &player){
+void Renderer::Setup(const Config &config,const Game &game,const std::vector<Player> &player){
     //
     window.draw(objects.s_title);
     window.draw(objects.s_name);

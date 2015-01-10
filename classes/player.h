@@ -9,7 +9,7 @@
 #include "config.h"
 //#include "game.h"
 #include "pending.h"
-#include "enum.h"
+//#include "packet.h"
 #include "powerup.h"
 // Define
 #define PI 3.14159265359
@@ -59,8 +59,8 @@ class Player{
         Player();
         Player(const sf::String &Name,const sf::Color &Color);
         // Functions
-        void New_Game(const Config &config,Game &game);
-        void New_Round(const Config &config,Game &game);
+        void New_Game();
+        void New_Round(const Config &config,const Game &game);
         void Draw(sf::RenderWindow &window);
         void Update_Position(const Config &config, Game &game);
         void Update_Position(const Config &config, sf::Packet &packet);

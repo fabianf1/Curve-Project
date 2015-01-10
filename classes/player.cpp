@@ -20,14 +20,13 @@ Player::Player(const sf::String &Name,const sf::Color &Color){
     disconnected=false;
 }
 // Functions
-void Player::New_Game(const Config &config,Game &game){
+void Player::New_Game(){
     // Set points
     points=0;
-    // Call New round
-    //New_Round(config,game);
+    ready=false;
 }
 //
-void Player::New_Round(const Config &config,Game &game){
+void Player::New_Round(const Config &config,const Game &game){
     Calculate_Powerup_Effect(config,game);
     if(!game.client[1]){
         // Set position

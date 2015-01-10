@@ -209,7 +209,7 @@ void Renderer_Objects::Init_Game(const Config &config){
     g_countdown.setStyle(sf::Text::Bold);
 }
 // Vector things
-void Renderer_Objects::Sync_Players(const Config &config,Game &game,const std::vector<Player> &player){
+void Renderer_Objects::Sync_Players(const Config &config,const std::vector<Player> &player){
     //
     if(vector_length<player.size()){
         for(unsigned int i=0;i<(player.size()-vector_length);i++){

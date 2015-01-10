@@ -1,3 +1,4 @@
+// This file contains an enum to keep track of what the packet contains and operator overloads to allow sending it with sf::Packet
 #ifndef CURVE_ENUM
 #define CURVE_ENUM
 

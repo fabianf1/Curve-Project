@@ -18,6 +18,6 @@ class Powerup_Field{
 
         // Constructors
         Powerup_Field(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID);
-        Powerup_Field(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID, int &Place);
+        Powerup_Field(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID,const int &Place);
 };
 #endif // CURVE_POWERUP_FIELD
