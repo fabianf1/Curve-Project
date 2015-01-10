@@ -97,6 +97,13 @@ void Player::Draw(sf::RenderWindow &window){
 }
 //
 void Player::Update_Position(const Config &config, Game &game){
+    // Sine things
+    if(sine){
+        sine_phase+=(game.elapsed*config.sine_frequency*2)*PI;
+        linewidth=sine_linewidth*(1+sin(sine_phase)*config.sine_amplitude);
+        shift=sine_shift*(1+sin(sine_phase+PI)*config.sine_amplitude);
+        circle.setRadius(linewidth/2);
+    }
     // Check keys
     if(local){
         left=sf::Keyboard::isKeyPressed(keyL);
@@ -250,6 +257,7 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
     invisible=false;
     inverted=false;
     gapping=false;
+    sine=false;
     int speed=0;
     int line_size=0;
     // Check for effects
@@ -288,6 +296,10 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
                 gapping=true;
                 gap[0]=0;
             }
+            // Sine
+            else if(game.player_powerup_effect[i].type==Powerup::Type::Sine){
+                sine=true;
+            }
         }
     }
     // Do speed and line size effects
@@ -312,6 +324,14 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
         if(linewidth<1){
             linewidth=1;
         }
+    }
+    // Sine things
+    if(!sine){
+        sine_phase=0;
+    }
+    else{
+        sine_linewidth=linewidth;
+        sine_shift=shift;
     }
     // Circle Style
     if(inverted){

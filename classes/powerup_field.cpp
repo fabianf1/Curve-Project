@@ -11,3 +11,14 @@ Powerup_Field::Powerup_Field(const int &X,const int &Y,const Powerup::Type &Type
     time2=Time;
     id=ID;
 }
+//
+Powerup_Field::Powerup_Field(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID, int &Place){
+    x=X;
+    y=Y;
+    type=Type;
+    impact=Impact;
+    time1=0;
+    time2=Time;
+    id=ID;
+    place=Place;
+}

@@ -14,7 +14,6 @@ To-Do List
 * Multiple players per server/client
 * Make sharp angles really sharp
 * Add more powerups
-    * Sinusoidal speed/linewidth
     * Jumping line, line teleports forward instead of moving
 * Fix variations in FPS
 * Test new additions online

@@ -36,14 +36,17 @@ class Player{
         bool keyrelease;
         //
         int linewidth;
+        int sine_linewidth; // Linewidth without the sine;
         float shift;
+        float sine_shift; // Speed without the sine;
         float turn;
         bool rightangle;
         bool invisible;
         bool inverted;
         bool noline;
         bool gapping;
-        //bool wall;
+        bool sine;
+        float sine_phase;
         //
         unsigned int id; // Place in client vector;
         int place; // Place in player array

@@ -47,6 +47,9 @@ class Config{
         int darkness_radius;
         int bomb_radius;
         //
+        float sine_frequency;
+        float sine_amplitude;
+        //
         float powerup_scale;
         float powerup_radius;
         int powerup_spawn_chance;

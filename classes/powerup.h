@@ -16,11 +16,11 @@ class Powerup{
         enum class Impact : int {Self,Other,All} impact;
         // Vars
         int spawn_chance; // Overal spawn chance depends on the other powerups
-        int effect_min_disappear; // In seconds
+        float effect_min_disappear; // In seconds
         int effect_rand_disappear; // In milliseconds
         // Functions
         // Constructor
-        Powerup(const Powerup::Type &Type,const Powerup::Impact &Impact, const int &Chance, const int &Min, const int &Rand);
+        Powerup(const Powerup::Type &Type,const Powerup::Impact &Impact, const int &Chance, const float &Min, const int &Rand);
 };
 // Overloads for sf::Packet
 sf::Packet& operator << (sf::Packet& packet, const Powerup::Type &j);
