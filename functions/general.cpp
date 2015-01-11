@@ -27,6 +27,5 @@ sf::Image LoadImageFromResource(const std::string& name){
     sf::Image image;
     if (!image.loadFromMemory(firstByte, rsrcDataSize))
         throw std::runtime_error("Failed to load image from memory.");
-
     return image;
 }
