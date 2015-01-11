@@ -31,7 +31,7 @@ void Renderer::Thread(const Config &config,Game &game,const std::vector<Player> 
         }
         else if(game.mode==Game::Mode::Play){
             Play(config,game,player);
-            if(game.powerup_enabled){PowerUp(config,game);}
+            if(game.powerup_enabled){PowerUp(config,game,player);}
         }
         //
         window.display();
@@ -190,9 +190,26 @@ void Renderer::Play(const Config &config,const Game &game,const std::vector<Play
     if(game.countdown_int>0){window.draw(objects.g_countdown);}
 }
 //
-void Renderer::PowerUp(const Config &config,const Game &game){
+void Renderer::PowerUp(const Config &config,const Game &game,const std::vector<Player> &player){
     for(unsigned int i=0;i<game.powerup_field.size();i++){
-        // find opacity
+        // Check if withing FOV
+        if(game.darkness){
+            bool draw=false;
+            int diffx;
+            int diffy;
+            for(unsigned int j=0;j<player.size();j++){
+                diffx=(player[j].x-game.powerup_field[i].x);
+                diffy=(player[j].y-game.powerup_field[i].y);
+                if( diffx*diffx+diffy*diffy < (config.darkness_radius*config.darkness_radius)/4 ){
+                    draw=true;
+                    break;
+                }
+            }
+            if(!draw){
+                continue;
+            }
+        }
+        // Set opacity
         int opacity=255;
         if(game.powerup_field[i].time1<config.powerup_fade_time){
             opacity=(game.powerup_field[i].time1/config.powerup_fade_time)*255;

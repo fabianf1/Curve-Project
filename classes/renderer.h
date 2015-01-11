@@ -35,7 +35,7 @@ class Renderer{
         void Main_Menu();
         void Setup(const Config &config,const Game &game,const std::vector<Player> &player);
         void Play(const Config &config,const Game &game,const std::vector<Player> &player);
-        void PowerUp(const Config &config,const Game &game);
+        void PowerUp(const Config &config,const Game &game,const std::vector<Player> &player);
         void Shutdown();
 };
 
