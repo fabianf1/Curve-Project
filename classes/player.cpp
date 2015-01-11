@@ -205,7 +205,14 @@ void Player::Update_Position(const Config &config, Game &game){
     circle.setPosition(x-linewidth/2,y-linewidth/2);
 }
 //
-void Player::Update_Position(const Config &config, sf::Packet &packet){
+void Player::Update_Position(const Config &config, sf::Packet &packet,const float &packettime){
+    // Sine things
+    if(sine){
+        sine_phase+=(packettime*config.sine_frequency*2)*PI;
+        linewidth=sine_linewidth*(1+sin(sine_phase)*config.sine_amplitude);
+        shift=sine_shift*(1+sin(sine_phase+PI)*config.sine_amplitude);
+        circle.setRadius(linewidth/2);
+    }
     xOLD=x;
     yOLD=y;
     hOLD=heading;

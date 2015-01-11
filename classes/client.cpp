@@ -209,7 +209,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
             int id;
             while(!packet.endOfPacket()){
                 packet >> id;
-                player[id].Update_Position(config,packet);
+                player[id].Update_Position(config,packet,game.packettime);
             }
         }
         else{
@@ -338,6 +338,10 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                     case Powerup::Type::Darkness:
                         game.powerup_effect.emplace_back(Powerup::Type::Darkness,D,id);
                         game.darkness=true;
+                        break;
+                    case Powerup::Type::Bomb:
+                        // Remove lines
+                        game.PowerUp_Bomb(config,player,i);
                         break;
                     default:
                         break;

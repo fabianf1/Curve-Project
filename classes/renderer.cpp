@@ -39,7 +39,7 @@ void Renderer::Thread(const Config &config,Game &game,const std::vector<Player> 
         // FPS
         if(game.frame%(config.fps)==0){
             sf::Time temp=game.fps_clock.restart();
-            std::cout << temp.asSeconds() << std::endl;
+            //std::cout << temp.asSeconds() << std::endl;
             objects.g_fps[1].setString(int2string( (1.0/temp.asSeconds())*(config.fps) ));
         }
     }

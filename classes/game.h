@@ -87,6 +87,7 @@ class Game{
         void PowerUp_Manager(const Config &config,std::vector<Player> &player);
         void PowerUp_Manager(const Config &config);
         void Choose_PowerUp(Powerup::Type &type, Powerup::Impact &impact, int &place);
+        void PowerUp_Bomb(const Config &config,std::vector<Player> &player, const int &i);
         void Pause(const Config &config, const bool &Pause);
         void Shutdown();
 };

@@ -86,9 +86,7 @@ void Game::Initialize(const Config &config, std::vector<Player> &player){
     player_powerup_effect.clear();
     // Make players ready for new game
     for(unsigned int i=0;i<player.size();i++){
-        if(!client[1]){
-            player[i].New_Game();
-        }
+        player[i].New_Game();
     }
     round=0;
     packetnumber=0;
@@ -647,35 +645,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                         break;
                     case Powerup::Type::Bomb:
                         // Remove lines
-                        int xc,yc;
-                        for(unsigned int k=0;k<player.size();k++){
-                            for(unsigned int l=0;l+3<player[k].line.getVertexCount();l=l+4){
-                                // Find out if within blast radius
-                                xc=(player[k].line[l].position.x+player[k].line[l+1].position.x+player[k].line[l+2].position.x+player[k].line[l+3].position.x)/4;
-                                yc=(player[k].line[l].position.y+player[k].line[l+1].position.y+player[k].line[l+2].position.y+player[k].line[l+3].position.y)/4;
-                                if( (xc-player[i].x)*(xc-player[i].x) + (yc-player[i].y)*(yc-player[i].y) < config.bomb_radius*config.bomb_radius/4 ){
-                                    // Remove; Erase doesn't work due to the wrapper. I just move the lines out of sight for now;
-                                    // Fix would be to use std::vector<sf::Vertex>
-                                    /*player[k].line.erase(player[k].line.begin()+l);
-                                    player[k].line.erase(player[k].line.begin()+l+1);
-                                    player[k].line.erase(player[k].line.begin()+l+2);
-                                    player[k].line.erase(player[k].line.begin()+l+3);
-                                    l=l-4;*/
-                                    player[k].line[l].position=sf::Vector2f(0, 0);
-                                    player[k].line[l+1].position=sf::Vector2f(0, 0);
-                                    player[k].line[l+2].position=sf::Vector2f(0, 0);
-                                    player[k].line[l+3].position=sf::Vector2f(0, 0);
-                                }
-                            }
-                        }
-                        // Remove Powerups
-                        for(unsigned int k=0;k<powerup_field.size();k++){
-                            xc=player[i].x-powerup_field[k].x;
-                            yc=player[i].y-powerup_field[k].y;
-                            if( xc*xc + yc*yc < config.bomb_radius*config.bomb_radius/4 ){
-                                powerup_field.erase(powerup_field.begin()+k);
-                            }
-                        }
+                        PowerUp_Bomb(config,player,i);
                         break;
                     default:
                         break;
@@ -717,6 +687,34 @@ void Game::Choose_PowerUp(Powerup::Type &type, Powerup::Impact &impact, int &pla
         }
         else{
             low+=powerups[i].spawn_chance;
+        }
+    }
+}
+//
+void Game::PowerUp_Bomb(const Config &config,std::vector<Player> &player, const int &i){
+    // Remove lines
+    int xc,yc;
+    for(unsigned int k=0;k<player.size();k++){
+        for(unsigned int l=0;l+3<player[k].line.getVertexCount();l=l+4){
+            // Find out if within blast radius
+            xc=(player[k].line[l].position.x+player[k].line[l+1].position.x+player[k].line[l+2].position.x+player[k].line[l+3].position.x)/4;
+            yc=(player[k].line[l].position.y+player[k].line[l+1].position.y+player[k].line[l+2].position.y+player[k].line[l+3].position.y)/4;
+            if( (xc-player[i].x)*(xc-player[i].x) + (yc-player[i].y)*(yc-player[i].y) < config.bomb_radius*config.bomb_radius/4 ){
+                // Remove; Erase doesn't work due to the wrapper. I just move the lines out of sight for now;
+                // Fix would be to use std::vector<sf::Vertex>
+                player[k].line[l].position=sf::Vector2f(0, 0);
+                player[k].line[l+1].position=sf::Vector2f(0, 0);
+                player[k].line[l+2].position=sf::Vector2f(0, 0);
+                player[k].line[l+3].position=sf::Vector2f(0, 0);
+            }
+        }
+    }
+    // Remove Powerups
+    for(unsigned int k=0;k<powerup_field.size();k++){
+        xc=player[i].x-powerup_field[k].x;
+        yc=player[i].y-powerup_field[k].y;
+        if( xc*xc + yc*yc < config.bomb_radius*config.bomb_radius/4 ){
+            powerup_field.erase(powerup_field.begin()+k);
         }
     }
 }

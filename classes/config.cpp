@@ -48,7 +48,7 @@ Config::Config(){
     darkness_radius=125;
     bomb_radius=250;
     //
-    sine_frequency=1; // T=1sec;
+    sine_frequency=0.5; // T=2sec;
     sine_amplitude=0.6;
     //
     powerup_spawn_chance=10; //5;// % per powerup_spawn_check second
