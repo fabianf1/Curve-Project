@@ -26,6 +26,11 @@ void Main::Curve_Project(){
             renderer.objects.Sync_Players(config,player);
             game.refresh_players=false;
         }
+        // Options changed
+        if(game.refresh_options){
+            game.Options_Changed(renderer.objects);
+            game.refresh_options=false;
+        }
         // Delay function
         thread_pacer.Pace();
     }
@@ -45,7 +50,7 @@ void Main::Event_Handler(){
     }
     // Lost Focus Handler
     else if(event.type == sf::Event::LostFocus&&!game.client[1]&&!game.server[1]){
-        game.Pause(config,true);
+        game.Pause(true);
     }
     // Client connect
     else if(game.mode==Game::Mode::Main_Menu){
@@ -139,8 +144,7 @@ void Main::Event_Handler(){
         }
         // Pause
         else if(!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
-            game.pause=!game.pause;
-            game.game_clock.restart();
+            game.Pause(true);
         }
     }
 }
@@ -207,6 +211,7 @@ void Main::Game_Setup_Handler(){
             }
         }
         if(player[i].local){
+            // Buttons
             if(renderer.objects.s_lbutton[i].Check(renderer.window)){
                 Change_Button(0,i);
             }
@@ -245,31 +250,31 @@ void Main::Game_Setup_Handler(){
     // Options
     if(renderer.objects.s_max10.Check(renderer.window)){
         game.maxpoints=10;
-        renderer.objects.setOptions(game);
+        game.Options_Changed(renderer.objects);
     }
     if(renderer.objects.s_max20.Check(renderer.window)){
         game.maxpoints=20;
-        renderer.objects.setOptions(game);
+        game.Options_Changed(renderer.objects);
     }
     if(renderer.objects.s_max40.Check(renderer.window)){
         game.maxpoints=40;
-        renderer.objects.setOptions(game);
+        game.Options_Changed(renderer.objects);
     }
     if(renderer.objects.s_powerupoff.Check(renderer.window)){
         game.powerup_enabled=false;
-        renderer.objects.setOptions(game);
+        game.Options_Changed(renderer.objects);
     }
     if(renderer.objects.s_powerupon.Check(renderer.window)){
         game.powerup_enabled=true;
-        renderer.objects.setOptions(game);
+        game.Options_Changed(renderer.objects);
     }
     if(renderer.objects.s_countdownoff.Check(renderer.window)){
         game.countdown_enabled=false;
-        renderer.objects.setOptions(game);
+        game.Options_Changed(renderer.objects);
     }
     if(renderer.objects.s_countdownon.Check(renderer.window)){
         game.countdown_enabled=true;
-        renderer.objects.setOptions(game);
+        game.Options_Changed(renderer.objects);
     }
     // Buttons
     if(!game.client[1]&&!game.server[1]&&renderer.objects.s_add.Check(renderer.window)){
@@ -311,12 +316,15 @@ void Main::Game_Setup_Handler(){
     }
     if( (game.client[1] && !client.ready) && renderer.objects.s_start.getString()!="Ready" ){
         renderer.objects.s_start.setString("Ready!");
+        renderer.objects.s_start.setPosition(config.window_width/2-renderer.objects.s_start.getLocalBounds().width/2,config.window_height-100);
     }
     else if(game.client[1]&&client.ready&&renderer.objects.s_start.getString()!="Waiting"){
         renderer.objects.s_start.setString("Waiting!");
+        renderer.objects.s_start.setPosition(config.window_width/2-renderer.objects.s_start.getLocalBounds().width/2,config.window_height-100);
     }
     else if(renderer.objects.s_start.getString()!="Start Game"){
         renderer.objects.s_start.setString("Start Game");
+        renderer.objects.s_start.setPosition(config.window_width/2-renderer.objects.s_start.getLocalBounds().width/2,config.window_height-100);
     }
 //
     if(renderer.objects.s_quit.Check(renderer.window)){
@@ -356,10 +364,9 @@ void Main::Play_Handler(){
     for(unsigned int i=0;i<player.size()&&i<renderer.objects.vector_length;i++){
         renderer.objects.g_score[i].setString(int2string(player[i].points));
     }
-    if(game.frame % 15 == 0){
-        // Update round number
+    // Update round number
+    if(renderer.objects.g_round[1].getString()!=int2string(game.round)){
         renderer.objects.g_round[1].setString(int2string(game.round));
-        renderer.objects.g_frame[1].setString(int2string(game.frame));
     }
     // Countdown timer
     if(game.countdown_int>0){

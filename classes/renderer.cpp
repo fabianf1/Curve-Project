@@ -179,8 +179,6 @@ void Renderer::Play(const Config &config,const Game &game,const std::vector<Play
     }
     window.draw(objects.g_round[0]);
     window.draw(objects.g_round[1]);
-    window.draw(objects.g_frame[0]);
-    window.draw(objects.g_frame[1]);
     window.draw(objects.g_fps[0]);
     window.draw(objects.g_fps[1]);
     //window.draw(objects.g_packet[0]);

@@ -4,7 +4,7 @@
 // SFML Headers
 #include <SFML/Graphics.hpp>
 // Class Headers
-#include "game.h"
+
 //
 class Text_Button: public sf::Text{
     // Vars

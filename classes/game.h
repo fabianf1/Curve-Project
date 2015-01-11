@@ -16,6 +16,8 @@
 #include "pacer.h"
 #include "packet.h"
 //
+class Renderer_Objects;
+//
 class Game{
     public:
         // Thread Var
@@ -41,6 +43,7 @@ class Game{
         sf::Clock countdown;
         //
         bool refresh_players;
+        bool refresh_options;
         //
         bool wallsaway;
         bool darkness;
@@ -88,7 +91,11 @@ class Game{
         void PowerUp_Manager(const Config &config);
         void Choose_PowerUp(Powerup::Type &type, Powerup::Impact &impact, int &place);
         void PowerUp_Bomb(const Config &config,std::vector<Player> &player, const int &i);
-        void Pause(const Config &config, const bool &Pause);
+        void Pause(const bool &Pause);
+        void Options_Changed(Renderer_Objects &objects);
         void Shutdown();
 };
+//
+#include "renderer_objects.h"
+//
 #endif // CURVE_GAME

@@ -108,7 +108,7 @@ void Game::Thread(const Config &config,std::vector<Player> &player){
             float elapsed = 3.0 - countdown.getElapsedTime().asSeconds();
             if(elapsed<=0.0){
                 countdown_int=0;
-                Pause(config,false);
+                Pause(false);
             }
             else if(elapsed <=1.0){
                 countdown_int=1;
@@ -719,7 +719,7 @@ void Game::PowerUp_Bomb(const Config &config,std::vector<Player> &player, const 
     }
 }
 //
-void Game::Pause(const Config &config, const bool &Pause){
+void Game::Pause(const bool &Pause){
     if(Pause){
         pause=true;
         if(server[1]){
@@ -734,8 +734,8 @@ void Game::Pause(const Config &config, const bool &Pause){
     else{
         pause=false;
         game_clock.restart();
+        packetclock.restart();
         if(server[1]){
-            packetclock.restart();
             Pending pending;
             pending.packet << Packet::Pause << false;
             pending.send_id.push_back(-1);
@@ -745,5 +745,17 @@ void Game::Pause(const Config &config, const bool &Pause){
         }
         countdown_int=0;
     }
+}
+//
+void Game::Options_Changed(Renderer_Objects &objects){
+    if(server[1]){
+        Pending pending;
+        pending.packet << Packet::Options << maxpoints << powerup_enabled;
+        pending.send_id.push_back(-1);
+        mutex.lock();
+        packets.push_back(pending);
+        mutex.unlock();
+    }
+    objects.setOptions(*this);
 }
 //

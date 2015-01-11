@@ -196,6 +196,8 @@ void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,s
     game.mutex.lock();
     game.packets.push_back(pending);
     game.mutex.unlock();
+    // Send options
+    game.refresh_options=true;
 }
 //
 void Server::Process_Package(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet, const unsigned int &n){
@@ -261,7 +263,7 @@ void Server::Process_Package(const Config &config,Game &game,std::vector<Player>
         int id;
         packet >> id;
         std::cout << player[id].name.toAnsiString() << "(" << id << ") " << " lags";
-        game.pause=true;
+        game.Pause(true);
     }
 }
 //

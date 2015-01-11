@@ -166,36 +166,26 @@ void Renderer_Objects::Init_Game(const Config &config){
     g_round[1].setFont(font);
     g_round[1].setColor(sf::Color::Yellow);
     g_round[1].setPosition(config.window_width-config.statuswidth+100,config.window_height/2);
-    // Frame
-    g_frame[0].setCharacterSize(font_size*0.75);
-    g_frame[0].setFont(font);
-    g_frame[0].setColor(sf::Color::Yellow);
-    g_frame[0].setString("Frame:");
-    g_frame[0].setPosition(config.window_width-config.statuswidth+5,config.window_height/2+30);
-    g_frame[1].setCharacterSize(font_size*0.75);
-    g_frame[1].setFont(font);
-    g_frame[1].setColor(sf::Color::Yellow);
-    g_frame[1].setPosition(config.window_width-config.statuswidth+100,config.window_height/2+30);
     // FPS
     g_fps[0].setCharacterSize(font_size*0.75);
     g_fps[0].setFont(font);
     g_fps[0].setColor(sf::Color::Yellow);
     g_fps[0].setString("FPS:");
-    g_fps[0].setPosition(config.window_width-config.statuswidth+5,config.window_height/2+60);
+    g_fps[0].setPosition(config.window_width-config.statuswidth+5,config.window_height/2+30);
     g_fps[1].setCharacterSize(font_size*0.75);
     g_fps[1].setFont(font);
     g_fps[1].setColor(sf::Color::Yellow);
-    g_fps[1].setPosition(config.window_width-config.statuswidth+100,config.window_height/2+60);
+    g_fps[1].setPosition(config.window_width-config.statuswidth+100,config.window_height/2+30);
     // Packet
     g_packet[0].setCharacterSize(font_size*0.75);
     g_packet[0].setFont(font);
     g_packet[0].setColor(sf::Color::Yellow);
     g_packet[0].setString("PPS:");
-    g_packet[0].setPosition(config.window_width-config.statuswidth+5,config.window_height/2+90);
+    g_packet[0].setPosition(config.window_width-config.statuswidth+5,config.window_height/2+60);
     g_packet[1].setCharacterSize(font_size*0.75);
     g_packet[1].setFont(font);
     g_packet[1].setColor(sf::Color::Yellow);
-    g_packet[1].setPosition(config.window_width-config.statuswidth+100,config.window_height/2+90);
+    g_packet[1].setPosition(config.window_width-config.statuswidth+100,config.window_height/2+60);
     // Quit Button
     g_quit.setButton("Quit",font,font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Bold,sf::Text::Bold);
     g_quit.setPosition(config.window_width-config.statuswidth/2-g_quit.getLocalBounds().width/2,config.window_height-50);

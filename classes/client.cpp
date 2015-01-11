@@ -232,7 +232,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         game.round_winner=id;
         game.game_finished=true;
         game.round_finished=true;
-        game.pause=true;
+        game.Pause(true);
         // Shutdown game thread
         if(game.update_thread[1]){
             game.Shutdown();
@@ -243,7 +243,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         packet >> id;
         game.round_winner=id;
         game.round_finished=true;
-        game.pause=true;
+        game.Pause(true);
         game.end_message_set=false;
     }
     else if(type==Packet::PowerupDelF){
@@ -353,12 +353,9 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         }
     }
     else if(type==Packet::Pause){
-        packet >> game.pause;
-        if(!game.pause){
-            game.game_clock.restart();
-            game.packetclock.restart();
-            game.countdown_int=0;
-        }
+        bool pause;
+        packet >> pause;
+        game.Pause(pause);
     }
     else if(type==Packet::DCon){
         int id;
@@ -373,13 +370,13 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         packet >> player[id].ready;
         game.refresh_players=true;
     }
-    else if(type==Packet::Config){
+    else if(type==Packet::Options){
         packet >> game.maxpoints >> game.powerup_enabled;
+        game.refresh_options=true;
     }
     else if(type==Packet::Countdown){
         game.countdown.restart();
         game.countdown_int=3;
-        //packet >> game.countdown_int;
     }
 }
 //

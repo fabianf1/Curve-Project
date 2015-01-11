@@ -66,7 +66,6 @@ class Renderer_Objects{
         std::vector<sf::Text> g_names;
         std::vector<sf::Text> g_score;
         sf::Text g_round[2];
-        sf::Text g_frame[2];
         sf::Text g_fps[2];
         sf::Text g_packet[2];
         Text_Button g_quit;

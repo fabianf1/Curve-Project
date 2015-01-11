@@ -6,7 +6,6 @@
 #include <math.h>
 // Class Headers
 #include "text_button.h"
-//#include "game.h"
 //
 class Text_Box{
     // Vars
