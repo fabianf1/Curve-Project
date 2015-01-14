@@ -17,5 +17,4 @@ To-Do List
     * Jumping line, line teleports forward instead of moving
 * Fix variations in FPS
 * Send linewidth to client(Sine powerup)
-* Change wallsaway and darkness bools with counters to support stacking
 * Write a sf::VertexArray like class that supports erase();

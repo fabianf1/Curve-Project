@@ -4,7 +4,7 @@
 
 #include <SFML/Network.hpp>
 
-enum class Packet : int {ID,Sync,Name,StartGame,NewRound,Update,Points,GameEnd,RoundEnd,PowerupDelF,PowerupDelP,PowerupDelG,PowerupS,PowerupHit,Pause,Ready,DCon,Options,KeyL,KeyR,Lag,Countdown};
+enum class Packet : int {ID,Sync,Name,StartGame,NewRound,Update,Points,GameEnd,RoundEnd,PowerupDelF,PowerupDelP,PowerupDelG,PowerupS,PowerupHit,PowerupEnd,Pause,Ready,DCon,Options,KeyL,KeyR,Lag,Countdown};
 // Overload Packer class for this enum
 sf::Packet& operator <<(sf::Packet& packet, const Packet &j);
 sf::Packet& operator >>(sf::Packet& packet, Packet &j);

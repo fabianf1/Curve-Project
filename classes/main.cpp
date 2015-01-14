@@ -144,7 +144,7 @@ void Main::Event_Handler(){
         }
         // Pause
         else if(!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
-            game.Pause(true);
+            game.Pause(!game.pause);
         }
     }
 }

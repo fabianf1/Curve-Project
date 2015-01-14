@@ -222,7 +222,9 @@ void Game::New_Round(const Config &config,std::vector<Player> &player){
     powerup_field.clear();
     powerup_effect.clear();
     wallsaway=false;
+    wallsaway_timer=0;
     darkness=false;
+    darkness_timer=0;
     morepowerups=0;
     powerup_spawn_time=config.powerup_spawn_delay;
     // Ready 'm up!
@@ -498,33 +500,41 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
     for(unsigned j=0;j<powerup_effect.size();j++){
         powerup_effect[j].time-=elapsed;
         if(powerup_effect[j].time<0.0){
-            //
-            if(powerup_effect[j].type==Powerup::Type::Walls_Away){
-                wallsaway=false;
-                if(server[1]){
-                    Pending pending;
-                    pending.packet << Packet::PowerupDelG << powerup_effect[j].id;
-                    pending.send_id.push_back(-1);
-                    mutex.lock();
-                    packets.push_back(pending);
-                    mutex.unlock();
-                }
-            }
-            else if(powerup_effect[j].type==Powerup::Type::More_Powerups){
+            if(powerup_effect[j].type==Powerup::Type::More_Powerups){
                 morepowerups=3;
             }
-            else if(powerup_effect[j].type==Powerup::Type::Darkness){
-                darkness=false;
-                if(server[1]){
-                    Pending pending;
-                    pending.packet << Packet::PowerupDelG << powerup_effect[j].id;
-                    pending.send_id.push_back(-1);
-                    mutex.lock();
-                    packets.push_back(pending);
-                    mutex.unlock();
-                }
-            }
             powerup_effect.erase(powerup_effect.begin()+j);
+        }
+    }
+    // Process Wallsaway and darkness
+    if(wallsaway){
+        wallsaway_timer-=elapsed;
+        if(wallsaway_timer<0.0){
+            wallsaway=false;
+            wallsaway_timer=0.0;
+            if(server[1]){
+                Pending pending;
+                pending.packet << Packet::PowerupEnd << Powerup::Type::Walls_Away;
+                pending.send_id.push_back(-1);
+                mutex.lock();
+                packets.push_back(pending);
+                mutex.unlock();
+            }
+        }
+    }
+    if(darkness){
+        darkness_timer-=elapsed;
+        if(darkness_timer<0.0){
+            darkness=false;
+            darkness_timer=0.0;
+            if(server[1]){
+                Pending pending;
+                pending.packet << Packet::PowerupEnd << Powerup::Type::Darkness;
+                pending.send_id.push_back(-1);
+                mutex.lock();
+                packets.push_back(pending);
+                mutex.unlock();
+            }
         }
     }
     // Then spawn new ones
@@ -633,14 +643,14 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                         }
                         break;
                     case Powerup::Type::Walls_Away:
-                        powerup_effect.emplace_back(Powerup::Type::Walls_Away,D,id);
+                        wallsaway_timer+=D;
                         wallsaway=true;
                         break;
                     case Powerup::Type::More_Powerups:
                         powerup_effect.emplace_back(Powerup::Type::More_Powerups,D,id);
                         break;
                     case Powerup::Type::Darkness:
-                        powerup_effect.emplace_back(Powerup::Type::Darkness,D,id);
+                        darkness_timer+=D;
                         darkness=true;
                         break;
                     case Powerup::Type::Bomb:

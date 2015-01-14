@@ -46,7 +46,9 @@ class Game{
         bool refresh_options;
         //
         bool wallsaway;
+        float wallsaway_timer;
         bool darkness;
+        float darkness_timer;
         int morepowerups;
         float elapsed;
         float powerup_spawn_time;

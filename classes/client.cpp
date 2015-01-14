@@ -299,6 +299,10 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         game.powerup_field.push_back(powerup);
     }
     else if(type==Packet::PowerupHit){
+        // Check
+        if(game.round_finished){
+            return;
+        }
         // Player id that hit the powerup
         int id;
         packet >> id;
@@ -332,11 +336,9 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                         }
                         break;
                     case Powerup::Type::Walls_Away:
-                        game.powerup_effect.emplace_back(Powerup::Type::Walls_Away,D,id);
                         game.wallsaway=true;
                         break;
                     case Powerup::Type::Darkness:
-                        game.powerup_effect.emplace_back(Powerup::Type::Darkness,D,id);
                         game.darkness=true;
                         break;
                     case Powerup::Type::Bomb:
@@ -350,6 +352,16 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                 game.powerup_field.erase(game.powerup_field.begin()+i);
                 break;
             }
+        }
+    }
+    else if(type==Packet::PowerupEnd){
+        Powerup::Type type;
+        packet >> type;
+        if(type==Powerup::Type::Darkness){
+            game.darkness=false;
+        }
+        else if(type==Powerup::Type::Walls_Away){
+            game.wallsaway=false;
         }
     }
     else if(type==Packet::Pause){
