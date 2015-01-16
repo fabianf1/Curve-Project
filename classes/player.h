@@ -32,6 +32,7 @@ class Player{
         sf::Color color;
         sf::VertexArray line; // Stores the line
         sf::CircleShape circle;
+        sf::RectangleShape rectangle;
         int points;
         bool keyrelease;
         //

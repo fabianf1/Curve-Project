@@ -305,7 +305,7 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                     // Own line
                     else if(j==i){
                         // Delay should be depending on speed and line width
-                        unsigned int delay=config.shift;
+                        unsigned int delay=2*config.shift;
                         // Linewidth scaling
                         if(player[j].linewidth>config.linewidth){
                             delay*=player[j].linewidth/config.linewidth;

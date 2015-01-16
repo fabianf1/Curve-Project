@@ -202,7 +202,13 @@ void Player::Update_Position(const Config &config, Game &game){
         }
     }
     // Update Circle
-    circle.setPosition(x-linewidth/2,y-linewidth/2);
+    if(!rightangle){
+        circle.setPosition(x-linewidth/2,y-linewidth/2);
+    }
+    else{
+        rectangle.setPosition(x,y);
+        rectangle.setRotation(heading);
+    }
 }
 //
 void Player::Update_Position(const Config &config, sf::Packet &packet,const float &packettime){
@@ -339,13 +345,26 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
         sine_linewidth=linewidth;
         sine_shift=shift;
     }
-    // Circle Style
-    if(inverted){
-        circle.setFillColor(sf::Color::Blue); // Bugged for some reason
+    if(!rightangle){
+        // Circle Style
+        if(inverted){
+            circle.setFillColor(sf::Color::Blue);
+        }
+        else{
+            circle.setFillColor(color);
+        }
+        circle.setRadius(linewidth/2);
+        // Rectangle style
     }
     else{
-        circle.setFillColor(color);
+        rectangle.setSize(sf::Vector2f(linewidth,linewidth));
+        if(inverted){
+            rectangle.setFillColor(sf::Color::Blue);
+        }
+        else{
+            rectangle.setFillColor(color);
+        }
+        rectangle.setOrigin(linewidth/2,linewidth/2);
     }
-    circle.setRadius(linewidth/2);
 }
 //
