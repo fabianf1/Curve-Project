@@ -63,13 +63,12 @@ Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time)
 }
 // Functions
 void Game::Switch_Mode(const Game::Mode &Mode){
-    // Lock Mutex
-    //mode_lock.lock();
+    // Lock
+    mode_mutex.lock();
     // Switch mode
     mode=Mode;
-    //
-    //mode_lock.unlock();
-    sf::sleep(sf::seconds(0.25));
+    // Unlock
+    mode_mutex.unlock();
 }
 //
 void Game::Initialize(const Config &config, std::vector<Player> &player){

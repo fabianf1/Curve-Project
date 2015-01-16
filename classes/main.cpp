@@ -12,24 +12,29 @@ void Main::Curve_Project(){
             Event_Handler();
         }
         // Process other events
-        if(game.mode==Game::Mode::Main_Menu){
-            Main_Menu_Handler();
-        }
-        else if(game.mode==Game::Mode::Setup){
-            Game_Setup_Handler();
-        }
-        else if(game.mode==Game::Mode::Play){
-            Play_Handler();
-        }
-        // Check if new player is added
-        if(renderer.objects.vector_length<player.size()||renderer.objects.vector_length>player.size()||game.refresh_players){
-            renderer.objects.Sync_Players(config,player);
-            game.refresh_players=false;
-        }
-        // Options changed
-        if(game.refresh_options){
-            game.Options_Changed(renderer.objects);
-            game.refresh_options=false;
+        // The lock is needed so that the fonts remain normal
+        if(game.mode_mutex.try_lock()){
+            if(game.mode==Game::Mode::Main_Menu){
+                Main_Menu_Handler();
+            }
+            else if(game.mode==Game::Mode::Setup){
+                Game_Setup_Handler();
+            }
+            else if(game.mode==Game::Mode::Play){
+                Play_Handler();
+            }
+            // Check if new player is added
+            if(renderer.objects.vector_length<player.size()||renderer.objects.vector_length>player.size()||game.refresh_players){
+                renderer.objects.Sync_Players(config,player);
+                game.refresh_players=false;
+            }
+            // Options changed
+            if(game.refresh_options){
+                game.Options_Changed(renderer.objects);
+                game.refresh_options=false;
+            }
+            // Unlock
+            game.mode_mutex.unlock();
         }
         // Delay function
         thread_pacer.Pace();

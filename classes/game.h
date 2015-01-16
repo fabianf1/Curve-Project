@@ -41,6 +41,7 @@ class Game{
         int last_fps;
         int countdown_int;
         sf::Clock countdown;
+        std::recursive_mutex mode_mutex;
         //
         bool refresh_players;
         bool refresh_options;

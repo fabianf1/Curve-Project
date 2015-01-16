@@ -18,11 +18,12 @@ void Renderer::Start(const Config &config,Game &game,const std::vector<Player> &
 // Render Thread Function
 void Renderer::Thread(const Config &config,Game &game,const std::vector<Player> &player){
     std::cout << "Render Thread Started" << std::endl;
-    sf::sleep(sf::milliseconds(1000));
     // Start main loop
     while(window.isOpen()){
         window.clear(config.window_backgroundcolor);
-        //
+        // Lock the mode mutex. Not rendering while mode is changing solves font problems
+        game.mode_mutex.lock();
+        // Render the things
         if(game.mode==Game::Mode::Main_Menu){
             Main_Menu();
         }
@@ -33,6 +34,8 @@ void Renderer::Thread(const Config &config,Game &game,const std::vector<Player> 
             Play(config,game,player);
             if(game.powerup_enabled){PowerUp(config,game,player);}
         }
+        // Unlock
+        game.mode_mutex.unlock();
         //
         window.display();
         game.frame++;

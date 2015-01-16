@@ -11,13 +11,10 @@ Renderer_Objects::Renderer_Objects(const Config &config){
     vector_length=0;
     // Load font
     font=LoadFont("fontdata");
-    font=LoadFont("fontdata");
     // Initialize Main Menu
     Init_Main_Menu(config);
     Init_Game_Setup(config);
     Init_Game(config);
-
-
 }
 // Main Menu Init
 void Renderer_Objects::Init_Main_Menu(const Config &config){
