@@ -94,7 +94,7 @@ void Player::Draw(sf::RenderWindow &window){
     window.draw(line);
     window.draw(circle);
 }
-//
+// Server and local version of Update_Position
 void Player::Update_Position(const Config &config, Game &game){
     // Sine things
     if(sine){
@@ -166,7 +166,7 @@ void Player::Update_Position(const Config &config, Game &game){
         xOLD+=config.window_width-config.statuswidth-config.wallwidth;
         x+=config.window_width-config.statuswidth-config.wallwidth;
         // Draw extra thing if not invisible
-        if(!invisible){
+        if(!invisible&&gap[0]>0.0){
             // Set quad points
             Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
@@ -176,7 +176,7 @@ void Player::Update_Position(const Config &config, Game &game){
         yOLD+=config.window_height-config.wallwidth;
         y+=config.window_height-config.wallwidth;
         // Draw extra thing if not invisible
-        if(!invisible){
+        if(!invisible&&gap[0]>0.0){
             // Set quad points
             Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
@@ -186,7 +186,7 @@ void Player::Update_Position(const Config &config, Game &game){
         xOLD-=config.window_width-config.statuswidth-config.wallwidth;
         x-=config.window_width-config.statuswidth-config.wallwidth;
         // Draw extra thing if not invisible
-        if(!invisible){
+        if(!invisible&&gap[0]>0.0){
             // Set quad points
             Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
@@ -196,7 +196,7 @@ void Player::Update_Position(const Config &config, Game &game){
         yOLD-=config.window_height-config.wallwidth;
         y-=config.window_height-config.wallwidth;
         // Draw extra thing if not invisible
-        if(!invisible){
+        if(!invisible&&gap[0]>0.0){
             // Set quad points
             Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
         }
@@ -206,11 +206,16 @@ void Player::Update_Position(const Config &config, Game &game){
         circle.setPosition(x-linewidth/2,y-linewidth/2);
     }
     else{
+        // Check if we need to make the right angle really right
+        if(!invisible&&gap[0]>0.0&&abs(heading-hOLD)>60){
+            Add_Line(xOLD-linewidth/2*cos(heading*PI/180.0),xOLD+linewidth/2*cos(heading*PI/180.0),yOLD-linewidth/2*sin(heading*PI/180.0),yOLD+linewidth/2*sin(heading*PI/180.0),heading,heading,linewidth);
+        }
+        // Rectangle update
         rectangle.setPosition(x,y);
         rectangle.setRotation(heading);
     }
 }
-//
+// Client Version of Update_Position
 void Player::Update_Position(const Config &config, sf::Packet &packet,const float &packettime){
     // Sine things
     if(sine){
@@ -229,8 +234,19 @@ void Player::Update_Position(const Config &config, sf::Packet &packet,const floa
     if(!noline&& abs(x-xOLD)<maxdiffw && abs(y-yOLD)<maxdiffh){
         Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
     }
-    // Circle
-    circle.setPosition(x-linewidth/2,y-linewidth/2);
+    // Update Circle
+    if(!rightangle){
+        circle.setPosition(x-linewidth/2,y-linewidth/2);
+    }
+    else{
+        // Check if we need to make the right angle really right
+        if(!noline&&abs(heading-hOLD)>60){
+            Add_Line(xOLD-linewidth/2*cos(heading*PI/180.0),xOLD+linewidth/2*cos(heading*PI/180.0),yOLD-linewidth/2*sin(heading*PI/180.0),yOLD+linewidth/2*sin(heading*PI/180.0),heading,heading,linewidth);
+        }
+        // Rectangle update
+        rectangle.setPosition(x,y);
+        rectangle.setRotation(heading);
+    }
 }
 //
 void Player::Add_Line(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &linewidth){

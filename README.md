@@ -12,7 +12,6 @@ To-Do List
 * Add version check
 * Add AI
 * Multiple players per server/client
-* Make sharp angles really sharp
 * Add more powerups
     * Jumping line, line teleports forward instead of moving
 * Fix variations in FPS

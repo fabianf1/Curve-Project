@@ -144,24 +144,14 @@ void Renderer::Play(const Config &config,const Game &game,const std::vector<Play
             }
             // Circle
             for(unsigned int k=0;k<player.size();k++){
-                if(k==i){
+                if(k==i || ( (player[i].x-player[k].x)*(player[i].x-player[k].x) + (player[i].y-player[k].y)*(player[i].y-player[k].y) < (config.darkness_radius*config.darkness_radius)/4 ) ){
                     if(!player[i].rightangle){
                         window.draw(player[i].circle);
                     }
                     else{
                         window.draw(player[i].rectangle);
                     }
-                }
-                else{
-                    if( (player[i].x-player[k].x)*(player[i].x-player[k].x) + (player[i].y-player[k].y)*(player[i].y-player[k].y) < (config.darkness_radius*config.darkness_radius)/4 ){
-                        if(!player[i].rightangle){
-                            window.draw(player[i].circle);
-                        }
-                        else{
-                            window.draw(player[i].rectangle);
-                        }
-                        break;
-                    }
+                    break;
                 }
             }
         }
