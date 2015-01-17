@@ -23,10 +23,9 @@ class Game_Setup{
         Game_Setup();
         // Functions
         void Initialize(const Config &config,Game &game,std::vector<Player> &player);
-        void Add_Player(const Config &config,Game &game,std::vector<Player> &player);
-        void Remove_Player(const Config &config,Game &game,std::vector<Player> &player, const int &i);
+        void Add_Player(Game &game,std::vector<Player> &player);
+        void Remove_Player(Game &game,std::vector<Player> &player, const int &i);
         bool Key_Available(const std::vector<Player> &player,const sf::Keyboard::Key &key);
-        void Join(const Config &config,Game &game,std::vector<Player> &player);
         void Quit(const Config &config,Game &game,std::vector<Player> &player);
         void Start_Game(const Config &config,Game &game,std::vector<Player> &player);
         void Auto_Add_Players(const Config &config,Game &game,std::vector<Player> &player);

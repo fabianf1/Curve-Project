@@ -7,15 +7,10 @@ void Server::Start(const Config &config,Game_Setup &game_setup,Game &game,std::v
     // Set player for server
     game.id=0;
     //
-    if(player.size()>1){
-        player.clear();
-        for(int i=0;i<6;i++){
-            game_setup.color_used[i]=false;
-        }
-    }
     if(player.size()==0){
-        game_setup.Add_Player(config,game,player);
+        game_setup.Add_Player(game,player);
     }
+    game.refresh_players=true;
     // Create Server Threads
     thread_listener = std::thread(&Server::Server_Listener,this,std::cref(config),std::ref(game_setup),std::ref(game),std::ref(player));
     thread_sender = std::thread(&Server::Server_Sender,this,std::cref(config),std::ref(game),std::ref(player));
@@ -83,7 +78,7 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
                             pending.packet << Packet::DCon << clients[i].id;
                             pending.send_id.push_back(-1);
                             // Remove from vectors
-                            game_setup.Remove_Player(config,game,player,clients[i].id);
+                            game_setup.Remove_Player(game,player,clients[i].id);
                             game.refresh_players=true;
                             // Remove out of list
                             selector.remove(*clients[i].socket);
@@ -170,7 +165,7 @@ void Server::Server_Sender(const Config &config,Game &game,std::vector<Player> &
 //
 void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player){
     // Add new player and synchronize positions between client_info and player vector
-    game_setup.Add_Player(config,game,player);
+    game_setup.Add_Player(game,player);
     clients.back().id=player.size()-1;
     player.back().id=clients.size()-1;
     std::cout << clients.back().id << ";" << player.back().id << std::endl;
@@ -274,6 +269,16 @@ void Server::Shutdown(Game &game){
     }
     if(thread_sender.joinable()){
         thread_sender.join();
+    }
+}
+void Server::Shutdown(Game &game,std::vector<Player> &player, Game_Setup &game_setup){
+    Shutdown(game);
+    // Remove players that are not local
+    for(unsigned int i=0;i<player.size();i++){
+        if(!player[i].local){
+            game_setup.Remove_Player(game,player,i);
+            i--;
+        }
     }
 }
 //

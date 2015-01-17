@@ -18,10 +18,6 @@ Game_Setup::Game_Setup(){
 }
 //
 void Game_Setup::Initialize(const Config &config,Game &game,std::vector<Player> &player){
-    // Clear all
-    /*if(player.size()>0){
-        player.clear();
-    }*/
     //
     if(player.size()==0){
         color[0]=sf::Color::Red;
@@ -37,7 +33,7 @@ void Game_Setup::Initialize(const Config &config,Game &game,std::vector<Player> 
     game.Switch_Mode(Game::Mode::Setup);
 }
 //
-void Game_Setup::Add_Player(const Config &config,Game &game,std::vector<Player> &player){
+void Game_Setup::Add_Player(Game &game,std::vector<Player> &player){
     // Find Available color
     int new_col;
     for(int i=0;i<6;i++){
@@ -57,7 +53,7 @@ void Game_Setup::Add_Player(const Config &config,Game &game,std::vector<Player> 
     std::cout << "Number of players: " << player.size() << std::endl;
 }
 //
-void Game_Setup::Remove_Player(const Config &config,Game &game,std::vector<Player> &player, const int &i){
+void Game_Setup::Remove_Player(Game &game,std::vector<Player> &player, const int &i){
     // Backup color
     sf::Color col=player[i].color;
     // Remove player
@@ -87,15 +83,6 @@ bool Game_Setup::Key_Available(const std::vector<Player> &player,const sf::Keybo
     return true;
 }
 //
-void Game_Setup::Join(const Config &config,Game &game,std::vector<Player> &player){
-    // Clear all
-    /*if(player.size()>0){
-        player.clear();
-    }*/
-    // Try connecting
-
-}
-//
 void Game_Setup::Quit(const Config &config,Game &game,std::vector<Player> &player){
     // Quit Server and Client and clear up
     //
@@ -108,13 +95,21 @@ void Game_Setup::Start_Game(const Config &config,Game &game,std::vector<Player> 
             std::cout << "Not enough players!" << std::endl;
         return;
     }
-    // Check if buttons are set
+    // Check if buttons are set and if everyone is local
+    //bool local=true;
     for(unsigned int i=0;i<player.size();i++){
         if( (player[i].local&&(player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown)) || (!player[i].local&&!player[i].ready) ){
             std::cout << "Keys not set or someone is not ready!" << std::endl;
             return;
         }
+        /*else if(!player[i].local){
+            local=false;
+        }*/
     }
+    // Shutdown server if everyone local
+    /*if(local&&game.server[1]){
+        game.server[2]=true;
+    }*/
     // If they are start init
     game.Initialize(config,player);
 }
@@ -123,10 +118,10 @@ void Game_Setup::Auto_Add_Players(const Config &config,Game &game,std::vector<Pl
     if(player.size()>0){
         return;
     }
-    Add_Player(config,game,player);
+    Add_Player(game,player);
     player[0].keyL=sf::Keyboard::Left;
     player[0].keyR=sf::Keyboard::Right;
-    Add_Player(config,game,player);
+    Add_Player(game,player);
     player[1].keyL=sf::Keyboard::Z;
     player[1].keyR=sf::Keyboard::X;
 }

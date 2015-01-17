@@ -11,9 +11,10 @@ To-Do List
 * Clean up code
 * Add version check
 * Add AI
-* Multiple players per server/client
+* Multiple players per client
 * Add more powerups
     * Jumping line, line teleports forward instead of moving
 * Fix variations in FPS
 * Send linewidth to client(Sine powerup)
 * Write a sf::VertexArray like class that supports erase();
+* Fix quit buttons in online games

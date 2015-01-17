@@ -79,10 +79,11 @@ void Renderer::Setup(const Config &config,const Game &game,const std::vector<Pla
         else{
             window.draw(objects.s_status[i]);
         }
-        if(!game.client[1]&& (!player[i].server||!game.server[1]) ){window.draw(objects.s_kick[i]);}
+        // Only display kick when local or server and if server then always keep one.
+        if(!game.client[1]&& ( (game.server[1] && (i!=0) ) || (!game.server[1]) ) ){window.draw(objects.s_kick[i]);}
     }
     // More
-    if(objects.vector_length<6&&!game.client[1]&&!game.server[1]){
+    if(objects.vector_length<6&&!game.client[1]){
         window.draw(objects.s_add);
     }
     //window.draw(objects.s_name_pointer);
