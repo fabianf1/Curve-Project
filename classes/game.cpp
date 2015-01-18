@@ -439,7 +439,24 @@ void Game::End_Round(const Config &config,std::vector<Player> &player){
 //
 void Game::Quit(const Config &config){
     Shutdown();
-    Switch_Mode(Game::Mode::Setup);
+    // If client stop client thread and return to main menu
+    if(client[1]){
+        client[2]=true;
+        Switch_Mode(Game::Mode::Main_Menu);
+    }
+    else{
+        // If Server return to setup menu and send a packet
+        if(server[1]){
+            Pending pending;
+            pending.send_id.push_back(-1);
+            pending.packet << Packet::Return_Setup;
+            mutex.lock();
+            packets.push_back(pending);
+            mutex.unlock();
+        }
+        //
+        Switch_Mode(Game::Mode::Setup);
+    }
 }
 //
 void Game::Shutdown(){

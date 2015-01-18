@@ -306,7 +306,10 @@ void Main::Game_Setup_Handler(){
     if(game.server[1]&&renderer.objects.s_server.getString()=="Start Server"){
         renderer.objects.s_server.setString("Local: " + sf::IpAddress::getLocalAddress().toString());
     }
-    else if(!game.server[1]&&renderer.objects.s_server.getString()!="Start Server"){
+    else if(game.client[1]&&renderer.objects.s_server.getString()!= "Server: " + game.server_ip.toString() ){
+        renderer.objects.s_server.setString("Server: " + game.server_ip.toString());
+    }
+    else if(!game.server[1]&&!game.client[1]&&renderer.objects.s_server.getString()!="Start Server"){
         renderer.objects.s_server.setString("Start Server");
     }
     // Server Button

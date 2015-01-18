@@ -17,4 +17,4 @@ To-Do List
 * Fix variations in FPS
 * Send linewidth to client(Sine powerup)
 * Write a sf::VertexArray like class that supports erase();
-* Fix quit buttons in online games
+* Use same code conventions everywhere

@@ -85,6 +85,12 @@ bool Game_Setup::Key_Available(const std::vector<Player> &player,const sf::Keybo
 //
 void Game_Setup::Quit(const Config &config,Game &game,std::vector<Player> &player){
     // Quit Server and Client and clear up
+    if(game.client[1]){
+        game.client[2]=true;
+    }
+    else if(game.server[1]){
+        game.server[2]=true;
+    }
     //
     game.Switch_Mode(Game::Mode::Main_Menu);
 }

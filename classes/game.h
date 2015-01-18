@@ -60,8 +60,8 @@ class Game{
         std::vector<Powerup_Effect> powerup_effect; // Stores powerupeffects that effect whole game;
         std::vector<Powerup_Effect> player_powerup_effect;
         //
-        bool update_thread[3];// 0=start,1=running,2=shutdown;
-        bool server[3];// 0=start,1=running,2=shutdown;
+        bool update_thread[3];// 0=Cleanup required,1=running,2=shutdown;
+        bool server[3];
         bool client[3];
         bool connected;
         unsigned int id;

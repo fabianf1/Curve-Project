@@ -6,29 +6,30 @@ void Client::Start(const Config &config, Game &game,std::vector<Player> &player)
     if(player.size()>0){
         player.clear();
     }
-    game.client[0]=false;
+    // Check if clean
+    if(game.client[0]){
+        Shutdown(game);
+    }
+    //
     std::cout << "Connecting!" << std::endl;
-    //for(int i=0; i<config.max_attempts&&!connected;i++){
+    for(int i=0; i<config.max_attempts&&!game.client[1];i++){
         sf::Socket::Status status= socket.connect(game.server_ip,config.port,sf::milliseconds(1000));
         if(status==sf::Socket::Error){
             std::cout << "Server connection Error!" << std::endl;
-            //sf::sleep(sf::milliseconds(config.attempt_delay));
+            sf::sleep(sf::milliseconds(config.attempt_delay));
         }
         else if(status==sf::Socket::NotReady){
-             std::cout << "Not ready?!" << std::endl; // This happens for some reason at the first reconnect attempt
-             //sf::sleep(sf::milliseconds(config.attempt_delay));
+             std::cout << "Not ready?!" << std::endl; // When the client tries to reconnect this always occurs for some reason. Trying again results in a succeeded connection attempt.
+             sf::sleep(sf::milliseconds(config.attempt_delay));
         }
         else{
             std::cout << "Connected to server!" << std::endl;
             socket.setBlocking(false);
             sync=false;
             ready=false;
-            //game.connected=true;
             // Start server connection thread
             thread = std::thread(&Client::Thread,this,std::cref(config),std::ref(game),std::ref(player));
-            //thread_listener = std::thread(&Server::Server_Listener,this,std::cref(config),std::ref(game),player);
             game.client[1]=true;
-            //Initialize_Game_Setup_MP(config,game,player);
             std::cout << "Synchronizing!" << std::endl;
             while(!sync){
                 sf::sleep(sf::milliseconds(250));
@@ -36,7 +37,7 @@ void Client::Start(const Config &config, Game &game,std::vector<Player> &player)
             std::cout << "Synchronized!" << std::endl;
             game.Switch_Mode(Game::Mode::Setup);
         }
-    //}
+    }
 }
 //
 void Client::Thread(const Config &config,Game &game,std::vector<Player> &player){
@@ -83,6 +84,7 @@ void Client::Thread(const Config &config,Game &game,std::vector<Player> &player)
     }
     socket.disconnect();
     game.client[1]=game.client[2]=false;
+    game.client[0]=true;
     game.connected=false;
     std::cout << "Client thread ended!" << std::endl;
 }
@@ -390,6 +392,12 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         game.countdown.restart();
         game.countdown_int=3;
     }
+    else if(type==Packet::Return_Setup){
+        if(game.update_thread[1]){
+            game.Shutdown();
+        }
+        game.Switch_Mode(Game::Mode::Setup);
+    }
 }
 //
 void Client::Shutdown(Game &game){
@@ -397,4 +405,5 @@ void Client::Shutdown(Game &game){
     if(thread.joinable()){
         thread.join();
     }
+    game.client[0]=game.client[2]=false;
 }

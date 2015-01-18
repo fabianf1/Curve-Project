@@ -2,15 +2,13 @@
 // Needed Header
 #include "renderer_objects.h"
 // Constructor
-Renderer_Objects::Renderer_Objects(const Config &config){
+Renderer_Objects::Renderer_Objects(const Config &config): font(LoadFont("fontdata")) {
     // Set variables
     font_title_size=50;
     font_size=30;
     g_font_title_size=25;
     g_font_size=15;
     vector_length=0;
-    // Load font
-    font=LoadFont("fontdata");
     // Initialize Main Menu
     Init_Main_Menu(config);
     Init_Game_Setup(config);

@@ -26,7 +26,7 @@ class Renderer_Objects{
         int g_font_size;
         unsigned int vector_length; // To keep track of vector lengths
         // Font
-        sf::Font font;
+        const sf::Font font;
         // Main Menu
         sf::Text m_title;
         Text_Button m_create;

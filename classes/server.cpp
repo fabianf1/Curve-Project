@@ -3,7 +3,10 @@
 #include "server.h"
 // Functions
 void Server::Start(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player){
-    game.server[0]=false;
+    // Check if clean
+    if(game.server[0]){
+        Shutdown(game,player,game_setup);
+    }
     // Set player for server
     game.id=0;
     //
@@ -87,6 +90,11 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
                             game.mutex.lock();
                             game.packets.push_back(pending);
                             game.mutex.unlock();
+                            // Find out if all players left
+                            if(player.size()<=1){
+                                // Return to setup screen
+                                game.Quit(config);
+                            }
                             break;
                     }
                 }
@@ -94,12 +102,13 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
         }     // End Selector
     }
     // Shutdown
-    sf::sleep(sf::milliseconds(1000));
+    sf::sleep(sf::seconds(1));
     selector.clear();
     clients.clear();
     listener.close();
     game.connected=false;
     game.server[1]=game.server[2]=false;
+    game.server[0]=true;
     //
     std::cout << "Server listener ended!" << std::endl;
 }
@@ -168,7 +177,6 @@ void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,s
     game_setup.Add_Player(game,player);
     clients.back().id=player.size()-1;
     player.back().id=clients.size()-1;
-    std::cout << clients.back().id << ";" << player.back().id << std::endl;
     player.back().local=false;
     player.back().server=false;
     // Send everything to client
@@ -270,6 +278,7 @@ void Server::Shutdown(Game &game){
     if(thread_sender.joinable()){
         thread_sender.join();
     }
+    game.server[0]=game.server[2]=false;
 }
 void Server::Shutdown(Game &game,std::vector<Player> &player, Game_Setup &game_setup){
     Shutdown(game);
