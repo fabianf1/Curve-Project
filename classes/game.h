@@ -31,6 +31,7 @@ class Game{
         int maxpoints;
         bool powerup_enabled;
         bool countdown_enabled;
+        bool multiple_players_enabled;
         bool pause;
         unsigned int round;
         unsigned int deathcount;

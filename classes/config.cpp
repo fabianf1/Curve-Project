@@ -12,6 +12,7 @@ Config::Config(){
     statuswidth=200;
     window_backgroundcolor=sf::Color::Black;
     fps=60;
+    max_players=6;
     // Icon
     icon = LoadImageFromResource("curveicon");
     // Line Settings

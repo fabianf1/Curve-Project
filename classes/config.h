@@ -19,6 +19,7 @@ class Config{
         sf::Image icon;
         //
         int fps; // Maximum number of fps
+        unsigned int max_players;
         //
         int linewidth;
         sf::Color linecolors[6];

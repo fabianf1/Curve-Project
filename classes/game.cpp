@@ -10,6 +10,7 @@ Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time)
     mode=Mode::Main_Menu;
     powerup_enabled=true;
     countdown_enabled=false;
+    multiple_players_enabled=false;
     morepowerups=0;
     update_thread[0]=update_thread[1]=update_thread[2]=false;
     server[0]=server[1]=server[2]=false;
@@ -154,25 +155,29 @@ void Game::Thread(const Config &config,std::vector<Player> &player){
         }
         else if(client[1]&&!round_finished){
             // Check key states and send if changed
-            // KeyL changed
-            if( (!player[id].left&&sf::Keyboard::isKeyPressed(player[id].keyL)) || (player[id].left&&!sf::Keyboard::isKeyPressed(player[id].keyL)) ){
-                player[id].left=sf::Keyboard::isKeyPressed(player[id].keyL);
-                // Send package
-                Pending pending;
-                pending.packet << Packet::KeyL << id << player[id].left;
-                mutex.lock();
-                packets.push_back(pending);
-                mutex.unlock();
-            }
-            // KeyR changed
-            if( (!player[id].right&&sf::Keyboard::isKeyPressed(player[id].keyR)) || (player[id].right&&!sf::Keyboard::isKeyPressed(player[id].keyR)) ){
-                player[id].right=sf::Keyboard::isKeyPressed(player[id].keyR);
-                // Send package
-                Pending pending;
-                pending.packet << Packet::KeyR << id << player[id].right;
-                mutex.lock();
-                packets.push_back(pending);
-                mutex.unlock();
+            for(unsigned int i=0;i<player.size();i++){
+                if(player[i].local){
+                    // KeyL changed
+                    if( (!player[i].left&&sf::Keyboard::isKeyPressed(player[i].keyL)) || (player[i].left&&!sf::Keyboard::isKeyPressed(player[i].keyL)) ){
+                        player[i].left=sf::Keyboard::isKeyPressed(player[i].keyL);
+                        // Send package
+                        Pending pending;
+                        pending.packet << Packet::KeyL << i << player[i].left;
+                        mutex.lock();
+                        packets.push_back(pending);
+                        mutex.unlock();
+                    }
+                    // KeyR changed
+                    if( (!player[i].right&&sf::Keyboard::isKeyPressed(player[i].keyR)) || (player[i].right&&!sf::Keyboard::isKeyPressed(player[i].keyR)) ){
+                        player[i].right=sf::Keyboard::isKeyPressed(player[i].keyR);
+                        // Send package
+                        Pending pending;
+                        pending.packet << Packet::KeyR << i << player[i].right;
+                        mutex.lock();
+                        packets.push_back(pending);
+                        mutex.unlock();
+                    }
+                }
             }
             // Powerup
             if(!pause){
@@ -776,7 +781,7 @@ void Game::Pause(const bool &Pause){
 void Game::Options_Changed(Renderer_Objects &objects){
     if(server[1]){
         Pending pending;
-        pending.packet << Packet::Options << maxpoints << powerup_enabled;
+        pending.packet << Packet::Options << maxpoints << powerup_enabled << multiple_players_enabled;
         pending.send_id.push_back(-1);
         mutex.lock();
         packets.push_back(pending);

@@ -228,19 +228,36 @@ void Main::Game_Setup_Handler(){
         if(player[i].server&&renderer.objects.s_status[i].getString()!="Server"){
             renderer.objects.s_status[i].setString("Server");
         }
-        else if(!player[i].server&&!player[i].local&&!player[i].ready&&renderer.objects.s_status[i].getString()!="Not ready"){
+        else if(!player[i].server&&!player[i].local
+                && ( (game.server[1] && !server.clients[player[i].id].ready) || (game.client[1] && !player[i].ready ) )
+                && renderer.objects.s_status[i].getString()!="Not ready"){
             renderer.objects.s_status[i].setString("Not ready");
         }
-        else if(!player[i].server&&!player[i].local&&player[i].ready&&renderer.objects.s_status[i].getString()!="Ready"){
+        else if(!player[i].server&&!player[i].local
+                && ( (game.server[1] && server.clients[player[i].id].ready) || (game.client[1] && player[i].ready ) )
+                &&renderer.objects.s_status[i].getString()!="Ready"){
             renderer.objects.s_status[i].setString("Ready");
         }
         // Kick
-        if(!game.client[1]&& ( (game.server[1] && (i!=0) ) || (!game.server[1]) ) && renderer.objects.s_kick[i].Check(renderer.window)){
+        // Local: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
+        if( ( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server&&!game.client[1] ) ) && renderer.objects.s_kick[i].Check(renderer.window)){
             // Remove from server
             if(game.server[1]){
                 if(!player[i].local){
-                    server.selector.remove(*server.clients[player[i].id].socket);
-                    server.clients.erase(server.clients.begin()+player[i].id);
+                    // Remove from clients
+                    for(unsigned int j=0;j<server.clients[player[i].id].id.size();j++){
+                        if(server.clients[player[i].id].id[j]==i){
+                            server.clients[player[i].id].id.erase(server.clients[player[i].id].id.begin()+j);
+                            break;
+                        }
+                    }
+                    // Update player id's
+                    server.Update_Player_id(player,i);
+                    // Remove if no player left
+                    if(server.clients[player[i].id].id.size()==0){
+                        server.selector.remove(*server.clients[player[i].id].socket);
+                        server.clients.erase(server.clients.begin()+player[i].id);
+                    }
                 }
                 Pending pending;
                 pending.packet << Packet::DCon << i;
@@ -248,60 +265,91 @@ void Main::Game_Setup_Handler(){
                 game.mutex.lock();
                 game.packets.push_back(pending);
                 game.mutex.unlock();
+                //
+                game_setup.Remove_Player(game,player,i);
+                renderer.objects.Sync_Players(config,player);
             }
-            //
-            game_setup.Remove_Player(game,player,i);
-            renderer.objects.Sync_Players(config,player);
+            else if(game.client[1]){
+                player[i].local=false;
+                Pending pending;
+                pending.packet << Packet::Remove_Player << i;
+                pending.send_id.push_back(-1);
+                game.mutex.lock();
+                game.packets.push_back(pending);
+                game.mutex.unlock();
+            }
             break;
         }
     }
     // Options
-    if(renderer.objects.s_max10.Check(renderer.window)){
+    if(renderer.objects.s_max10.Check(renderer.window)&&!game.client[1]){
         game.maxpoints=10;
         game.Options_Changed(renderer.objects);
     }
-    if(renderer.objects.s_max20.Check(renderer.window)){
+    if(renderer.objects.s_max20.Check(renderer.window)&&!game.client[1]){
         game.maxpoints=20;
         game.Options_Changed(renderer.objects);
     }
-    if(renderer.objects.s_max40.Check(renderer.window)){
+    if(renderer.objects.s_max40.Check(renderer.window)&&!game.client[1]){
         game.maxpoints=40;
         game.Options_Changed(renderer.objects);
     }
-    if(renderer.objects.s_powerupoff.Check(renderer.window)){
+    if(renderer.objects.s_powerupoff.Check(renderer.window)&&!game.client[1]){
         game.powerup_enabled=false;
         game.Options_Changed(renderer.objects);
     }
-    if(renderer.objects.s_powerupon.Check(renderer.window)){
+    if(renderer.objects.s_powerupon.Check(renderer.window)&&!game.client[1]){
         game.powerup_enabled=true;
         game.Options_Changed(renderer.objects);
     }
-    if(renderer.objects.s_countdownoff.Check(renderer.window)){
-        game.countdown_enabled=false;
-        game.Options_Changed(renderer.objects);
+    if(!game.client[1]&&!game.server[1]){
+        if(renderer.objects.s_countdownoff.Check(renderer.window)){
+            game.countdown_enabled=false;
+            game.Options_Changed(renderer.objects);
+        }
+        if(renderer.objects.s_countdownon.Check(renderer.window)){
+            game.countdown_enabled=true;
+            game.Options_Changed(renderer.objects);
+        }
     }
-    if(renderer.objects.s_countdownon.Check(renderer.window)){
-        game.countdown_enabled=true;
-        game.Options_Changed(renderer.objects);
+    else{
+        if(renderer.objects.s_multiple_playersoff.Check(renderer.window)&&!game.client[1]){
+            game.multiple_players_enabled=false;
+            game.Options_Changed(renderer.objects);
+        }
+        if(renderer.objects.s_multiple_playerson.Check(renderer.window)&&!game.client[1]){
+            game.multiple_players_enabled=true;
+            game.Options_Changed(renderer.objects);
+        }
     }
     // Buttons
-    if(!game.client[1]&&renderer.objects.s_add.Check(renderer.window)){
-        // Add new player
-        game_setup.Add_Player(game,player);
-        renderer.objects.Sync_Players(config,player);
-        // Send to clients
-        if(game.server[1]){
+    if(player.size()<config.max_players&&renderer.objects.s_add.Check(renderer.window)){
+        // Send request
+        if(game.client[1]){
             Pending pending;
-            pending.packet << Packet::Sync;
-            for(unsigned int i=0;i<player.size();i++){
-                pending.packet << i << player[i].name << player[i].color << player[i].server << player[i].ready;
-            }
-            pending.send_id.push_back(-1);
+            pending.packet << Packet::Request_Player;
             game.mutex.lock();
             game.packets.push_back(pending);
             game.mutex.unlock();
+        }
+        else{
+            // Add new player
+            game_setup.Add_Player(game,player);
+            renderer.objects.Sync_Players(config,player);
+            // Send to clients
+            if(game.server[1]){
+                Pending pending;
+                pending.packet << Packet::Sync;
+                for(unsigned int i=0;i<player.size();i++){
+                    pending.packet << i << player[i].name << player[i].color << player[i].server << player[i].ready;
+                }
+                pending.send_id.push_back(-1);
+                game.mutex.lock();
+                game.packets.push_back(pending);
+                game.mutex.unlock();
             }
         }
+    }
     // Server Text
     if(game.server[1]&&renderer.objects.s_server.getString()=="Start Server"){
         renderer.objects.s_server.setString("Local: " + sf::IpAddress::getLocalAddress().toString());
@@ -330,7 +378,7 @@ void Main::Game_Setup_Handler(){
     if(renderer.objects.s_start.Check(renderer.window)){
         if(!game.client[1]){
             // Otherwise check if all players are ready and start
-            game_setup.Start_Game(config,game,player);
+            game_setup.Start_Game(config,game,player,server);
         }
         else{
             // Client Things

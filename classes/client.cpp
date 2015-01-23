@@ -86,6 +86,7 @@ void Client::Thread(const Config &config,Game &game,std::vector<Player> &player)
     game.client[1]=game.client[2]=false;
     game.client[0]=true;
     game.connected=false;
+    player.clear();
     std::cout << "Client thread ended!" << std::endl;
 }
 //
@@ -97,8 +98,7 @@ void Client::Ready(Game &game,std::vector<Player> &player){
         for(unsigned int i=0;i<player.size();i++){
             if(player[i].local &&( player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown) ){
                 ready=false;
-                player[i].ready=true;
-                // Return ? Break?
+                break;
             }
         }
         // If still ready sent to server
@@ -112,18 +112,12 @@ void Client::Ready(Game &game,std::vector<Player> &player){
     }
     else{
         ready=false;
-        for(unsigned int i=0;i<player.size();i++){
-            if(player[i].local){
-                player[i].ready=false;
-            }
-        }
-        //
+        // Send packet
         Pending pending;
         pending.packet << Packet::Ready << false;
         game.mutex.lock();
         game.packets.push_back(pending);
         game.mutex.unlock();
-        player[game.id].ready=false;
     }
 }
 //
@@ -159,6 +153,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                 player[id].ready=ready;
             }
         }
+        game.refresh_players=true;
         sync=true;
         // Switch screen if still IG
         if(game.mode==Game::Mode::Play){
@@ -373,9 +368,11 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
     }
     else if(type==Packet::DCon){
         int id;
-        packet >> id;
-        // Remove from list
-        player.erase(player.begin()+id);
+        while(!packet.endOfPacket()){
+            packet >> id;
+            // Remove from list
+            player.erase(player.begin()+id);
+        }
         game.refresh_players=true;
     }
     else if(type==Packet::Ready){
@@ -385,7 +382,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         game.refresh_players=true;
     }
     else if(type==Packet::Options){
-        packet >> game.maxpoints >> game.powerup_enabled;
+        packet >> game.maxpoints >> game.powerup_enabled >> game.multiple_players_enabled;
         game.refresh_options=true;
     }
     else if(type==Packet::Countdown){
@@ -397,6 +394,23 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
             game.Shutdown();
         }
         game.Switch_Mode(Game::Mode::Setup);
+    }
+    else if(type==Packet::Request_Player){
+        int id;
+        packet >> id;
+        //
+        if(id==-1){
+            std::cout << "Request denied!" << std::endl;
+        }
+        else{
+            while(id>=player.size()){
+                player.emplace_back("",sf::Color::Black);
+                player.back().server=false;
+                player.back().ready=false;
+            }
+            player[id].local=true;
+            game.refresh_players=true;
+        }
     }
 }
 //

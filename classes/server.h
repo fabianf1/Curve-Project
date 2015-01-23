@@ -37,10 +37,11 @@ class Server{
         void Server_Listener(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
         void Server_Sender(const Config &config,Game &game,std::vector<Player> &player);
         void New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
-        void Process_Package(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
+        void Process_Package(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
         void Shutdown(Game &game);
         void Shutdown(Game &game,std::vector<Player> &player,Game_Setup &game_setup);
         void Sync_Clients(const Config &config,Game &game,const std::vector<Player> &player);
+        void Update_Player_id(const std::vector<Player> &player,const unsigned int &n);
         // Constructor
         Server(): sender_pacer(25){}
         // Functions

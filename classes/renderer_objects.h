@@ -56,6 +56,8 @@ class Renderer_Objects{
         Text_Button s_powerupon,s_powerupoff;
         sf::Text s_countdown;
         Text_Button s_countdownon,s_countdownoff;
+        sf::Text s_multiple_players;
+        Text_Button s_multiple_playerson,s_multiple_playersoff;
         // Buttons :D
         Text_Button s_start;
         Text_Button s_quit;

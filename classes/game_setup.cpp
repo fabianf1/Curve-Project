@@ -95,27 +95,30 @@ void Game_Setup::Quit(const Config &config,Game &game,std::vector<Player> &playe
     game.Switch_Mode(Game::Mode::Main_Menu);
 }
 //
-void Game_Setup::Start_Game(const Config &config,Game &game,std::vector<Player> &player){
+void Game_Setup::Start_Game(const Config &config,Game &game,std::vector<Player> &player,const Server &server){
     // Check if there are at least two players
     if(player.size()<2){
-            std::cout << "Not enough players!" << std::endl;
+        std::cout << "Not enough players!" << std::endl;
         return;
     }
-    // Check if buttons are set and if everyone is local
-    //bool local=true;
+    // Check keys
     for(unsigned int i=0;i<player.size();i++){
-        if( (player[i].local&&(player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown)) || (!player[i].local&&!player[i].ready) ){
-            std::cout << "Keys not set or someone is not ready!" << std::endl;
+        if( (player[i].local&&(player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown))){
+            std::cout << "Keys not set!" << std::endl;
             return;
         }
-        /*else if(!player[i].local){
-            local=false;
-        }*/
     }
-    // Shutdown server if everyone local
-    /*if(local&&game.server[1]){
+    // Check ready
+    for(unsigned int i=0;i<server.clients.size();i++){
+        if(!server.clients[i].ready){
+            std::cout << "Someone is not ready!" << std::endl;
+            return;
+        }
+    }
+    // Shutdown server if no clients
+    if(server.clients.size()==0&&game.server[1]){
         game.server[2]=true;
-    }*/
+    }
     // If they are start init
     game.Initialize(config,player);
 }

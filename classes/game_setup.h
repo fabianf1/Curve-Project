@@ -10,7 +10,8 @@
 #include "config.h"
 #include "game.h"
 #include "player.h"
-
+// Prototype
+class Server;
 //
 class Game_Setup{
     public:
@@ -27,8 +28,10 @@ class Game_Setup{
         void Remove_Player(Game &game,std::vector<Player> &player, const int &i);
         bool Key_Available(const std::vector<Player> &player,const sf::Keyboard::Key &key);
         void Quit(const Config &config,Game &game,std::vector<Player> &player);
-        void Start_Game(const Config &config,Game &game,std::vector<Player> &player);
+        void Start_Game(const Config &config,Game &game,std::vector<Player> &player,const Server &server);
         void Auto_Add_Players(const Config &config,Game &game,std::vector<Player> &player);
 };
+// Class headers
+#include "server.h"
 
 #endif // CURVE_GAME_SETUP

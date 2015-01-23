@@ -79,11 +79,11 @@ void Renderer::Setup(const Config &config,const Game &game,const std::vector<Pla
         else{
             window.draw(objects.s_status[i]);
         }
-        // Only display kick when local or server and if server then always keep one.
-        if(!game.client[1]&& ( (game.server[1] && (i!=0) ) || (!game.server[1]) ) ){window.draw(objects.s_kick[i]);}
+        // Local: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
+        if( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server&&!game.client[1]) ){window.draw(objects.s_kick[i]);}
     }
     // More
-    if(objects.vector_length<6&&!game.client[1]){
+    if(objects.vector_length<config.max_players){
         window.draw(objects.s_add);
     }
     //window.draw(objects.s_name_pointer);
@@ -100,6 +100,11 @@ void Renderer::Setup(const Config &config,const Game &game,const std::vector<Pla
         window.draw(objects.s_countdown);
         window.draw(objects.s_countdownon);
         window.draw(objects.s_countdownoff);
+    }
+    else{
+        window.draw(objects.s_multiple_players);
+        window.draw(objects.s_multiple_playerson);
+        window.draw(objects.s_multiple_playersoff);
     }
     // Buttons
     window.draw(objects.s_server);

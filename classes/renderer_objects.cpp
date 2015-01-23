@@ -93,13 +93,13 @@ void Renderer_Objects::Init_Game_Setup(const Config &config){
     s_maxpoints.setPosition(670 , 200);
     //
     s_max10.setButton("10",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_max10.setPosition(830,200);
+    s_max10.setPosition(840,200);
     //
     s_max20.setButton("20",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_max20.setPosition(870,200);
+    s_max20.setPosition(880,200);
     //
     s_max40.setButton("40",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_max40.setPosition(910,200);
+    s_max40.setPosition(920,200);
     //
     s_powerups.setString("Powerups:");
     s_powerups.setFont(font);
@@ -108,10 +108,10 @@ void Renderer_Objects::Init_Game_Setup(const Config &config){
     s_powerups.setPosition(670 , 240);
     //
     s_powerupon.setButton("On",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_powerupon.setPosition(830,240);
+    s_powerupon.setPosition(840,240);
     //
     s_powerupoff.setButton("Off",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_powerupoff.setPosition(880,240);
+    s_powerupoff.setPosition(890,240);
     //
     s_countdown.setString("Countdown:");
     s_countdown.setFont(font);
@@ -120,10 +120,22 @@ void Renderer_Objects::Init_Game_Setup(const Config &config){
     s_countdown.setPosition(670 , 280);
     //
     s_countdownon.setButton("On",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_countdownon.setPosition(830,280);
+    s_countdownon.setPosition(840,280);
     //
     s_countdownoff.setButton("Off",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_countdownoff.setPosition(880,280);
+    s_countdownoff.setPosition(890,280);
+    //
+    s_multiple_players.setString("Multiple players:");
+    s_multiple_players.setFont(font);
+    s_multiple_players.setCharacterSize(font_size*0.75);
+    s_multiple_players.setColor(sf::Color::White);
+    s_multiple_players.setPosition(670 , 280);
+    //
+    s_multiple_playerson.setButton("On",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
+    s_multiple_playerson.setPosition(840,280);
+    //
+    s_multiple_playersoff.setButton("Off",font,font_size*0.75,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
+    s_multiple_playersoff.setPosition(890,280);
     // Buttons :D
     s_start.setButton("Start Game",font,font_size,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
     s_start.setPosition(config.window_width/2-s_start.getLocalBounds().width/2,config.window_height-100); // Middle Bottom
@@ -217,7 +229,7 @@ void Renderer_Objects::Sync_Players(const Config &config,const std::vector<Playe
         }
     }
     // Synchronize
-    for(unsigned int i=0;i<vector_length;i++){
+    for(unsigned int i=0;i<vector_length&&i<player.size();i++){
         s_names[i].setString(player[i].name);
         s_names[i].setColors(player[i].color,player[i].color);
         s_names[i].setPosition(40,195+(i)*45);
@@ -324,6 +336,15 @@ void Renderer_Objects::setOptions(const Game &game){
     else{
         s_countdownon.setActive(false);
         s_countdownoff.setActive(true);
+    }
+    // Multiple players
+    if(game.multiple_players_enabled){
+        s_multiple_playerson.setActive(true);
+        s_multiple_playersoff.setActive(false);
+    }
+    else{
+        s_multiple_playerson.setActive(false);
+        s_multiple_playersoff.setActive(true);
     }
 }
 // Font Loader
