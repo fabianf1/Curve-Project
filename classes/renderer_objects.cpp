@@ -34,6 +34,9 @@ void Renderer_Objects::Init_Main_Menu(const Config &config){
     m_quit.setPosition( 50 , config.window_height/2+80); // Left ~middle
     // Prompt
     m_ip_prompt.setPrompt("Enter IP:",font,font_size,config.window_width/2,config.window_height/2);
+    #ifdef DEBUG
+    m_ip_prompt.setString(sf::IpAddress::getLocalAddress().toString());
+    #endif // DEBUG
 }
 // Game Setup Init
 void Renderer_Objects::Init_Game_Setup(const Config &config){

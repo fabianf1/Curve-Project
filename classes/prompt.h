@@ -24,6 +24,7 @@ class Prompt{
         void Event(sf::Event &event);
         void Switch();
         bool Check(sf::RenderWindow &window);
+        void setString(const sf::String &string);
         sf::String getString();
         // Constructor
         Prompt(): enabled(false){};

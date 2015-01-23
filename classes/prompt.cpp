@@ -69,6 +69,10 @@ bool Prompt::Check(sf::RenderWindow &window){
     return confirm.Check(window);
 }
 //
+void Prompt::setString(const sf::String &string){
+    text.setString(string);
+}
+//
 sf::String Prompt::getString(){
     return text.getString();
 }
