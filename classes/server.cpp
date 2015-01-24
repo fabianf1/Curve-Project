@@ -87,6 +87,12 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
                             // Remove out of list
                             selector.remove(*clients[i].socket);
                             clients.erase(clients.begin()+i);
+                            // Update id in player
+                            for(unsigned int j=1;j<player.size();j++){
+                                if(!player[j].local&&player[j].id>i){
+                                    player[j].id--;
+                                }
+                            }
                             // Pend Packed
                             pending.send_id.push_back(-1);
                             game.mutex.lock();
@@ -145,20 +151,26 @@ void Server::Server_Sender(const Config &config,Game &game,std::vector<Player> &
             }
             // Send loop
             for(int j=game.packets[i].send_id.size()-1;j>=0;j--){
-                switch(clients[game.packets[i].send_id[j]].socket->send(game.packets[i].packet)){
-                    case sf::Socket::Done:
-                        // Remove Send id
-                        game.packets[i].send_id.erase(game.packets[i].send_id.begin()+j);
-                        break;
-                    case sf::Socket::NotReady:
-                        std::cout << "Client not ready: " << clients[game.packets[i].send_id[j]].ip.toString()  << std::endl;
-                        break;
-                    case sf::Socket::Disconnected:
-                    case sf::Socket::Error:
-                    default:
-                        std::cout << "Failed to send packet:" << clients[game.packets[i].send_id[j]].ip.toString()  << std::endl;
-                        break;
-                } // End switch case
+                // Check if client still exists
+                if(game.packets[i].send_id[j]>=clients.size()){
+                    game.packets[i].send_id.erase(game.packets[i].send_id.begin()+j);
+                }
+                else{
+                    switch(clients[game.packets[i].send_id[j]].socket->send(game.packets[i].packet)){
+                        case sf::Socket::Done:
+                            // Remove Send id
+                            game.packets[i].send_id.erase(game.packets[i].send_id.begin()+j);
+                            break;
+                        case sf::Socket::NotReady:
+                            std::cout << "Client not ready: " << clients[game.packets[i].send_id[j]].ip.toString()  << std::endl;
+                            break;
+                        case sf::Socket::Disconnected:
+                        case sf::Socket::Error:
+                        default:
+                            std::cout << "Failed to send packet:" << clients[game.packets[i].send_id[j]].ip.toString()  << std::endl;
+                            break;
+                    } // End switch case
+                }
             } // End Send id for loop
             // Remove empty packets
             if(game.packets[i].send_id.size()==0){
@@ -235,11 +247,13 @@ void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &g
         // Resend Package
         if(clients.size()>1){
             Pending pending;
-            // We need to mention all players that are connected
-            // So change this sometime maybe
-            pending.packet << Packet::Ready << clients[n].id[0] << player[clients[n].id[0]].ready;
+            pending.packet << Packet::Ready;
+            for(unsigned int i=0;i<clients[n].id.size();i++){
+                pending.packet << clients[n].id[i] << clients[n].ready;
+            }
+            // Only send to other clients
             for(unsigned int j=0;j<clients.size();j++){
-                if(j!=clients[clients[n].id[0]].id[0]){
+                if(j!=n){
                     pending.send_id.push_back(j);
                 }
             }
@@ -298,7 +312,7 @@ void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &g
         pending.packet.clear();
         pending.send_id.clear();
         pending.packet << Packet::Request_Player << (player.size()-1);
-        pending.send_id.push_back(clients.size()-1);
+        pending.send_id.push_back(n);
         game.mutex.lock();
         game.packets.push_back(pending);
         game.mutex.unlock();

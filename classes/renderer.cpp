@@ -83,10 +83,9 @@ void Renderer::Setup(const Config &config,const Game &game,const std::vector<Pla
         if( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server&&!game.client[1]) ){window.draw(objects.s_kick[i]);}
     }
     // More
-    if(objects.vector_length<config.max_players){
+    if(objects.vector_length<config.max_players&&( (game.client[1]&&!player[game.id].ready) || !game.client[1] ) ){
         window.draw(objects.s_add);
     }
-    //window.draw(objects.s_name_pointer);
     // Options
     window.draw(objects.s_options);
     window.draw(objects.s_maxpoints);

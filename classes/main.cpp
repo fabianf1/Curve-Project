@@ -323,7 +323,7 @@ void Main::Game_Setup_Handler(){
         }
     }
     // Buttons
-    if(player.size()<config.max_players&&renderer.objects.s_add.Check(renderer.window)){
+    if(player.size()<config.max_players&& ( (game.client[1]&&!client.ready) || !game.client[1] ) && renderer.objects.s_add.Check(renderer.window)){
         // Send request
         if(game.client[1]){
             Pending pending;

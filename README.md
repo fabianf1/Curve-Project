@@ -14,9 +14,6 @@ To-Do List
 * Multiple players per client
     * Group clients in Server or add number denoting to which client the player belong
     * Set number of players when connecting (Maybe)
-* Update id in player after client disconnect
-* Add mutex to protect against simultaneous player addition
-* Add mutex to protect access to socket when adding or deleting
 * Add more powerups
     * Jumping line, line teleports forward instead of moving
 * Fix variations in FPS
@@ -24,3 +21,5 @@ To-Do List
 * Write a sf::VertexArray like class that supports erase();
 * Use same code conventions everywhere
 * Add checks to check incoming data
+* Remove packets that would have been send to now disconnected clients
+* Prevent possible data races

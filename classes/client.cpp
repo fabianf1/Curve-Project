@@ -95,6 +95,7 @@ void Client::Ready(Game &game,std::vector<Player> &player){
     // Check if keys are set
     if(!ready){
         ready=true;
+        player[game.id].ready=true;
         for(unsigned int i=0;i<player.size();i++){
             if(player[i].local &&( player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown) ){
                 ready=false;
@@ -112,6 +113,7 @@ void Client::Ready(Game &game,std::vector<Player> &player){
     }
     else{
         ready=false;
+        player[game.id].ready=false;
         // Send packet
         Pending pending;
         pending.packet << Packet::Ready << false;
@@ -377,8 +379,10 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
     }
     else if(type==Packet::Ready){
         int id;
-        packet >> id;
-        packet >> player[id].ready;
+        while(!packet.endOfPacket()){
+            packet >> id;
+            packet >> player[id].ready;
+        }
         game.refresh_players=true;
     }
     else if(type==Packet::Options){
