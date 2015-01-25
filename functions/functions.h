@@ -8,7 +8,7 @@
 #include <Windows.h> // I really should test on linux
 
 // General.cpp
-sf::String int2string(int x);
+sf::String int2string(const int &x);
 sf::Image LoadImageFromResource(const std::string& name);
 
 #endif // CURVE_FUNCTIONS

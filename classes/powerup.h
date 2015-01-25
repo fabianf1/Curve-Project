@@ -1,13 +1,8 @@
 // This class is used to store the different powerups in the game. As each powerup has a different spawn rate, disappear time etc. is is convenient to have such a class.
-
 #ifndef CURVE_POWERUP
 #define CURVE_POWERUP
 // SFML Headers
 #include <SFML/Network.hpp>
-// Standard Headers
-
-// Class Headers
-
 //
 class Powerup{
     public:

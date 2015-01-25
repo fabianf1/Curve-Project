@@ -4,7 +4,7 @@
 //
 void Renderer::Start(const Config &config,Game &game,const std::vector<Player> &player){
     // Window
-    window.create(sf::VideoMode(config.window_width, config.window_height), config.title, config.window_style, sf::ContextSettings(24,8,config.window_antialising));
+    window.create(sf::VideoMode(config.window_width, config.window_height), config.title, config.window_style, sf::ContextSettings(24,8,config.window_antialiasing));
     window.setIcon(202,202,config.icon.getPixelsPtr());
     window.clear(config.window_backgroundcolor);
     window.display();

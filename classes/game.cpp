@@ -15,52 +15,12 @@ Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time)
     update_thread[0]=update_thread[1]=update_thread[2]=false;
     server[0]=server[1]=server[2]=false;
     client[0]=client[1]=client[2]=false;
-    connected=false;
-    server_ip=sf::IpAddress::getLocalAddress().toString();
     countdown_int=0;
     srand (std::time(nullptr));
     refresh_players=false;
-    // Set the different powerups
-    // Slow
-    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Self,100,10,10000);
-    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Other,100,10,0);
-    //powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::All,100,10,5000);
-    // Fast
-    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Self,100,10,2500);
-    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Other,100,10,5000);
-    //powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::All,100,10,5000);
-    // Small
-    powerups.emplace_back(Powerup::Type::Small,Powerup::Impact::Self,100,10,5000);
-    // Big
-    powerups.emplace_back(Powerup::Type::Big,Powerup::Impact::Other,100,10,5000);
-    // Right Angles
-    powerups.emplace_back(Powerup::Type::Right_Angle,Powerup::Impact::Self,50,7.5,5000);
-    powerups.emplace_back(Powerup::Type::Right_Angle,Powerup::Impact::Other,100,7.5,5000);
-    // Clear
-    powerups.emplace_back(Powerup::Type::Clear,Powerup::Impact::All,100,0,0);
-    // Invisible
-    powerups.emplace_back(Powerup::Type::Invisible,Powerup::Impact::Self,100,7.5,2500);
-    // Walls Away
-    powerups.emplace_back(Powerup::Type::Walls_Away,Powerup::Impact::All,100,10,0);
-    // More Powerups
-    powerups.emplace_back(Powerup::Type::More_Powerups,Powerup::Impact::All,100,config.powerup_more_powerup_delay,0);
-    // Invert Keys
-    powerups.emplace_back(Powerup::Type::Invert_Keys,Powerup::Impact::Other,100,5,5000);
-    // ?
-    powerups.emplace_back(Powerup::Type::Question_Mark,Powerup::Impact::Other,25,0,0);
-    // Darkness
-    powerups.emplace_back(Powerup::Type::Darkness,Powerup::Impact::All,25,7.5,5000);
-    // Gap
-    powerups.emplace_back(Powerup::Type::Gap,Powerup::Impact::Other,75,5,5000);
-    // Bomb
-    powerups.emplace_back(Powerup::Type::Bomb,Powerup::Impact::All,50,0,0);
-    // Sine
-    powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,50,config.sine_frequency*5,0);
-    // Calculate total chance
-    total_chance=0;
-    for(unsigned int i=0;i<powerups.size();i++){
-        total_chance+=powerups[i].spawn_chance;
-    }
+    refresh_options=false;
+    //
+    Initialize_Powerups(config);
 }
 // Functions
 void Game::Switch_Mode(const Game::Mode &Mode){
@@ -97,6 +57,48 @@ void Game::Initialize(const Config &config, std::vector<Player> &player){
     Switch_Mode(Game::Mode::Play);
     //
     New_Round(config,player);
+}
+//
+void Game::Initialize_Powerups(const Config &config){
+    // Set the different powerups
+    // Slow
+    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Self,100,10,10000);
+    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Other,100,10,0);
+    // Fast
+    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Self,100,10,2500);
+    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Other,100,10,5000);
+    // Small
+    powerups.emplace_back(Powerup::Type::Small,Powerup::Impact::Self,100,10,5000);
+    // Big
+    powerups.emplace_back(Powerup::Type::Big,Powerup::Impact::Other,100,10,5000);
+    // Right Angles
+    powerups.emplace_back(Powerup::Type::Right_Angle,Powerup::Impact::Self,50,7.5,5000);
+    powerups.emplace_back(Powerup::Type::Right_Angle,Powerup::Impact::Other,100,7.5,5000);
+    // Clear
+    powerups.emplace_back(Powerup::Type::Clear,Powerup::Impact::All,100,0,0);
+    // Invisible
+    powerups.emplace_back(Powerup::Type::Invisible,Powerup::Impact::Self,100,7.5,2500);
+    // Walls Away
+    powerups.emplace_back(Powerup::Type::Walls_Away,Powerup::Impact::All,100,10,0);
+    // More Powerups
+    powerups.emplace_back(Powerup::Type::More_Powerups,Powerup::Impact::All,100,config.powerup_more_powerup_delay,0);
+    // Invert Keys
+    powerups.emplace_back(Powerup::Type::Invert_Keys,Powerup::Impact::Other,100,5,5000);
+    // ?
+    powerups.emplace_back(Powerup::Type::Question_Mark,Powerup::Impact::Other,25,0,0);
+    // Darkness
+    powerups.emplace_back(Powerup::Type::Darkness,Powerup::Impact::All,25,7.5,5000);
+    // Gap
+    powerups.emplace_back(Powerup::Type::Gap,Powerup::Impact::Other,75,5,5000);
+    // Bomb
+    powerups.emplace_back(Powerup::Type::Bomb,Powerup::Impact::All,50,0,0);
+    // Sine
+    powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,50,config.sine_frequency*5,0);
+    // Calculate total chance
+    total_chance=0;
+    for(unsigned int i=0;i<powerups.size();i++){
+        total_chance+=powerups[i].spawn_chance;
+    }
 }
 //
 void Game::Thread(const Config &config,std::vector<Player> &player){
@@ -187,7 +189,6 @@ void Game::Thread(const Config &config,std::vector<Player> &player){
         }
         // Pacer
         game_pacer.Pace();
-        frame++;
     }
     // Shutdown
     update_thread[0]=false;
@@ -221,7 +222,7 @@ void Game::New_Round(const Config &config,std::vector<Player> &player){
     round_finished=false;
     game_finished=false;
     end_message_set=false;
-    pause=true; // Pause_Game(config,game,window,true);
+    pause=true;
     round++;
     powerup_field.clear();
     powerup_effect.clear();
@@ -233,17 +234,6 @@ void Game::New_Round(const Config &config,std::vector<Player> &player){
     powerup_spawn_time=config.powerup_spawn_delay;
     // Ready 'm up!
     if(server[1]){
-        // I will need a better method if I want this
-        /*bool ready=false;
-        while(!ready){
-            ready=true;
-            for(unsigned int i=0;i<player.size();i++){
-                if(!player[i].ready){
-                    ready=false;
-                    break;
-                }
-            }
-        }*/
         // Start countdown
         countdown.restart();
         countdown_int=3;
@@ -294,7 +284,7 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                             }
                         }
                         // Head on detection
-                        // Only Fire when not gapping
+                        // Only when other player also isn't invisible
                         if(!hit&&player[j].gap[0]>0.0&&!player[j].invisible){
                             diffx=x-player[j].x;
                             diffy=y-player[j].y;
@@ -304,12 +294,11 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                                 break;
                             }
                         }
-
                     }
                     // Own line
                     else if(j==i){
                         // Delay should be depending on speed and line width
-                        unsigned int delay=2*config.shift;
+                        unsigned int delay=1.5*config.shift;
                         // Linewidth scaling
                         if(player[j].linewidth>config.linewidth){
                             delay*=player[j].linewidth/config.linewidth;
@@ -381,7 +370,6 @@ void Game::Player_Death(std::vector<Player> &player,const std::vector<unsigned i
     for(unsigned int i=0;i<death_vec.size();i++){
         deathcount++;
         player[death_vec[i]].death=true;
-        player[death_vec[i]].deathframe=frame;
     }
 }
 //
@@ -426,7 +414,7 @@ void Game::End_Round(const Config &config,std::vector<Player> &player){
     // Game continues, someone has just won a round;
     else{
         for(unsigned int i=0;i<player.size();i++){
-            if(player[i].deathframe==0){
+            if(!player[i].death){
                 round_winner=i;
             }
         }
@@ -450,7 +438,7 @@ void Game::Quit(const Config &config){
         Switch_Mode(Game::Mode::Main_Menu);
     }
     else{
-        // If Server return to setup menu and send a packet
+        // If Server let clients also return to Setup
         if(server[1]){
             Pending pending;
             pending.send_id.push_back(-1);
@@ -558,7 +546,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
             }
         }
     }
-    // Then spawn new ones
+    // Spawn new ones
     // This is done every 0.5 seconds if it succeeds the second if
     powerup_spawn_time-=elapsed;
     if(powerup_spawn_time<0.0){
@@ -570,7 +558,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
             int powerup_radius=config.powerup_radius;
             bool spawn=false;
             int iter=0; // Debug Variable
-            // Making sure powerups doesn't spawn in front or on player
+            // Try to make sure powerups doesn't spawn in front or on player
             int X,Y;
             while(!spawn&&iter<100){
                 X=config.wallwidth+powerup_radius + rand() % (config.window_width-config.statuswidth-2*config.wallwidth-powerup_radius+1); // Rand x position within walls
@@ -588,8 +576,8 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                         break;
                     }
                     // Check 2, not directly in front of player
-                    dx=X- (player[i].x+cos(player[i].heading)*config.powerup_safe_d);
-                    dy=Y- (player[i].y+sin(player[i].heading)*config.powerup_safe_d);
+                    dx=X- player[i].x+ (cos(player[i].heading)*config.powerup_safe_d);
+                    dy=Y- player[i].y+ (sin(player[i].heading)*config.powerup_safe_d);
                     radius = config.powerup_safe_radius;
                     if( (dx*dx) + (dy*dy) < radius*radius ) {
                         spawn=false;

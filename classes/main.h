@@ -26,8 +26,6 @@ class Main{
         Renderer renderer;
         sf::Event event;
         Pacer thread_pacer;
-        // Functions
-
         // Constructor
         Main() :game(config), renderer(config),thread_pacer(config.main_thread_min_time) {};
         // Functions

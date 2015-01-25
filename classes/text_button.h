@@ -3,8 +3,6 @@
 #define CURVE_TEXT_BUTTON
 // SFML Headers
 #include <SFML/Graphics.hpp>
-// Class Headers
-
 //
 class Text_Button: public sf::Text{
     // Vars

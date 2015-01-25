@@ -11,15 +11,12 @@ To-Do List
 * Clean up code
 * Add version check
 * Add AI
-* Multiple players per client
-    * Group clients in Server or add number denoting to which client the player belong
-    * Set number of players when connecting (Maybe)
+* Group clients in Server or add number denoting to which client the player belong
 * Add more powerups
     * Jumping line, line teleports forward instead of moving
-* Fix variations in FPS
 * Send linewidth to client(Sine powerup)
 * Write a sf::VertexArray like class that supports erase();
 * Use same code conventions everywhere
 * Add checks to check incoming data
-* Remove packets that would have been send to now disconnected clients
 * Prevent possible data races
+* Wait until everyone is ready before starting countdown

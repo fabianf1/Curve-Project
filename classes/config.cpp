@@ -8,7 +8,7 @@ Config::Config(){
     window_width=1000;
     window_height=600;
     window_style=sf::Style::Close;
-    window_antialising=8;
+    window_antialiasing=8;
     statuswidth=200;
     window_backgroundcolor=sf::Color::Black;
     fps=60;

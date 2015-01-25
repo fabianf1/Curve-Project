@@ -1,11 +1,9 @@
 // Contains Renderer class declaration
 #ifndef CURVE_RENDER
 #define CURVE_RENDER
-// Needed Headers
-//#include "..\curve.h"
-// Standard headers
+// SFML Headers
 #include <SFML/Graphics.hpp>
-//#include <SFML/Network.hpp>
+// Standard Headers
 #include <thread>
 #include <iostream>
 #include <vector>
@@ -16,8 +14,6 @@
 #include "client.h"
 #include "renderer_objects.h"
 #include "powerup_sprite.h"
-// Temporary
-#include "../functions/functions.h"
 
 //
 class Renderer{

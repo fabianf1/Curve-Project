@@ -13,7 +13,7 @@ class Config{
         //
         int window_width,window_height; // Height and width of screen
         int window_style; // Style of window
-        int window_antialising; // Declare antialiasing level
+        int window_antialiasing; // Declare antialiasing level
         int statuswidth;
         sf::Color window_backgroundcolor;
         sf::Image icon;
@@ -62,7 +62,7 @@ class Config{
         float powerup_more_powerup_delay;
         float powerup_spawn_delay; // Delay for spawning after round start
         float powerup_fade_time;
-        int powerup_safe_d;
+        int powerup_safe_d; // Distance in front of player that should be safe
         int powerup_safe_radius;
         //
         float min_to_gap; // seconds

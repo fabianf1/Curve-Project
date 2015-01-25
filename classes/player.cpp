@@ -7,7 +7,6 @@ Player::Player(){
     line.setPrimitiveType(sf::Quads);
     keyL=keyR=sf::Keyboard::Unknown;
     local=server=false;
-    disconnected=false;
 }
 //
 Player::Player(const sf::String &Name,const sf::Color &Color){
@@ -17,7 +16,6 @@ Player::Player(const sf::String &Name,const sf::Color &Color){
     line.setPrimitiveType(sf::Quads);
     keyL=keyR=sf::Keyboard::Unknown;
     local=server=false;
-    disconnected=false;
 }
 // Functions
 void Player::New_Game(){
@@ -80,14 +78,10 @@ void Player::New_Round(const Config &config,const Game &game){
     left=right=false;
     line.clear();
     death=false;
-    deathframe=0;
     circle.setPosition(x-linewidth/2,y-linewidth/2);
     circle.setRadius(linewidth/2);
-    // Lower two are for server things?
+    // Client
     noline=false;
-    sendlast=false;
-    // Client part
-
 }
 //
 void Player::Draw(sf::RenderWindow &window){

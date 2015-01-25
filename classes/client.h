@@ -15,15 +15,12 @@
 #include "powerup.h"
 #include "pacer.h"
 #include "packet.h"
-// Temporary
-#include "../functions/functions.h"
 //
 class Client{
     public:
         // Vars
         std::thread thread;
         sf::TcpSocket socket;
-        bool connected;
         bool sync;
         bool ready;
         sf::Packet packet;

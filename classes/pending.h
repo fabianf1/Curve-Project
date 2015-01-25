@@ -5,7 +5,6 @@
 #include <vector>
 // SFML Headers
 #include <SFML/Network.hpp>
-
 // If server send to all id's given
 // If client: ignore!
 class Pending{

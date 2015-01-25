@@ -64,7 +64,6 @@ class Game{
         bool update_thread[3];// 0=Cleanup required,1=running,2=shutdown;
         bool server[3];
         bool client[3];
-        bool connected;
         unsigned int id;
         sf::IpAddress server_ip;
         int packetnumber;
@@ -85,6 +84,7 @@ class Game{
         // Functions
         void Switch_Mode(const Game::Mode &Mode);
         void Initialize(const Config &config,std::vector<Player> &player);
+        void Initialize_Powerups(const Config &config);
         void Thread(const Config &config,std::vector<Player> &player);
         void New_Round(const Config &config,std::vector<Player> &player);
         void Hit_Detector(const Config &config,std::vector<Player> &player);

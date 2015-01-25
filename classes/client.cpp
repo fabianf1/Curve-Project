@@ -85,7 +85,6 @@ void Client::Thread(const Config &config,Game &game,std::vector<Player> &player)
     socket.disconnect();
     game.client[1]=game.client[2]=false;
     game.client[0]=true;
-    game.connected=false;
     player.clear();
     std::cout << "Client thread ended!" << std::endl;
 }
@@ -181,12 +180,6 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
             packet >> player[id].x >> player[id].y >> player[id].heading;
             player[id].New_Round(config,game);
         }
-        // Send ready package
-        Pending pending;
-        pending.packet << Packet::Ready << true;
-        game.mutex.lock();
-        game.packets.push_back(pending);
-        game.mutex.unlock();
     }
     else if(type==Packet::Update){
         // Time Between packets measurement

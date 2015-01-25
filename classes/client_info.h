@@ -11,14 +11,9 @@ class Client_Info{
         // Vars
         std::unique_ptr<sf::TcpSocket> socket;
         std::vector<unsigned int> id; // Place in player array
-        sf::IpAddress ip;
         bool ready;
-        bool connected;
         // Constructor
-        Client_Info(): socket(new sf::TcpSocket){
-            connected=false;
-            ready=false;
-        }
+        Client_Info(): socket(new sf::TcpSocket), ready(false){}
 };
 
 #endif // CURVE_CIENT_INFO

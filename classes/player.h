@@ -1,19 +1,15 @@
 // Contains config class declaration
 #ifndef CURVE_PLAYER
 #define CURVE_PLAYER
-// SFML Headers
-//#include <SFML/Network.hpp>
 // Standard Headers
 #include <math.h>
 // Class Headers
 #include "config.h"
-//#include "game.h"
 #include "pending.h"
-//#include "packet.h"
 #include "powerup.h"
 // Define
 #define PI 3.14159265359
-// Extra
+// Prototype
 class Game;
 
 //
@@ -23,11 +19,9 @@ class Player{
         float x,y,heading;
         float xOLD,yOLD,hOLD;
         sf::Keyboard::Key keyL,keyR;
-        bool enabled; // Not needed anymore
         bool death;
         bool ready;
-        int deathframe;
-        float gap[2];// Time to gap, and gap time;
+        float gap[2];// Time to gap[0], and gap time[1];
         sf::String name;
         sf::Color color;
         sf::VertexArray line; // Stores the line
@@ -54,8 +48,6 @@ class Player{
         bool local;
         bool server;
         bool left,right;
-        bool sendlast;
-        bool disconnected;
         // Constructor
         Player();
         Player(const sf::String &Name,const sf::Color &Color);

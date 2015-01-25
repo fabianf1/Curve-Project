@@ -1,8 +1,6 @@
 // Contains Prompt class declaration
 #ifndef CURVE_PROMPT
 #define CURVE_PROMPT
-// Standard Headers
-//#include <String
 // SFML Headers
 #include <SFML/Graphics.hpp>
 // Class Headers

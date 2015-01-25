@@ -20,12 +20,6 @@ Game_Setup::Game_Setup(){
 void Game_Setup::Initialize(const Config &config,Game &game,std::vector<Player> &player){
     //
     if(player.size()==0){
-        color[0]=sf::Color::Red;
-        color[1]=sf::Color::Yellow;
-        color[2]=sf::Color::White;
-        color[3]=sf::Color::Green;
-        color[4]=sf::Color::Magenta;
-        color[5]=sf::Color::Blue;
         for(int i=0;i<6;i++){
             color_used[i]=false;
         }
@@ -134,5 +128,4 @@ void Game_Setup::Auto_Add_Players(const Config &config,Game &game,std::vector<Pl
     player[1].keyL=sf::Keyboard::Z;
     player[1].keyR=sf::Keyboard::X;
 }
-
 //

@@ -8,7 +8,7 @@ void Main::Curve_Project(){
     // Main loop
     while(renderer.window.isOpen()){
         // Event Handler
-        while (renderer.window.pollEvent(event)){
+        while(renderer.window.pollEvent(event)){
             Event_Handler();
         }
         // Process other events
@@ -23,7 +23,7 @@ void Main::Curve_Project(){
             else if(game.mode==Game::Mode::Play){
                 Play_Handler();
             }
-            // Check if new player is added
+            // Check if player change
             if(renderer.objects.vector_length<player.size()||renderer.objects.vector_length>player.size()||game.refresh_players){
                 renderer.objects.Sync_Players(config,player);
                 game.refresh_players=false;
@@ -95,7 +95,7 @@ void Main::Event_Handler(){
         }
         #endif
         // Name Changer
-        if(game.name_change>-1&&event.type==sf::Event::KeyPressed&& (event.key.code==sf::Keyboard::Escape) ){
+        else if(game.name_change>-1&&event.type==sf::Event::KeyPressed&& (event.key.code==sf::Keyboard::Escape) ){
             renderer.objects.s_names[game.name_change].setActive(false);
             game.name_change=-1;
             // Reset
@@ -130,27 +130,28 @@ void Main::Event_Handler(){
         if(game.game_finished&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             game.Quit(config);
             if(game.server[1]){
-                // SEND THE SYNCER!
-                // All player information
-                Pending pending;
-                pending.packet << Packet::Sync;
-                for(unsigned int i=0;i<player.size();i++){
-                    pending.packet << i << player[i].name << player[i].color << player[i].server << player[i].ready;
-                }
-                pending.send_id.push_back(-1);
-                game.mutex.lock();
-                game.packets.push_back(pending);
-                game.mutex.unlock();
+                // Synchronize all information
+                server.Sync_Clients(game,player);
             }
         }
         // New Round
         else if(game.round_finished&&!game.client[1]&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             game.New_Round(config,player);
         }
+        #ifdef DEBUG
         // Pause
         else if(!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             game.Pause(!game.pause);
         }
+        #else
+        // When not debugging only unpause as server
+        else if(game.server[1]&&!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
+            game.Pause(false);
+        }
+        else if(!game.server[1]&&!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
+            game.Pause(!game.pause);
+        }
+        #endif
     }
 }
 //
@@ -183,6 +184,7 @@ void Main::Main_Menu_Handler(){
 void Main::Game_Setup_Handler(){
     // Players
     for(unsigned int i=0;i<player.size()&&i<renderer.objects.vector_length;i++){
+        // Name
         if(renderer.objects.s_names[i].Check(renderer.window)){
             // Name Change
             if(player[i].local){
@@ -208,13 +210,16 @@ void Main::Game_Setup_Handler(){
                     renderer.objects.s_names[game.name_change].setActive(false);
                     game.name_change=i;
                     renderer.objects.s_names[i].setActive(true);
+                    Change_Button(-1,0);
                 }
                 else{
                     game.name_change=i;
                     renderer.objects.s_names[i].setActive(true);
+                    Change_Button(-1,0);
                 }
             }
         }
+        // Left/Right
         if(player[i].local){
             // Buttons
             if(renderer.objects.s_lbutton[i].Check(renderer.window)){
@@ -225,17 +230,15 @@ void Main::Game_Setup_Handler(){
             }
         }
         // Status
-        if(player[i].server&&renderer.objects.s_status[i].getString()!="Server"){
+        if(player[i].server){
             renderer.objects.s_status[i].setString("Server");
         }
         else if(!player[i].server&&!player[i].local
-                && ( (game.server[1] && !server.clients[player[i].id].ready) || (game.client[1] && !player[i].ready ) )
-                && renderer.objects.s_status[i].getString()!="Not ready"){
+                && ( (game.server[1] && !server.clients[player[i].id].ready) || (game.client[1] && !player[i].ready ) ) ){
             renderer.objects.s_status[i].setString("Not ready");
         }
         else if(!player[i].server&&!player[i].local
-                && ( (game.server[1] && server.clients[player[i].id].ready) || (game.client[1] && player[i].ready ) )
-                &&renderer.objects.s_status[i].getString()!="Ready"){
+                && ( (game.server[1] && server.clients[player[i].id].ready) || (game.client[1] && player[i].ready ) ) ){
             renderer.objects.s_status[i].setString("Ready");
         }
         // Kick
@@ -338,26 +341,18 @@ void Main::Game_Setup_Handler(){
             renderer.objects.Sync_Players(config,player);
             // Send to clients
             if(game.server[1]){
-                Pending pending;
-                pending.packet << Packet::Sync;
-                for(unsigned int i=0;i<player.size();i++){
-                    pending.packet << i << player[i].name << player[i].color << player[i].server << player[i].ready;
-                }
-                pending.send_id.push_back(-1);
-                game.mutex.lock();
-                game.packets.push_back(pending);
-                game.mutex.unlock();
+               server.Sync_Clients(game,player);
             }
         }
     }
     // Server Text
-    if(game.server[1]&&renderer.objects.s_server.getString()=="Start Server"){
+    if(game.server[1]){
         renderer.objects.s_server.setString("Local: " + sf::IpAddress::getLocalAddress().toString());
     }
-    else if(game.client[1]&&renderer.objects.s_server.getString()!= "Server: " + game.server_ip.toString() ){
+    else if(game.client[1]){
         renderer.objects.s_server.setString("Server: " + game.server_ip.toString());
     }
-    else if(!game.server[1]&&!game.client[1]&&renderer.objects.s_server.getString()!="Start Server"){
+    else if(!game.server[1]&&!game.client[1]){
         renderer.objects.s_server.setString("Start Server");
     }
     // Server Button
