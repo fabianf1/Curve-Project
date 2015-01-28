@@ -2,7 +2,7 @@
 // Needed Header
 #include "game.h"
 // Constructor
-Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time){
+Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time), rand_generator(std::time(nullptr)){
     frame=0;
     keychange[0]=-1;
     name_change=-1;
@@ -16,11 +16,14 @@ Game::Game(const Config &config): game_pacer(config.game_update_thread_min_time)
     server[0]=server[1]=server[2]=false;
     client[0]=client[1]=client[2]=false;
     countdown_int=0;
-    srand (std::time(nullptr));
     refresh_players=false;
     refresh_options=false;
     //
     Initialize_Powerups(config);
+    // Random
+    srand (std::time(nullptr));
+    rand_powerup.param(std::uniform_int_distribution<int> (0,total_chance).param());
+    rand_spawn.param(std::uniform_int_distribution<int> (0,100).param());
 }
 // Functions
 void Game::Switch_Mode(const Game::Mode &Mode){
@@ -93,7 +96,7 @@ void Game::Initialize_Powerups(const Config &config){
     // Bomb
     powerups.emplace_back(Powerup::Type::Bomb,Powerup::Impact::All,50,0,0);
     // Sine
-    powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,50,config.sine_frequency*5,0);
+    powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,50,(1/config.sine_frequency)*5,0);
     // Calculate total chance
     total_chance=0;
     for(unsigned int i=0;i<powerups.size();i++){
@@ -551,7 +554,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
     powerup_spawn_time-=elapsed;
     if(powerup_spawn_time<0.0){
         powerup_spawn_time=config.powerup_spawn_check;
-        if(morepowerups>0||rand() % (100+1)<config.powerup_spawn_chance){
+        if(morepowerups>0||rand_spawn(rand_generator)<config.powerup_spawn_chance){
             //
             morepowerups--;
             //
@@ -695,7 +698,7 @@ void Game::PowerUp_Manager(const Config &config){
 }
 //
 void Game::Choose_PowerUp(Powerup::Type &type, Powerup::Impact &impact, int &place){
-    int random=rand() % total_chance;
+    int random=rand_powerup(rand_generator);
     int low=0;
     for(unsigned int i=0;i<powerups.size();i++){
         if( random>=low && random<(low+powerups[i].spawn_chance) ){

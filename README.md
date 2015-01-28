@@ -20,3 +20,4 @@ To-Do List
 * Add checks to check incoming data
 * Prevent possible data races
 * Wait until everyone is ready before starting countdown
+* Make sure a powerup does not spawn on or right in front of a player

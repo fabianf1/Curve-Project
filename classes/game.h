@@ -7,6 +7,7 @@
 #include <mutex>
 #include <time.h>
 #include <iostream>
+#include <random>
 // Class Headers
 #include "powerup.h"
 #include "powerup_field.h"
@@ -79,6 +80,10 @@ class Game{
         sf::Clock packetclock; // Measuring time between packets;
         //
         Pacer game_pacer;
+        // Random
+        std::default_random_engine rand_generator;
+        std::uniform_int_distribution<int> rand_powerup;
+        std::uniform_int_distribution<int> rand_spawn;
         // Constructor
         Game(const Config &config);
         // Functions
