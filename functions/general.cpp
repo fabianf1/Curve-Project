@@ -1,7 +1,7 @@
 // Sort of generic functions
 #include "functions.h"
 //
-sf::String int2string(const int &x){
+std::string int2string(const int &x){
     std::stringstream type;
     type << x;
     return type.str();

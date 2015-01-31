@@ -14,7 +14,7 @@
 #include "prompt.h"
 #include "player.h"
 //
-sf::String int2string(const int &x);
+std::string int2string(const int &x);
 
 //
 class Renderer_Objects{

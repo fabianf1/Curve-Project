@@ -3,12 +3,13 @@
 #define CURVE_FUNCTIONS
 
 // Needed Headers
+#include <string>
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include <Windows.h> // I really should test on linux
 
 // General.cpp
-sf::String int2string(const int &x);
+std::string int2string(const int &x);
 sf::Image LoadImageFromResource(const std::string& name);
 
 #endif // CURVE_FUNCTIONS

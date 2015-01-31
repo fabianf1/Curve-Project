@@ -558,36 +558,33 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
             //
             morepowerups--;
             //
-            int powerup_radius=config.powerup_radius;
             bool spawn=false;
             int iter=0; // Debug Variable
             // Try to make sure powerups doesn't spawn in front or on player
             int X,Y;
             while(!spawn&&iter<100){
-                X=config.wallwidth+powerup_radius + rand() % (config.window_width-config.statuswidth-2*config.wallwidth-powerup_radius+1); // Rand x position within walls
-                Y=config.wallwidth+powerup_radius + rand() % (config.window_height-2*config.wallwidth-powerup_radius+1);
+                X=config.wallwidth + rand() % (config.window_width-config.statuswidth-2*config.wallwidth+1); // Rand x position within walls
+                Y=config.wallwidth + rand() % (config.window_height-2*config.wallwidth+1);
                 spawn=true;
                 // Player hit check
                 for(unsigned int i=0;i<player.size();i++){
                     if(player[i].death){continue;}
                     // Check 1, Not on player
-                    float dx=player[i].x-X;
-                    float dy=player[i].y-Y;
-                    float radius = config.powerup_radius + player[i].linewidth/2.0;
-                    if( (dx*dx) + (dy*dy) < radius*radius ) {
+                    if( pow(player[i].x-X,2) + pow(player[i].y-Y,2) < pow(config.powerup_radius,2) ) {
                         spawn=false;
                         break;
                     }
                     // Check 2, not directly in front of player
-                    dx=X- player[i].x+ (cos(player[i].heading)*config.powerup_safe_d);
-                    dy=Y- player[i].y+ (sin(player[i].heading)*config.powerup_safe_d);
-                    radius = config.powerup_safe_radius;
-                    if( (dx*dx) + (dy*dy) < radius*radius ) {
+                    if( pow(X - (player[i].x+cos(player[i].heading*config.powerup_safe_d)), 2) + pow(Y - (player[i].y+sin(player[i].heading*config.powerup_safe_d)), 2) < pow(config.powerup_safe_radius, 2) ){
                         spawn=false;
                         break;
                     }
                 }
                 iter++;
+                // Debug
+                if(iter%25==0){
+                    std::cout << iter <<std::endl;
+                }
             }
             // Choose a powerup
             Powerup::Type type;
@@ -681,7 +678,12 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                     packets.push_back(pending);
                     mutex.unlock();
                 }
-                //
+                // Debug
+                /*if(powerup_field[j].time1<config.powerup_fade_time/2.0){
+                    Pause(true);
+                    std::cout << "Spawn fail." << std::endl;
+                    std::cout << powerup_field[j].x << ";" << powerup_field[j].y << ";;" << player[i].x << ";" << player[i].y << std::endl;
+                }*/
                 // Remove powerup!
                 powerup_field.erase(powerup_field.begin()+j);
             } // End within radius check

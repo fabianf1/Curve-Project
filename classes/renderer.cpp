@@ -317,7 +317,7 @@ void Renderer::PowerUp(const Config &config,const Game &game,const std::vector<P
             draw=&sprite.sinered;
         }
         else{
-            std::cout << "Error! No sprite!" << std::endl;
+            std::cout << "Error! No sprite!" << int2string( game.powerup_field[i].place ) << std::endl;
             draw=&sprite.questionblue;
         }
         // Do the things

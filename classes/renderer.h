@@ -14,6 +14,8 @@
 #include "client.h"
 #include "renderer_objects.h"
 #include "powerup_sprite.h"
+//
+#include "../functions/functions.h"
 
 //
 class Renderer{

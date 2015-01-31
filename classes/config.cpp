@@ -63,8 +63,8 @@ Config::Config(){
     powerup_more_powerup_delay=2.0;
     powerup_spawn_delay=1; //2.6;
     powerup_fade_time=2.0; // Time it takes for a powerup to fade in or out
-    powerup_safe_d=shift;
-    powerup_safe_radius=powerup_radius*5/2;
+    powerup_safe_d=shift*2;
+    powerup_safe_radius=shift*2;
     // Gap Settings
     min_to_gap=5.0; // In seconds
     rand_to_gap=10000; // In milliseconds
