@@ -5,6 +5,7 @@
 #include <SFML/Network.hpp>
 // Standard headers
 #include <vector>
+#include <memory>
 
 class Client_Info{
     public:
@@ -13,7 +14,9 @@ class Client_Info{
         std::vector<unsigned int> id; // Place in player array
         bool ready;
         // Constructor
-        Client_Info(): socket(new sf::TcpSocket), ready(false){}
+        Client_Info();
+        // Function
+        bool Check_ID(const unsigned int &n);
 };
 
 #endif // CURVE_CIENT_INFO

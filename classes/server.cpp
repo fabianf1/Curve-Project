@@ -210,6 +210,10 @@ void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &g
     if(type==Packet::Name){
         int id;
         packet >> id;
+        // Data Check
+        if(!clients[n].Check_ID(id)){
+            return;
+        }
         // Update
         packet >> player[id].name;
         // Resend Package
@@ -251,16 +255,31 @@ void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &g
     else if(type==Packet::KeyL){
         int id;
         packet >> id;
+        // Data Check
+        if(!clients[n].Check_ID(id)){
+            return;
+        }
+        //
         packet >> player[id].left;
     }
     else if(type==Packet::KeyR){
         int id;
         packet >> id;
+        // Data Check
+        if(!clients[n].Check_ID(id)){
+            return;
+        }
+        //
         packet >> player[id].right;
     }
     else if(type==Packet::Lag){
         int id;
         packet >> id;
+        // Data Check
+        if(!clients[n].Check_ID(id)){
+            return;
+        }
+        //
         std::cout << player[id].name.toAnsiString() << "(" << id << ") " << " lags";
         game.Pause(true);
     }
@@ -300,6 +319,10 @@ void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &g
     else if(type==Packet::Remove_Player){
         unsigned int id;
         packet >> id;
+        // Data Check
+        if(!clients[n].Check_ID(id)){
+            return;
+        }
         // Remove
         game_setup.Remove_Player(game,player,id);
         game.refresh_players=true;
