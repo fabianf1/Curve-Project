@@ -20,3 +20,4 @@ To-Do List
 * Add checks to check incoming data
 * Prevent possible data races
 * Wait until everyone is ready before starting countdown
+* Ensure latest data is present when doing things like bomb

@@ -243,10 +243,10 @@ void Main::Game_Setup_Handler(){
         }
         // Kick
         // Local: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
-        if( ( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server&&!game.client[1] ) ) && renderer.objects.s_kick[i].Check(renderer.window)){
+        if( ( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server[1]&&!game.client[1] ) ) && renderer.objects.s_kick[i].Check(renderer.window)){
             // Remove from server
-            if(game.server[1]){
-                if(!player[i].local){
+            if(!game.client[1]){
+                if(game.server[1]&&!player[i].local){
                     // Remove from clients
                     for(unsigned int j=0;j<server.clients[player[i].id].id.size();j++){
                         if(server.clients[player[i].id].id[j]==i){
@@ -261,18 +261,19 @@ void Main::Game_Setup_Handler(){
                         server.selector.remove(*server.clients[player[i].id].socket);
                         server.clients.erase(server.clients.begin()+player[i].id);
                     }
+                    //
+                    Pending pending;
+                    pending.packet << Packet::DCon << i;
+                    pending.send_id.push_back(-1);
+                    game.mutex.lock();
+                    game.packets.push_back(pending);
+                    game.mutex.unlock();
                 }
-                Pending pending;
-                pending.packet << Packet::DCon << i;
-                pending.send_id.push_back(-1);
-                game.mutex.lock();
-                game.packets.push_back(pending);
-                game.mutex.unlock();
                 //
                 game_setup.Remove_Player(game,player,i);
                 renderer.objects.Sync_Players(config,player);
             }
-            else if(game.client[1]){
+            else{
                 player[i].local=false;
                 Pending pending;
                 pending.packet << Packet::Remove_Player << i;

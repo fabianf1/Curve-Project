@@ -65,11 +65,11 @@ void Game::Initialize(const Config &config, std::vector<Player> &player){
 void Game::Initialize_Powerups(const Config &config){
     // Set the different powerups
     // Slow
-    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Self,100,10,10000);
-    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Other,100,10,0);
+    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Self,100,7.5,2500);
+    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Other,100,7.5,5000);
     // Fast
-    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Self,100,10,2500);
-    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Other,100,10,5000);
+    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Self,100,7.5,2500);
+    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Other,100,7.5,5000);
     // Small
     powerups.emplace_back(Powerup::Type::Small,Powerup::Impact::Self,100,10,5000);
     // Big
@@ -563,8 +563,8 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
             // Try to make sure powerups doesn't spawn in front or on player
             int X,Y;
             while(!spawn&&iter<100){
-                X=config.wallwidth + rand() % (config.window_width-config.statuswidth-2*config.wallwidth+1); // Rand x position within walls
-                Y=config.wallwidth + rand() % (config.window_height-2*config.wallwidth+1);
+                X=config.wallwidth + config.powerup_radius + rand() % (config.window_width-config.statuswidth-2*config.wallwidth-2*config.powerup_radius+1); // Rand x position within walls
+                Y=config.wallwidth + config.powerup_radius + rand() % (config.window_height-2*config.wallwidth-2*config.powerup_radius+1);
                 spawn=true;
                 // Player hit check
                 for(unsigned int i=0;i<player.size();i++){
@@ -685,7 +685,9 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                     std::cout << powerup_field[j].x << ";" << powerup_field[j].y << ";;" << player[i].x << ";" << player[i].y << std::endl;
                 }*/
                 // Remove powerup!
-                powerup_field.erase(powerup_field.begin()+j);
+                if(powerup_field[j].type!=Powerup::Type::Bomb){
+                    powerup_field.erase(powerup_field.begin()+j);
+                }
             } // End within radius check
         }// End powerup loop
     }// End player Hit Check
@@ -723,13 +725,13 @@ void Game::PowerUp_Bomb(const Config &config,std::vector<Player> &player, const 
             // Find out if within blast radius
             xc=(player[k].line[l].position.x+player[k].line[l+1].position.x+player[k].line[l+2].position.x+player[k].line[l+3].position.x)/4;
             yc=(player[k].line[l].position.y+player[k].line[l+1].position.y+player[k].line[l+2].position.y+player[k].line[l+3].position.y)/4;
-            if( (xc-player[i].x)*(xc-player[i].x) + (yc-player[i].y)*(yc-player[i].y) < config.bomb_radius*config.bomb_radius/4 ){
-                // Remove; Erase doesn't work due to the wrapper. I just move the lines out of sight for now;
+            if( (xc-player[i].x)*(xc-player[i].x) + (yc-player[i].y)*(yc-player[i].y) < config.bomb_radius*config.bomb_radius ){
+                // Remove; Erase doesn't work due to the wrapper. I just move the lines out of sight for now; Moving to 0,0 would be problematic with wallsaway
                 // Fix would be to use std::vector<sf::Vertex>
-                player[k].line[l].position=sf::Vector2f(0, 0);
-                player[k].line[l+1].position=sf::Vector2f(0, 0);
-                player[k].line[l+2].position=sf::Vector2f(0, 0);
-                player[k].line[l+3].position=sf::Vector2f(0, 0);
+                player[k].line[l].position=sf::Vector2f(-100, -100);
+                player[k].line[l+1].position=sf::Vector2f(-100, -100);
+                player[k].line[l+2].position=sf::Vector2f(-100, -100);
+                player[k].line[l+3].position=sf::Vector2f(-100, -100);
             }
         }
     }
@@ -737,8 +739,9 @@ void Game::PowerUp_Bomb(const Config &config,std::vector<Player> &player, const 
     for(unsigned int k=0;k<powerup_field.size();k++){
         xc=player[i].x-powerup_field[k].x;
         yc=player[i].y-powerup_field[k].y;
-        if( xc*xc + yc*yc < config.bomb_radius*config.bomb_radius/4 ){
+        if( xc*xc + yc*yc < config.bomb_radius*config.bomb_radius ){
             powerup_field.erase(powerup_field.begin()+k);
+            k--;
         }
     }
 }

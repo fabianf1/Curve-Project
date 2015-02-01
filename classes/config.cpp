@@ -46,8 +46,8 @@ Config::Config(){
     small_multiplier=0.6;
     big_multiplier=1.75;
     //
-    darkness_radius=125;
-    bomb_radius=250;
+    darkness_radius=100;
+    bomb_radius=150;
     //
     sine_frequency=0.5; // T=2sec;
     sine_amplitude=0.6;

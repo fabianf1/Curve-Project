@@ -80,7 +80,7 @@ void Renderer::Setup(const Config &config,const Game &game,const std::vector<Pla
             window.draw(objects.s_status[i]);
         }
         // Local: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
-        if( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server&&!game.client[1]) ){window.draw(objects.s_kick[i]);}
+        if( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server[1]&&!game.client[1]) ){window.draw(objects.s_kick[i]);}
     }
     // More
     if(objects.vector_length<config.max_players&&( (game.client[1]&&!player[game.id].ready) || !game.client[1] ) ){
@@ -140,7 +140,7 @@ void Renderer::Play(const Config &config,const Game &game,const std::vector<Play
                 yc=(player[i].line[j].position.y+player[i].line[j+1].position.y+player[i].line[j+2].position.y+player[i].line[j+3].position.y)/4;
                 for(unsigned int k=0;k<player.size();k++){
                     // Calculate center
-                    if( (xc-player[k].x)*(xc-player[k].x) + (yc-player[k].y)*(yc-player[k].y) < (config.darkness_radius*config.darkness_radius)/4 ){
+                    if( (xc-player[k].x)*(xc-player[k].x) + (yc-player[k].y)*(yc-player[k].y) < (config.darkness_radius*config.darkness_radius) ){
                         quad[0].position = sf::Vector2f(player[i].line[j].position.x, player[i].line[j].position.y);
                         quad[1].position = sf::Vector2f(player[i].line[j+1].position.x, player[i].line[j+1].position.y);
                         quad[2].position = sf::Vector2f(player[i].line[j+2].position.x, player[i].line[j+2].position.y);
@@ -152,7 +152,7 @@ void Renderer::Play(const Config &config,const Game &game,const std::vector<Play
             }
             // Circle
             for(unsigned int k=0;k<player.size();k++){
-                if(k==i || ( (player[i].x-player[k].x)*(player[i].x-player[k].x) + (player[i].y-player[k].y)*(player[i].y-player[k].y) < (config.darkness_radius*config.darkness_radius)/4 ) ){
+                if(k==i || ( (player[i].x-player[k].x)*(player[i].x-player[k].x) + (player[i].y-player[k].y)*(player[i].y-player[k].y) < (config.darkness_radius*config.darkness_radius) ) ){
                     if(!player[i].rightangle){
                         window.draw(player[i].circle);
                     }

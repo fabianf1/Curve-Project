@@ -52,7 +52,7 @@ class Config{
         float sine_amplitude;
         //
         float powerup_scale;
-        float powerup_radius;
+        int powerup_radius;
         int powerup_spawn_chance;
         float powerup_spawn_check;
         float powerup_min_disappear; // Min time for dissapearance
