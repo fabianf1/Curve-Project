@@ -16,7 +16,7 @@ bool Text_Button::Check(sf::RenderWindow &window){
         else{
             setStyle(selected_style|activated_style);
         }
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)&&last_click.getElapsedTime().asSeconds()>0.2){
+        if(window.hasFocus()&&sf::Mouse::isButtonPressed(sf::Mouse::Left)&&last_click.getElapsedTime().asSeconds()>0.2){
             last_click.restart();
             return true;
         }

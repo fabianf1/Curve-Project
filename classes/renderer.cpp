@@ -80,7 +80,9 @@ void Renderer::Setup(const Config &config,const Game &game,const std::vector<Pla
             window.draw(objects.s_status[i]);
         }
         // Local: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
-        if( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server[1]&&!game.client[1]) ){window.draw(objects.s_kick[i]);}
+        if( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server[1]&&!game.client[1]) ){
+            window.draw(objects.s_kick[i]);
+        }
     }
     // More
     if(objects.vector_length<config.max_players&&( (game.client[1]&&!player[game.id].ready) || !game.client[1] ) ){

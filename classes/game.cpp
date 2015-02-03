@@ -271,9 +271,9 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
             // Only when not gapping or invisible
             if(player[i].gap[0]>0.0&&!player[i].invisible){
                 float diffx,diffy;
+                bool hit=false;
                 //
-                for(unsigned int j=0;j<player.size();j++){
-                    bool hit=false;
+                for(unsigned int j=0;j<player.size()&&!hit;j++){
                     // Other Player
                     if(j!=i){
                         // Normal Detection
@@ -294,6 +294,7 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                             float radius=player[i].linewidth/2.0+player[j].linewidth/2.0;
                             if( (diffx*diffx) + (diffy*diffy) < (radius*radius) ){
                                 death_vec.emplace_back(i);
+                                hit=true;
                                 break;
                             }
                         }
@@ -315,13 +316,15 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                             delay*=config.shift/player[j].shift;
                         }
                         // Note that it is possible that having a very slow speed and then accelerating fast could maybe also trigger a hit
-                        // This is to check if the line is long enough. I think I could better add this to player::powerup_effect.
+                        // This is to check if the line is long enough.
+                        // I think I could better add all this scaling to player::powerup_effect.
                         if(player[j].line.getVertexCount()>delay){
                             for(unsigned int k=0;k<player[j].line.getVertexCount()-delay;k++){
                                 diffx=x-player[j].line[k].position.x;
                                 diffy=y-player[j].line[k].position.y;
                                 if( (diffx*diffx) + (diffy*diffy) < player[i].linewidth*player[i].linewidth/4 ){
                                     death_vec.emplace_back(i);
+                                    hit=true;
                                     break;
                                 }
                             }
@@ -336,11 +339,7 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
         //
         Player_Death(player,death_vec);
         // Stop round if less then two players
-        if(deathcount>player.size()){ // For debugging purposes
-            std::cout << "Too many deaths!" << std::endl;
-            End_Round(config,player);
-        }
-        else if(deathcount>=player.size()-1){
+        if(deathcount>=player.size()-1){
             // End Round function
             End_Round(config,player);
         }

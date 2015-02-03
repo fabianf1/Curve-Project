@@ -235,11 +235,11 @@ void Main::Game_Setup_Handler(){
         }
         else if(!player[i].server&&!player[i].local
                 && ( (game.server[1] && !server.clients[player[i].id].ready) || (game.client[1] && !player[i].ready ) ) ){
-            renderer.objects.s_status[i].setString("Not ready");
+            renderer.objects.s_status[i].setString("Not ready: " + int2string(player[i].local) );
         }
         else if(!player[i].server&&!player[i].local
                 && ( (game.server[1] && server.clients[player[i].id].ready) || (game.client[1] && player[i].ready ) ) ){
-            renderer.objects.s_status[i].setString("Ready");
+            renderer.objects.s_status[i].setString("Ready: " + int2string(player[i].local) );
         }
         // Kick
         // Local: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
