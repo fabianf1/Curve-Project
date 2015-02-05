@@ -3,6 +3,8 @@
 #define CURVE_CONFIG
 // SFML Headers
 #include <SFML/Graphics.hpp>
+// Standard Headers
+#include <string>
 // For LoadImageFromResource
 #include "../functions/functions.h"
 //
@@ -80,6 +82,8 @@ class Config{
         int max_attempts;
         int attempt_delay;
         float lagtime;
+        //
+        std::string version;
         // Constructor
         Config();
 };

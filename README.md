@@ -9,7 +9,6 @@ To build it look [here](http://sfml-dev.org/tutorials/2.2/) on how to setup SFML
 To-Do List
 ----------------------------
 * Clean up code
-* Add version check
 * Add AI
 * Send linewidth to client(Sine powerup)
 * Use same code conventions everywhere

@@ -81,4 +81,6 @@ Config::Config(){
     max_attempts=3;
     attempt_delay=500;
     lagtime=1.0;
+    //
+    version="0.1";
 }

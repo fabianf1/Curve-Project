@@ -52,7 +52,6 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
                 else{
                     selector.add(*clients.back().socket);
                     std::cout << "Remote client " + clients.back().socket->getRemoteAddress().toString() + " has connected to the server. \n";
-                    New_Client(config,game_setup,game,player);
                 }
             }
             // Loop clients
@@ -73,28 +72,7 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
                         default:
                             stop=true;
                             std::cout << "Remote client disconnected." << std::endl;
-                            // Create Package and remove player
-                            Pending pending;
-                            pending.packet << Packet::DCon;
-                            for(unsigned int j=0;j<clients[i].id.size();j++){
-                                pending.packet << clients[i].id[j];
-                                game_setup.Remove_Player(game,player,clients[i].id[j]);
-                            }
-                            game.refresh_players=true;
-                            // Remove out of list
-                            selector.remove(*clients[i].socket);
-                            clients.erase(clients.begin()+i);
-                            // Update id in player
-                            for(unsigned int j=1;j<player.size();j++){
-                                if(!player[j].local&&player[j].id>i){
-                                    player[j].id--;
-                                }
-                            }
-                            // Pend Packed
-                            pending.send_id.push_back(-1);
-                            game.mutex.lock();
-                            game.packets.push_back(pending);
-                            game.mutex.unlock();
+                            Disconnect_Client(game_setup, game, player, i);
                             // Find out if all players left
                             if(player.size()<=1){
                                 // Return to setup screen
@@ -182,32 +160,85 @@ void Server::Server_Sender(const Config &config,Game &game,std::vector<Player> &
     std::cout << "Server Sender ended!" << std::endl;
 }
 //
-void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player){
+void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player, const unsigned int &n){
+    //
+    clients[n].version_correct=true;
     // Add new player and synchronize positions between client_info and player vector
     game_setup.Add_Player(game,player);
-    clients.back().id.push_back(player.size()-1);
-    player.back().id=clients.size()-1;
+    clients[n].id.push_back(player.size()-1);
+    player.back().id=n;
     player.back().local=false;
     player.back().server=false;
-    // Send everything to client
+    // Send everything to clients
     Sync_Clients(game,player);
     sf::sleep(sf::milliseconds(250)); // Fixes some errors
     // Player given to client
     Pending pending;
     pending.packet << Packet::ID << (player.size()-1);
-    pending.send_id.push_back(clients.size()-1);
+    pending.send_id.push_back(n);
     game.mutex.lock();
     game.packets.push_back(pending);
     game.mutex.unlock();
     // Send options
     game.refresh_options=true;
 }
+//
+void Server::Disconnect_Client(Game_Setup &game_setup, Game &game,std::vector<Player> &player, const unsigned int &n){
+    // Create Package and remove player
+    Pending pending;
+    pending.packet << Packet::DCon;
+    for(unsigned int j=0;j<clients[n].id.size();j++){
+        pending.packet << clients[n].id[j];
+        game_setup.Remove_Player(game,player,clients[n].id[j]);
+    }
+    game.refresh_players=true;
+    // Remove out of list
+    selector.remove(*clients[n].socket);
+    clients.erase(clients.begin()+n);
+    // Update id in player
+    for(unsigned int j=1;j<player.size();j++){
+        if(!player[j].local&&player[j].id>n){
+            player[j].id--;
+        }
+    }
+    // Pend Packed
+    pending.send_id.push_back(-1);
+    game.mutex.lock();
+    game.packets.push_back(pending);
+    game.mutex.unlock();
+}
 // n is the place in the client vector
 void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player,sf::Packet &packet, const unsigned int &n){
     Packet type;
     packet >> type;
     //
-    if(type==Packet::Name){
+    if(!clients[n].version_correct){
+        if(type==Packet::Version){
+            std::string version;
+            packet >> version;
+            if(version==config.version){
+                std::cout << "Client version correct!" << std::endl;
+                New_Client(config,game_setup,game,player,n);
+            }
+            else{
+                std::cout << "Incorrect client version!" << std::endl;
+                Pending pending;
+                pending.packet << Packet::Version << false;
+                pending.send_id.push_back(n);
+                game.mutex.lock();
+                game.packets.push_back(pending);
+                game.mutex.unlock();
+                sf::sleep(sf::seconds(0.5));
+                Disconnect_Client(game_setup,game,player,n);
+            }
+        }
+        else{
+            // Force disconnect
+            Disconnect_Client(game_setup,game,player,n);
+        }
+    }
+    //
+    else if(type==Packet::Name){
         int id;
         packet >> id;
         // Data Check
@@ -297,24 +328,7 @@ void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &g
             return;
         }
         // Create new player
-        game_setup.Add_Player(game,player);
-        clients.back().id.push_back(player.size()-1);
-        player.back().id=n;
-        player.back().local=false;
-        player.back().server=false;
-        // Send to clients
-        // Sync
-        Sync_Clients(game,player);
-        sf::sleep(sf::milliseconds(250)); // Fixes some errors
-        // Notify client of new player
-        Pending pending;
-        pending.packet << Packet::Request_Player << (player.size()-1);
-        pending.send_id.push_back(n);
-        game.mutex.lock();
-        game.packets.push_back(pending);
-        game.mutex.unlock();
-        // Send options
-        game.refresh_options=true;
+        New_Client(config,game_setup,game,player,n);
     }
     else if(type==Packet::Remove_Player){
         unsigned int id;

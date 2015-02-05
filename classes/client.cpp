@@ -23,19 +23,26 @@ void Client::Start(const Config &config, Game &game,std::vector<Player> &player)
              sf::sleep(sf::milliseconds(config.attempt_delay));
         }
         else{
-            std::cout << "Connected to server!" << std::endl;
+            std::cout << "Connected to server! Checking version..." << std::endl;
             socket.setBlocking(false);
             sync=false;
             ready=false;
             // Start server connection thread
             thread = std::thread(&Client::Thread,this,std::cref(config),std::ref(game),std::ref(player));
             game.client[1]=true;
-            std::cout << "Synchronizing!" << std::endl;
-            while(!sync){
+            // Version Check
+            Pending pending;
+            pending.packet << Packet::Version << config.version;
+            game.packets.push_back(pending);
+            // This is not a very nice solution as it also blocks the main thread.
+            while(!sync&&game.client[1]){
                 sf::sleep(sf::milliseconds(250));
             }
-            std::cout << "Synchronized!" << std::endl;
-            game.Switch_Mode(Game::Mode::Setup);
+            if(sync){
+                std::cout << "Version correct!" << std::endl;
+                game.Switch_Mode(Game::Mode::Setup);
+            }
+            return;
         }
     }
 }
@@ -409,6 +416,19 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
             player[id].local=true;
             game.refresh_players=true;
         }
+    }
+    else if(type==Packet::Version){
+        bool correct;
+        packet >> correct;
+        if(!correct){
+            // Server has different game version. Disconnect!
+            std::cout << "Server has different version. Disconnecting!" << std::endl;
+            sf::sleep(sf::seconds(1));
+            game.client[2]=true;
+        }
+    }
+    else{
+        std::cout << "Unknown packet type!" << std::endl;
     }
 }
 //
