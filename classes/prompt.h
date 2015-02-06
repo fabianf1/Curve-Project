@@ -21,6 +21,7 @@ class Prompt{
         void Draw(sf::RenderWindow &window);
         void Event(sf::Event &event);
         void Switch();
+        bool getEnabled();
         bool Check(sf::RenderWindow &window);
         void setString(const sf::String &string);
         sf::String getString();

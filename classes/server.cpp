@@ -159,8 +159,8 @@ void Server::Server_Sender(const Config &config,Game &game,std::vector<Player> &
     // Shutdown
     std::cout << "Server Sender ended!" << std::endl;
 }
-//
-void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player, const unsigned int &n){
+// Great to use a variable named new client that can be false and the function name is New_Client too
+void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player, const unsigned int &n, const bool &new_client){
     //
     clients[n].version_correct=true;
     // Add new player and synchronize positions between client_info and player vector
@@ -172,13 +172,22 @@ void Server::New_Client(const Config &config,Game_Setup &game_setup,Game &game,s
     // Send everything to clients
     Sync_Clients(game,player);
     sf::sleep(sf::milliseconds(250)); // Fixes some errors
-    // Player given to client
-    Pending pending;
-    pending.packet << Packet::ID << (player.size()-1);
-    pending.send_id.push_back(n);
-    game.mutex.lock();
-    game.packets.push_back(pending);
-    game.mutex.unlock();
+    if(new_client){
+        Pending pending;
+        pending.packet << Packet::ID << (player.size()-1);
+        pending.send_id.push_back(n);
+        game.mutex.lock();
+        game.packets.push_back(pending);
+        game.mutex.unlock();
+    }
+    else{
+        Pending pending;
+        pending.packet << Packet::Request_Player << (player.size()-1);
+        pending.send_id.push_back(n);
+        game.mutex.lock();
+        game.packets.push_back(pending);
+        game.mutex.unlock();
+    }
     // Send options
     game.refresh_options=true;
 }
@@ -218,7 +227,7 @@ void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &g
             packet >> version;
             if(version==config.version){
                 std::cout << "Client version correct!" << std::endl;
-                New_Client(config,game_setup,game,player,n);
+                New_Client(config,game_setup,game,player,n,true);
             }
             else{
                 std::cout << "Incorrect client version!" << std::endl;
@@ -328,7 +337,7 @@ void Server::Process_Package(const Config &config,Game_Setup &game_setup,Game &g
             return;
         }
         // Create new player
-        New_Client(config,game_setup,game,player,n);
+        New_Client(config,game_setup,game,player,n,false);
     }
     else if(type==Packet::Remove_Player){
         unsigned int id;

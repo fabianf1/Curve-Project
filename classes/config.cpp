@@ -79,7 +79,7 @@ Config::Config(){
     //
     port=55003;
     max_attempts=3;
-    attempt_delay=500;
+    attempt_delay=100;
     lagtime=1.0;
     //
     version="0.1";

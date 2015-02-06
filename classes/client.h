@@ -30,6 +30,7 @@ class Client{
         void Thread(const Config &config,Game &game,std::vector<Player> &player);
         void Ready(Game &game,std::vector<Player> &player);
         void Process_Packet(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet);
+        void Sync_Package(Game &game,std::vector<Player> &player,sf::Packet &packet);
         void Shutdown(Game &game);
         // Constructor
         Client(): pacer(25){}

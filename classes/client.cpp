@@ -30,25 +30,16 @@ void Client::Start(const Config &config, Game &game,std::vector<Player> &player)
             // Start server connection thread
             thread = std::thread(&Client::Thread,this,std::cref(config),std::ref(game),std::ref(player));
             game.client[1]=true;
-            // Version Check
-            Pending pending;
-            pending.packet << Packet::Version << config.version;
-            game.packets.push_back(pending);
-            // This is not a very nice solution as it also blocks the main thread.
-            while(!sync&&game.client[1]){
-                sf::sleep(sf::milliseconds(250));
-            }
-            if(sync){
-                std::cout << "Version correct!" << std::endl;
-                game.Switch_Mode(Game::Mode::Setup);
-            }
-            return;
         }
     }
 }
 //
 void Client::Thread(const Config &config,Game &game,std::vector<Player> &player){
     std::cout << "Client thread started!" << std::endl;
+    // Send version Check
+    Pending pending;
+    pending.packet << Packet::Version << config.version;
+    game.packets.push_back(pending);
     // Main loop
     while(!game.client[2]){
         // Check if receiving something
@@ -130,7 +121,29 @@ void Client::Ready(Game &game,std::vector<Player> &player){
 void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet){
     Packet type;
     packet >> type;
-    if(type==Packet::ID){
+    // If waiting for sync only accept that and version package
+    if(!sync){
+        // Version is correct!
+        if(type==Packet::Sync){
+            Sync_Package(game,player,packet);
+            std::cout << "Version correct!" << std::endl;
+            game.Switch_Mode(Game::Mode::Setup);
+        }
+        // Version is incorrect
+        else if(type==Packet::Version){
+            bool correct;
+            packet >> correct;
+            if(!correct){
+                // Server has different game version. Disconnect!
+                std::cout << "Server has different version. Disconnecting!" << std::endl;
+                game.client[2]=true;
+            }
+        }
+        else{
+            std::cout << "Wrong package..." << std::endl;
+        }
+    }
+    else if(type==Packet::ID){
         packet >> game.id;
         while(game.id>=player.size()){
             player.emplace_back("",sf::Color::Black);
@@ -140,31 +153,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         player[game.id].local=true;
     }
     else if(type==Packet::Sync){
-        unsigned int id;
-        sf::String name;
-        sf::Color color;
-        bool server,ready;
-        while(!packet.endOfPacket()){
-            packet >> id >> name >> color >> server >> ready;
-            // Update
-            if(id>=player.size()){
-                player.emplace_back(name,color);
-                player.back().server=server;
-                player.back().ready=ready;
-            }
-            else{
-                player[id].name=name;
-                player[id].color=color;
-                player[id].server=server;
-                player[id].ready=ready;
-            }
-        }
-        game.refresh_players=true;
-        sync=true;
-        // Switch screen if still IG
-        if(game.mode==Game::Mode::Play){
-            game.Switch_Mode(Game::Mode::Setup);
-        }
+        Sync_Package(game,player,packet);
     }
     else if(type==Packet::Name){
         int id;
@@ -398,6 +387,12 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         if(game.update_thread[1]){
             game.Shutdown();
         }
+        ready=false;
+        Pending pending;
+        pending.packet << Packet::Ready << false;
+        game.mutex.lock();
+        game.packets.push_back(pending);
+        game.mutex.unlock();
         game.Switch_Mode(Game::Mode::Setup);
     }
     else if(type==Packet::Request_Player){
@@ -417,19 +412,33 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
             game.refresh_players=true;
         }
     }
-    else if(type==Packet::Version){
-        bool correct;
-        packet >> correct;
-        if(!correct){
-            // Server has different game version. Disconnect!
-            std::cout << "Server has different version. Disconnecting!" << std::endl;
-            sf::sleep(sf::seconds(1));
-            game.client[2]=true;
-        }
-    }
     else{
         std::cout << "Unknown packet type!" << std::endl;
     }
+}
+//
+void Client::Sync_Package(Game &game,std::vector<Player> &player,sf::Packet &packet){
+    unsigned int id;
+    sf::String name;
+    sf::Color color;
+    bool server,ready;
+    while(!packet.endOfPacket()){
+        packet >> id >> name >> color >> server >> ready;
+        // Update
+        if(id>=player.size()){
+            player.emplace_back(name,color);
+            player.back().server=server;
+            player.back().ready=ready;
+        }
+        else{
+            player[id].name=name;
+            player[id].color=color;
+            player[id].server=server;
+            player[id].ready=ready;
+        }
+    }
+    game.refresh_players=true;
+    sync=true;
 }
 //
 void Client::Shutdown(Game &game){

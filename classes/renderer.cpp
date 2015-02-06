@@ -85,7 +85,7 @@ void Renderer::Setup(const Config &config,const Game &game,const std::vector<Pla
         }
     }
     // More
-    if(objects.vector_length<config.max_players&&( (game.client[1]&&!player[game.id].ready) || !game.client[1] ) ){
+    if(objects.vector_length<config.max_players&&( (game.client[1]&&!player[game.id].ready&&game.multiple_players_enabled) || !game.client[1] ) ){
         window.draw(objects.s_add);
     }
     // Options

@@ -59,7 +59,13 @@ void Main::Event_Handler(){
     }
     // Client connect
     else if(game.mode==Game::Mode::Main_Menu){
-        renderer.objects.m_ip_prompt.Event(event);
+        if(event.type == sf::Event::KeyPressed && renderer.objects.m_ip_prompt.getEnabled() && event.key.code == sf::Keyboard::Return){
+            game.server_ip=sf::IpAddress(renderer.objects.m_ip_prompt.getString());
+            client.Start(config,game,player);
+        }
+        else{
+            renderer.objects.m_ip_prompt.Event(event);
+        }
     }
     // Setup screen things
     else if(game.mode==Game::Mode::Setup){
@@ -132,6 +138,13 @@ void Main::Event_Handler(){
             if(game.server[1]){
                 // Synchronize all information
                 server.Sync_Clients(game,player);
+                // Then send a return setup package
+                Pending pending;
+                pending.packet << Packet::Return_Setup;
+                pending.send_id.emplace_back(-1);
+                game.mutex.lock();
+                game.packets.push_back(pending);
+                game.mutex.unlock();
             }
         }
         // New Round
@@ -187,7 +200,7 @@ void Main::Game_Setup_Handler(){
         // Name
         if(renderer.objects.s_names[i].Check(renderer.window)){
             // Name Change
-            if(player[i].local){
+            if(player[i].local && (!game.client[1] || (game.client[1]&&!client.ready) ) ){
                 if(game.name_change==i){
                     if(renderer.objects.s_names[i].getString().getSize()==0){
                         renderer.objects.Sync_Players(config,player);
@@ -222,10 +235,10 @@ void Main::Game_Setup_Handler(){
         // Left/Right
         if(player[i].local){
             // Buttons
-            if(renderer.objects.s_lbutton[i].Check(renderer.window)){
+            if(renderer.objects.s_lbutton[i].Check(renderer.window) && (!game.client[1] || (game.client[1]&&!client.ready) )){
                 Change_Button(0,i);
             }
-            if(renderer.objects.s_rbutton[i].Check(renderer.window)){
+            if(renderer.objects.s_rbutton[i].Check(renderer.window) && (!game.client[1] || (game.client[1]&&!client.ready) )){
                 Change_Button(1,i);
             }
         }
@@ -327,7 +340,7 @@ void Main::Game_Setup_Handler(){
         }
     }
     // Buttons
-    if(player.size()<config.max_players&& ( (game.client[1]&&!client.ready) || !game.client[1] ) && renderer.objects.s_add.Check(renderer.window)){
+    if(player.size()<config.max_players&& ( (game.client[1]&&!client.ready&&game.multiple_players_enabled) || !game.client[1] ) && renderer.objects.s_add.Check(renderer.window)){
         // Send request
         if(game.client[1]){
             Pending pending;
@@ -377,6 +390,12 @@ void Main::Game_Setup_Handler(){
             game_setup.Start_Game(config,game,player,server);
         }
         else{
+            Change_Button(-1,0);
+            if(game.name_change>-1){
+                renderer.objects.s_names[game.name_change].setActive(false);
+                game.name_change=-1;
+                renderer.objects.Sync_Players(config,player);
+            }
             // Client Things
             client.Ready(game,player);
         }

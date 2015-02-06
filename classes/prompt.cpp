@@ -65,6 +65,10 @@ void Prompt::Switch(){
     enabled=!enabled;
 }
 //
+bool Prompt::getEnabled(){
+    return enabled;
+}
+//
 bool Prompt::Check(sf::RenderWindow &window){
     return confirm.Check(window);
 }
