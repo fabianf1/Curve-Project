@@ -10,7 +10,6 @@ To-Do List
 ----------------------------
 * Clean up code
 * Add AI
-* Send linewidth to client(Sine powerup)
 * Use same code conventions everywhere
 * Add checks to check incoming data
 * Prevent possible data races

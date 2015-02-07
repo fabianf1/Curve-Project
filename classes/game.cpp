@@ -143,7 +143,7 @@ void Game::Thread(const Config &config,std::vector<Player> &player){
                 if(!player[i].death){
                     player[i].Update_Position(config,*this);
                     if(server[1]){
-                        pending.packet << i << player[i].x << player[i].y << player[i].heading << (player[i].invisible||player[i].gap[0]<0.0) ;
+                        pending.packet << i << player[i].x << player[i].y << player[i].heading << player[i].linewidth << (player[i].invisible||player[i].gap[0]<0.0);
                     }
                 }
             }
@@ -663,7 +663,7 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                         break;
                     case Powerup::Type::Bomb:
                         // Remove lines
-                        PowerUp_Bomb(config,player,i);
+                        PowerUp_Bomb(config,player,i,j);
                         break;
                     default:
                         break;
@@ -677,16 +677,8 @@ void Game::PowerUp_Manager(const Config &config,std::vector<Player> &player){
                     packets.push_back(pending);
                     mutex.unlock();
                 }
-                // Debug
-                /*if(powerup_field[j].time1<config.powerup_fade_time/2.0){
-                    Pause(true);
-                    std::cout << "Spawn fail." << std::endl;
-                    std::cout << powerup_field[j].x << ";" << powerup_field[j].y << ";;" << player[i].x << ";" << player[i].y << std::endl;
-                }*/
                 // Remove powerup!
-                if(powerup_field[j].type!=Powerup::Type::Bomb){
-                    powerup_field.erase(powerup_field.begin()+j);
-                }
+                powerup_field.erase(powerup_field.begin()+j);
             } // End within radius check
         }// End powerup loop
     }// End player Hit Check
@@ -716,7 +708,7 @@ void Game::Choose_PowerUp(Powerup::Type &type, Powerup::Impact &impact, int &pla
     }
 }
 //
-void Game::PowerUp_Bomb(const Config &config,std::vector<Player> &player, const int &i){
+void Game::PowerUp_Bomb(const Config &config,std::vector<Player> &player, const int &i, const unsigned int &bomb_number){
     // Remove lines
     int xc,yc;
     for(unsigned int k=0;k<player.size();k++){
@@ -738,7 +730,7 @@ void Game::PowerUp_Bomb(const Config &config,std::vector<Player> &player, const 
     for(unsigned int k=0;k<powerup_field.size();k++){
         xc=player[i].x-powerup_field[k].x;
         yc=player[i].y-powerup_field[k].y;
-        if( xc*xc + yc*yc < config.bomb_radius*config.bomb_radius ){
+        if( xc*xc + yc*yc < config.bomb_radius*config.bomb_radius && k!=bomb_number ){
             powerup_field.erase(powerup_field.begin()+k);
             k--;
         }

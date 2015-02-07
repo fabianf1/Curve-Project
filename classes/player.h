@@ -56,7 +56,7 @@ class Player{
         void New_Round(const Config &config,const Game &game);
         void Draw(sf::RenderWindow &window);
         void Update_Position(const Config &config, Game &game);
-        void Update_Position(const Config &config, sf::Packet &packet,const float &packettime);
+        void Update_Position(const Config &config, sf::Packet &packet);
         void Add_Line(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &linewidth);
         void Calculate_Gap(const Config &config);
         void Calculate_Powerup_Effect(const Config &config,const Game &game);

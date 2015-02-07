@@ -210,18 +210,14 @@ void Player::Update_Position(const Config &config, Game &game){
     }
 }
 // Client Version of Update_Position
-void Player::Update_Position(const Config &config, sf::Packet &packet,const float &packettime){
-    // Sine things
-    if(sine){
-        sine_phase+=(packettime*config.sine_frequency*2)*PI;
-        linewidth=sine_linewidth*(1+sin(sine_phase)*config.sine_amplitude);
-        shift=sine_shift*(1+sin(sine_phase+PI)*config.sine_amplitude);
-        circle.setRadius(linewidth/2);
-    }
+void Player::Update_Position(const Config &config, sf::Packet &packet){
+    // Unpack
     xOLD=x;
     yOLD=y;
     hOLD=heading;
-    packet >> x >> y >> heading >> noline;
+    packet >> x >> y >> heading >> linewidth >> noline;
+    // Set Circle size
+    circle.setRadius(linewidth/2);
     //
     int maxdiffw=config.window_width-config.statuswidth-4*config.wallwidth;
     int maxdiffh=config.window_height-4*config.wallwidth;
@@ -337,24 +333,27 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
         shift*=config.slow_min_multiplier+exp(config.slow_scaling*speed);;
         turn*=config.slow_turn_min_multiplier+exp(config.slow_turn_scaling*speed);;
     }
-    //
-    if(line_size>0){
-        linewidth*=pow(config.big_multiplier,line_size);
-    }
-    else if(line_size<0){
-        linewidth*=pow(config.small_multiplier,(-1)*line_size);
-        if(linewidth<1){
-            linewidth=1;
+    // Linewidth is calculated on the server, Same goes for the sine things
+    if(!game.client[1]){
+        if(line_size>0){
+            linewidth*=pow(config.big_multiplier,line_size);
+        }
+        else if(line_size<0){
+            linewidth*=pow(config.small_multiplier,(-1)*line_size);
+            if(linewidth<1){
+                linewidth=1;
+            }
+        }
+        // Sine things
+        if(!sine){
+            sine_phase=0;
+        }
+        else{
+            sine_linewidth=linewidth;
+            sine_shift=shift;
         }
     }
-    // Sine things
-    if(!sine){
-        sine_phase=0;
-    }
-    else{
-        sine_linewidth=linewidth;
-        sine_shift=shift;
-    }
+    // Right Angle
     if(!rightangle){
         // Circle Style
         if(inverted){
