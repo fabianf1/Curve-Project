@@ -153,12 +153,12 @@ void Main::Event_Handler(){
         }
         #ifdef DEBUG
         // Pause
-        else if(!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
+        else if(!game.client[1]&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             game.Pause(!game.pause);
         }
         #else
         // When not debugging only unpause as server
-        else if(game.server[1]&&!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
+        else if(game.server[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             game.Pause(false);
         }
         else if(!game.server[1]&&!game.client[1]&&game.countdown_int==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
@@ -171,6 +171,9 @@ void Main::Event_Handler(){
 void Main::Main_Menu_Handler(){
     // Create Button
     if(renderer.objects.m_create.Check(renderer.window)){
+        if(renderer.objects.m_ip_prompt.getEnabled()){
+            renderer.objects.m_ip_prompt.Switch();
+        }
         renderer.objects.setOptions(game);
         game_setup.Initialize(config,game,player);
         return;
@@ -486,3 +489,4 @@ void Main::Play_Handler(){
         game.end_message_set=true;
     }
 }
+//

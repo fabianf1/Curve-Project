@@ -12,15 +12,18 @@ void Client::Start(const Config &config, Game &game,std::vector<Player> &player)
     }
     //
     std::cout << "Connecting!" << std::endl;
+    socket.setBlocking(true);
     for(int i=0; i<config.max_attempts&&!game.client[1];i++){
-        sf::Socket::Status status= socket.connect(game.server_ip,config.port,sf::milliseconds(1000));
+        sf::Socket::Status status= socket.connect(game.server_ip,config.port,sf::milliseconds(100));
         if(status==sf::Socket::Error){
             std::cout << "Server connection Error!" << std::endl;
             sf::sleep(sf::milliseconds(config.attempt_delay));
         }
         else if(status==sf::Socket::NotReady){
-             std::cout << "Not ready?!" << std::endl; // When the client tries to reconnect this always occurs for some reason. Trying again results in a succeeded connection attempt.
-             sf::sleep(sf::milliseconds(config.attempt_delay));
+            // When the client tries to reconnect this always occurs for some reason. Trying again results in a succeeded connection attempt.
+            // This was fixed by making the socket block again
+            std::cout << "Not ready?!" << std::endl;
+            sf::sleep(sf::milliseconds(config.attempt_delay));
         }
         else{
             std::cout << "Connected to server! Checking version..." << std::endl;
@@ -127,6 +130,12 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
         if(type==Packet::Sync){
             Sync_Package(game,player,packet);
             std::cout << "Version correct!" << std::endl;
+            //
+            #ifdef DEBUG
+            // Set keys
+            player[1].keyL=sf::Keyboard::Z;
+            player[1].keyR=sf::Keyboard::X;
+            #endif // DEBUG
             game.Switch_Mode(Game::Mode::Setup);
         }
         // Version is incorrect
@@ -163,7 +172,6 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
     }
     else if(type==Packet::StartGame){
         game.Initialize(config,player);
-        std::cout << "Starting Game!!" << std::endl;
     }
     else if(type==Packet::NewRound){
         game.New_Round(config,player);
@@ -198,6 +206,7 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                 player[id].Update_Position(config,packet);
             }
         }
+        // This should not happen anymore
         else{
             std::cout << "Packet mixup!!" << ", " << number << ", " << game.packetnumber << std::endl;
         }
@@ -251,24 +260,6 @@ void Client::Process_Packet(const Config &config,Game &game,std::vector<Player> 
                 for(unsigned int j=0;j<player.size();j++){
                     if(!player[j].death){player[j].Calculate_Powerup_Effect(config,game);}
                 }
-                break;
-            }
-        }
-    }
-    else if(type==Packet::PowerupDelG){
-        int id;
-        packet >> id;
-        for(unsigned int i=0;i<game.powerup_effect.size();i++){
-            if(game.powerup_effect[i].id==id){
-                // Check probably not needed anymore
-                if(game.powerup_effect[i].type==Powerup::Type::Walls_Away){
-                    game.wallsaway=false;
-                }
-                else if(game.powerup_effect[i].type==Powerup::Type::Darkness){
-                    game.darkness=false;
-                }
-                //
-                game.powerup_effect.erase(game.powerup_effect.begin()+i);
                 break;
             }
         }

@@ -39,12 +39,9 @@ void Prompt::Empty(){
 void Prompt::Draw(sf::RenderWindow &window){
     if(enabled){
         window.draw(border);
-
         window.draw(title);
-
         text.setPosition(x-text.getLocalBounds().width/2,text.getPosition().y);
         window.draw(text);
-
         window.draw(confirm);
     }
 }

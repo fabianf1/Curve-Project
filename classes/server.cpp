@@ -7,19 +7,21 @@ void Server::Start(const Config &config,Game_Setup &game_setup,Game &game,std::v
     if(game.server[0]){
         Shutdown(game,player,game_setup);
     }
-    // Set player for server
+    // At least one player is needed for the server at the moment.
     game.id=0;
-    //
     if(player.size()==0){
         game_setup.Add_Player(game,player);
+        #ifdef DEBUG
+        // Set keys
+        player[0].keyL=sf::Keyboard::Left;
+        player[0].keyR=sf::Keyboard::Right;
+        #endif // DEBUG
     }
     game.refresh_players=true;
     // Create Server Threads
     thread_listener = std::thread(&Server::Server_Listener,this,std::cref(config),std::ref(game_setup),std::ref(game),std::ref(player));
     thread_sender = std::thread(&Server::Server_Sender,this,std::cref(config),std::ref(game),std::ref(player));
-    // Do some more things
     game.server_ip=sf::IpAddress::getLocalAddress().toString();
-    // Server bootup complete
 }
 //
 void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player){
@@ -36,7 +38,7 @@ void Server::Server_Listener(const Config &config,Game_Setup &game_setup,Game &g
     }
     if(!game.server[1]){
         game.server[2]=true;
-        std::cout << "Can't bind! Please restart program." << std::endl;
+        std::cout << "Can't bind! Please retry." << std::endl;
     }
     // Main Loop
     while(!game.server[2]){

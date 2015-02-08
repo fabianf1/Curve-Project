@@ -20,7 +20,6 @@ bool Text_Button::Check(sf::RenderWindow &window){
             last_click.restart();
             return true;
         }
-        return false;
     }
     else{
         setColor(normal_color);

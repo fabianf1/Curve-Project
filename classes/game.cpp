@@ -123,15 +123,16 @@ void Game::Thread(const Config &config,std::vector<Player> &player){
             }
         }
         else if( !client[1] && !pause && !round_finished ){
-            // Elapsed
+            // Get elapsed time since last iteration. If the time is too long it will be set to a fixed value.
             elapsed=game_clock.restart().asSeconds();
             if(elapsed>config.max_dt){
                 elapsed=config.max_dt;
                 std::cout << "Slow execution!" << std::endl;
             }
-            // End Elapsed
             // Powerup
-            if(powerup_enabled){PowerUp_Manager(config,player);}
+            if(powerup_enabled){
+                PowerUp_Manager(config,player);
+            }
             // Update
             Pending pending;
             if(server[1]){
@@ -270,7 +271,6 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
             // Line hit check
             // Only when not gapping or invisible
             if(player[i].gap[0]>0.0&&!player[i].invisible){
-                float diffx,diffy;
                 bool hit=false;
                 //
                 for(unsigned int j=0;j<player.size()&&!hit;j++){
@@ -278,9 +278,7 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                     if(j!=i){
                         // Normal Detection
                         for(unsigned int k=0;k<player[j].line.getVertexCount();k++){
-                            diffx=x-player[j].line[k].position.x;
-                            diffy=y-player[j].line[k].position.y;
-                            if( (diffx*diffx) + (diffy*diffy) < player[i].linewidth*player[i].linewidth/4 ){
+                            if( pow(x-player[j].line[k].position.x,2) + pow(y-player[j].line[k].position.y,2) < pow(player[i].linewidth/2,2) ){
                                 death_vec.emplace_back(i);
                                 hit=true;
                                 break;
@@ -289,10 +287,7 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                         // Head on detection
                         // Only when other player also isn't invisible
                         if(!hit&&player[j].gap[0]>0.0&&!player[j].invisible){
-                            diffx=x-player[j].x;
-                            diffy=y-player[j].y;
-                            float radius=player[i].linewidth/2.0+player[j].linewidth/2.0;
-                            if( (diffx*diffx) + (diffy*diffy) < (radius*radius) ){
+                            if( pow(x-player[j].x,2) + pow(y-player[j].y,2) < pow(player[i].linewidth/2.0+player[j].linewidth/2.0,2) ){
                                 death_vec.emplace_back(i);
                                 hit=true;
                                 break;
@@ -320,9 +315,7 @@ void Game::Hit_Detector(const Config &config,std::vector<Player> &player){
                         // I think I could better add all this scaling to player::powerup_effect.
                         if(player[j].line.getVertexCount()>delay){
                             for(unsigned int k=0;k<player[j].line.getVertexCount()-delay;k++){
-                                diffx=x-player[j].line[k].position.x;
-                                diffy=y-player[j].line[k].position.y;
-                                if( (diffx*diffx) + (diffy*diffy) < player[i].linewidth*player[i].linewidth/4 ){
+                                if( pow(x-player[j].line[k].position.x,2) + pow(y-player[j].line[k].position.y,2) < pow(player[i].linewidth/2,2) ){
                                     death_vec.emplace_back(i);
                                     hit=true;
                                     break;
