@@ -196,17 +196,13 @@ void Player::Update_Position(const Config &config, Game &game){
         }
     }
     // Update Circle
-    if(!rightangle){
-        circle.setPosition(x-linewidth/2,y-linewidth/2);
-    }
-    else{
-        // Check if we need to make the right angle really right
-        if(!invisible&&gap[0]>0.0&&abs(heading-hOLD)>60){
-            Add_Line(xOLD-linewidth/2*cos(heading*PI/180.0),xOLD+linewidth/2*cos(heading*PI/180.0),yOLD-linewidth/2*sin(heading*PI/180.0),yOLD+linewidth/2*sin(heading*PI/180.0),heading,heading,linewidth);
-        }
-        // Rectangle update
-        rectangle.setPosition(x,y);
-        rectangle.setRotation(heading);
+    circle.setPosition(x-linewidth/2,y-linewidth/2);
+    // Rectangle update
+    rectangle.setPosition(x,y);
+    rectangle.setRotation(heading);
+    // Check if we need to make the right angle really right
+    if(rightangle&&!invisible&&gap[0]>0.0&&abs(heading-hOLD)>60){
+        Add_Line(xOLD-linewidth/2*cos(heading*PI/180.0),xOLD+linewidth/2*cos(heading*PI/180.0),yOLD-linewidth/2*sin(heading*PI/180.0),yOLD+linewidth/2*sin(heading*PI/180.0),heading,heading,linewidth);
     }
 }
 // Client Version of Update_Position

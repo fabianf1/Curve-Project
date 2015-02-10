@@ -385,7 +385,7 @@ void Game::End_Round(const Config &config,std::vector<Player> &player){
                 round_winner=i;
             }
             // If two people have the same amount of points revert winner to -1 to let see that there is no winner yet
-            else{
+            else if(player[i].points==points){
                 round_winner=-1;
             }
         }
