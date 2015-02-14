@@ -3,9 +3,10 @@
 
 // Main Loop
 int main(){
-    // Initialize class
+    // initialize class and start main loop
     Main main;
-    main.Curve_Project();
+    main.curveProject();
+    // Wait a little so it is possible to read the console
     #ifdef DEBUG
         sf::sleep(sf::milliseconds(2000));
     #endif // DEBUG

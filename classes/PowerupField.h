@@ -1,10 +1,10 @@
-// Contains Powerup_Field class declaration
+// Contains PowerupField class declaration
 #ifndef CURVE_POWERUP_FIELD
 #define CURVE_POWERUP_FIELD
 // Class Headers
-#include "powerup.h"
+#include "Powerup.h"
 //
-class Powerup_Field{
+class PowerupField{
     public:
         // Vars
         int x,y;// Position of the powerup
@@ -15,7 +15,7 @@ class Powerup_Field{
         int id;
         int place; // Place in powerup vector
         // Constructors
-        Powerup_Field(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID);
-        Powerup_Field(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID,const int &Place);
+        PowerupField(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID);
+        PowerupField(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID,const int &Place);
 };
 #endif // CURVE_POWERUP_FIELD

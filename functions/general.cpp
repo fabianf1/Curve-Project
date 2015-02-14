@@ -1,7 +1,7 @@
-// Sort of generic functions
-#include "functions.h"
 //
-std::string int2string(const int &x){
+#include "General.h"
+// Converts integers to a string
+std::string int2str(const int &x){
     std::stringstream type;
     type << x;
     return type.str();

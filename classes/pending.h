@@ -1,4 +1,4 @@
-// Contains Game Setup class declaration
+// Contains Game setup class declaration
 #ifndef CURVE_PENDING
 #define CURVE_PENDING
 // Standard Headers

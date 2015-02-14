@@ -4,25 +4,25 @@
 // SFML Headers
 #include <SFML/Graphics.hpp>
 // Class Headers
-#include "text_button.h"
+#include "TextButton.h"
 //
 class Prompt{
     // Vars
     bool enabled;
-    int x,y;
+    int xPosition,yPosition;
     sf::RectangleShape border;
     sf::Text text;
     sf::Text title;
-    Text_Button confirm;
+    TextButton confirm;
     public:
         // Functions
-        void setPrompt(const sf::String &field,const sf::Font &font,const unsigned int &fontsize,const int &X,const int &Y); // color and style hardcoded;
-        void Empty(); // To empty the fields
-        void Draw(sf::RenderWindow &window);
-        void Event(sf::Event &event);
-        void Switch();
-        bool getEnabled();
-        bool Check(sf::RenderWindow &window);
+        void setPrompt(const sf::String &field,const sf::Font &font,const unsigned int &fontSize,const int &x,const int &y); // color and style hardcoded;
+        void empty(); // To empty the fields
+        void draw(sf::RenderWindow &window);
+        void event(sf::Event &event);
+        void toggle();
+        bool isEnabled();
+        bool check(sf::RenderWindow &window);
         void setString(const sf::String &string);
         sf::String getString();
         // Constructor

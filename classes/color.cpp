@@ -1,4 +1,4 @@
-#include "color.h"
+#include "Color.h"
 
 sf::Packet& operator << (sf::Packet& packet, const sf::Color &j){
     return packet << j.r << j.g << j.b << j.a;

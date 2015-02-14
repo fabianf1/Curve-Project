@@ -3,10 +3,9 @@
 #define CURVE_PLAYER
 // Standard Headers
 #include <math.h>
-// Class Headers
-#include "config.h"
-#include "pending.h"
-#include "powerup.h"
+#include "Config.h"
+#include "Pending.h"
+#include "Powerup.h"
 // Define
 #define PI 3.14159265359
 // Prototype
@@ -30,18 +29,18 @@ class Player{
         int points;
         bool keyrelease;
         //
-        int linewidth;
-        int sine_linewidth; // Linewidth without the sine;
+        int lineWidth;
+        int sineLineWidth; // Linewidth without the sine;
         float shift;
-        float sine_shift; // Speed without the sine;
+        float sineShift; // Speed without the sine;
         float turn;
-        bool rightangle;
+        bool rightAngle;
         bool invisible;
         bool inverted;
-        bool noline;
+        bool noLine;
         bool gapping;
         bool sine;
-        float sine_phase;
+        float sinePhase;
         //
         unsigned int id; // Place in client vector;
         int place; // Place in player array
@@ -53,15 +52,15 @@ class Player{
         Player(const sf::String &Name,const sf::Color &Color);
         // Functions
         void New_Game();
-        void New_Round(const Config &config,const Game &game);
-        void Draw(sf::RenderWindow &window);
-        void Update_Position(const Config &config, Game &game);
-        void Update_Position(const Config &config, sf::Packet &packet);
-        void Add_Line(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &linewidth);
-        void Calculate_Gap(const Config &config);
-        void Calculate_Powerup_Effect(const Config &config,const Game &game);
+        void newRound(const Config &config,const Game &game);
+        void draw(sf::RenderWindow &window);
+        void updatePosition(const Config &config, Game &game);
+        void updatePosition(const Config &config, sf::Packet &packet);
+        void addLine(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &lineWidth);
+        void calculateGap(const Config &config);
+        void calculatePowerupEffect(const Config &config,const Game &game);
 };
 //
-#include "game.h"
+#include "Game.h"
 //
 #endif // CURVE_PLAYER

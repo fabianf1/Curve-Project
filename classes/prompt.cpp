@@ -1,10 +1,10 @@
-// Contains functions and constructors for the Text_Button class
+// Contains functions and constructors for the TextButton class
 // Needed Header
-#include "prompt.h"
+#include "Prompt.h"
 // Functions
-void Prompt::setPrompt(const sf::String &field,const sf::Font &font,const unsigned int &fontsize,const int &X,const int &Y){
-    x=X;
-    y=Y;
+void Prompt::setPrompt(const sf::String &field,const sf::Font &font,const unsigned int &fontsize,const int &x,const int &y){
+    xPosition=x;
+    yPosition=y;
     //
     int width=fontsize*(15);
     int height=fontsize*(5);
@@ -32,21 +32,21 @@ void Prompt::setPrompt(const sf::String &field,const sf::Font &font,const unsign
     confirm.setPosition(x-confirm.getLocalBounds().width/2,y+height/2-fontsize*1.5);
 }
 //
-void Prompt::Empty(){
+void Prompt::empty(){
     text.setString("");
 }
 //
-void Prompt::Draw(sf::RenderWindow &window){
+void Prompt::draw(sf::RenderWindow &window){
     if(enabled){
         window.draw(border);
         window.draw(title);
-        text.setPosition(x-text.getLocalBounds().width/2,text.getPosition().y);
+        text.setPosition(xPosition-text.getLocalBounds().width/2,text.getPosition().y);
         window.draw(text);
         window.draw(confirm);
     }
 }
 //
-void Prompt::Event(sf::Event &event){
+void Prompt::event(sf::Event &event){
     //
     if(event.type==sf::Event::TextEntered&&( (event.text.unicode>=48&&event.text.unicode<=57)||event.text.unicode==46) && text.getString().getSize()<16){
         text.setString(text.getString()+static_cast<char>(event.text.unicode));
@@ -58,16 +58,16 @@ void Prompt::Event(sf::Event &event){
     }
 }
 //
-void Prompt::Switch(){
+void Prompt::toggle(){
     enabled=!enabled;
 }
 //
-bool Prompt::getEnabled(){
+bool Prompt::isEnabled(){
     return enabled;
 }
 //
-bool Prompt::Check(sf::RenderWindow &window){
-    return confirm.Check(window);
+bool Prompt::check(sf::RenderWindow &window){
+    return confirm.check(window);
 }
 //
 void Prompt::setString(const sf::String &string){

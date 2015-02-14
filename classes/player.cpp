@@ -1,6 +1,6 @@
 // Contains functions and constructors for the config class
 // Needed Header
-#include "player.h"
+#include "Player.h"
 
 // Constructor
 Player::Player(){
@@ -24,50 +24,50 @@ void Player::New_Game(){
     ready=false;
 }
 //
-void Player::New_Round(const Config &config,const Game &game){
-    Calculate_Powerup_Effect(config,game);
+void Player::newRound(const Config &config,const Game &game){
+    calculatePowerupEffect(config,game);
     if(!game.client[1]){
         // Set position
-        x=config.wallwidth+linewidth+config.safespawn + rand() % (config.window_width-config.statuswidth-2*config.wallwidth-linewidth-config.safespawn*2+1);
-        y=config.wallwidth+linewidth+config.safespawn + rand() % (config.window_height-2*config.wallwidth-linewidth-config.safespawn*2+1);
+        x=config.wallWidth+lineWidth+config.safeSpawn + rand() % (config.windowWidth-config.statusWidth-2*config.wallWidth-lineWidth-config.safeSpawn*2+1);
+        y=config.wallWidth+lineWidth+config.safeSpawn + rand() % (config.windowHeight-2*config.wallWidth-lineWidth-config.safeSpawn*2+1);
         // Set Heading
         // Left Top
-        if(x<config.wallwidth+config.safeheading&&y<config.wallwidth+config.safeheading){
+        if(x<config.wallWidth+config.safeHeading&&y<config.wallWidth+config.safeHeading){
             heading=rand() % (90+1);
         }
         // Right top
-        else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading&&y<config.wallwidth+config.safeheading){
+        else if(x>config.windowWidth-config.statusWidth-config.wallWidth-config.safeHeading&&y<config.wallWidth+config.safeHeading){
             heading=rand() % (90+1)+90;
         }
         // Right Bottom
-        else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading&&y>config.window_height-config.wallwidth-config.safeheading){
+        else if(x>config.windowWidth-config.statusWidth-config.wallWidth-config.safeHeading&&y>config.windowHeight-config.wallWidth-config.safeHeading){
             heading=rand() % (90+1)+180;
         }
         // Left Bottom
-        else if(x<config.wallwidth+config.safeheading&&y>config.window_height-config.wallwidth-config.safeheading){
+        else if(x<config.wallWidth+config.safeHeading&&y>config.windowHeight-config.wallWidth-config.safeHeading){
             heading=rand() % (90+1)+270;
         }
         // Left
-        else if(x<config.wallwidth+config.safeheading){
+        else if(x<config.wallWidth+config.safeHeading){
             heading=rand() % (180+1)-90;
         }
         // Top
-        else if(y<config.wallwidth+config.safeheading){
+        else if(y<config.wallWidth+config.safeHeading){
             heading=rand() % (180+1);
         }
         // Right
-        else if(x>config.window_width-config.statuswidth-config.wallwidth-config.safeheading){
+        else if(x>config.windowWidth-config.statusWidth-config.wallWidth-config.safeHeading){
             heading=rand() % (180+1)+90;
         }
         // Bottom
-        else if(y>config.window_height-config.wallwidth-config.safeheading){
+        else if(y>config.windowHeight-config.wallWidth-config.safeHeading){
             heading=rand() % (180+1)+180;
         }
         // Anywhere else
         else{
             heading=rand() % (360+1);
         }
-        Calculate_Gap(config);
+        calculateGap(config);
         //
         ready=false;
     }
@@ -78,37 +78,37 @@ void Player::New_Round(const Config &config,const Game &game){
     left=right=false;
     line.clear();
     death=false;
-    circle.setPosition(x-linewidth/2,y-linewidth/2);
-    circle.setRadius(linewidth/2);
+    circle.setPosition(x-lineWidth/2,y-lineWidth/2);
+    circle.setRadius(lineWidth/2);
     // Client
-    noline=false;
+    noLine=false;
 }
 //
-void Player::Draw(sf::RenderWindow &window){
+void Player::draw(sf::RenderWindow &window){
     window.draw(line);
     window.draw(circle);
 }
-// Server and local version of Update_Position
-void Player::Update_Position(const Config &config, Game &game){
+// Server and local version of updatePosition
+void Player::updatePosition(const Config &config, Game &game){
     // Sine things
     if(sine){
-        sine_phase+=(game.elapsed*config.sine_frequency*2)*PI;
-        linewidth=sine_linewidth*(1+sin(sine_phase)*config.sine_amplitude);
-        shift=sine_shift*(1+sin(sine_phase+PI)*config.sine_amplitude);
-        circle.setRadius(linewidth/2);
+        sinePhase+=(game.elapsed*config.sineFrequency*2)*PI;
+        lineWidth=sineLineWidth*(1+sin(sinePhase)*config.sineAmplitude);
+        shift=sineShift*(1+sin(sinePhase+PI)*config.sineAmplitude);
+        circle.setRadius(lineWidth/2);
     }
-    // Check keys
+    // check keys
     if(local){
         left=sf::Keyboard::isKeyPressed(keyL);
         right=sf::Keyboard::isKeyPressed(keyR);
     }
-    // Check keyrelease
+    // check keyrelease
     if(keyrelease==false&&!left&&!right){
         keyrelease=true;
     }
     // Heading Change
     hOLD=heading;
-    if(!rightangle){
+    if(!rightAngle){
         // Move left
         if( (left&&!inverted) || (right&&inverted) ){
             heading-=(turn*game.elapsed);
@@ -142,8 +142,8 @@ void Player::Update_Position(const Config &config, Game &game){
         gap[0]-=game.elapsed;
         if(gap[0]<0.0){
             if(gap[1]<0.0){
-                Calculate_Gap(config);
-                Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
+                calculateGap(config);
+                addLine(xOLD,x,yOLD,y,heading,hOLD,lineWidth);
             }
             else{
                 gap[1]-=game.elapsed;
@@ -151,87 +151,87 @@ void Player::Update_Position(const Config &config, Game &game){
         }
         // Non gapping normal line add
         else{
-            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
+            addLine(xOLD,x,yOLD,y,heading,hOLD,lineWidth);
         }
     }
     // Do some extra things if outside playfield, which means walls away is active
     // Left
-    if(x<config.wallwidth/2){
-        xOLD+=config.window_width-config.statuswidth-config.wallwidth;
-        x+=config.window_width-config.statuswidth-config.wallwidth;
-        // Draw extra thing if not invisible
+    if(x<config.wallWidth/2){
+        xOLD+=config.windowWidth-config.statusWidth-config.wallWidth;
+        x+=config.windowWidth-config.statusWidth-config.wallWidth;
+        // draw extra thing if not invisible
         if(!invisible&&gap[0]>0.0){
             // Set quad points
-            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
+            addLine(xOLD,x,yOLD,y,heading,hOLD,lineWidth);
         }
     }
     // Top
-    else if(y<config.wallwidth/2){
-        yOLD+=config.window_height-config.wallwidth;
-        y+=config.window_height-config.wallwidth;
-        // Draw extra thing if not invisible
+    else if(y<config.wallWidth/2){
+        yOLD+=config.windowHeight-config.wallWidth;
+        y+=config.windowHeight-config.wallWidth;
+        // draw extra thing if not invisible
         if(!invisible&&gap[0]>0.0){
             // Set quad points
-            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
+            addLine(xOLD,x,yOLD,y,heading,hOLD,lineWidth);
         }
     }
     // Right
-    else if(x>config.window_width-config.statuswidth-config.wallwidth/2){
-        xOLD-=config.window_width-config.statuswidth-config.wallwidth;
-        x-=config.window_width-config.statuswidth-config.wallwidth;
-        // Draw extra thing if not invisible
+    else if(x>config.windowWidth-config.statusWidth-config.wallWidth/2){
+        xOLD-=config.windowWidth-config.statusWidth-config.wallWidth;
+        x-=config.windowWidth-config.statusWidth-config.wallWidth;
+        // draw extra thing if not invisible
         if(!invisible&&gap[0]>0.0){
             // Set quad points
-            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
+            addLine(xOLD,x,yOLD,y,heading,hOLD,lineWidth);
         }
     }
     // Bottom
-    else if(y>config.window_height-config.wallwidth/2){
-        yOLD-=config.window_height-config.wallwidth;
-        y-=config.window_height-config.wallwidth;
-        // Draw extra thing if not invisible
+    else if(y>config.windowHeight-config.wallWidth/2){
+        yOLD-=config.windowHeight-config.wallWidth;
+        y-=config.windowHeight-config.wallWidth;
+        // draw extra thing if not invisible
         if(!invisible&&gap[0]>0.0){
             // Set quad points
-            Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
+            addLine(xOLD,x,yOLD,y,heading,hOLD,lineWidth);
         }
     }
     // Update Circle
-    if(!rightangle){
-        circle.setPosition(x-linewidth/2,y-linewidth/2);
+    if(!rightAngle){
+        circle.setPosition(x-lineWidth/2,y-lineWidth/2);
     }
     else{
-        // Check if we need to make the right angle really right
+        // check if we need to make the right angle really right
         if(!invisible&&gap[0]>0.0&&abs(heading-hOLD)>60){
-            Add_Line(xOLD-linewidth/2*cos(heading*PI/180.0),xOLD+linewidth/2*cos(heading*PI/180.0),yOLD-linewidth/2*sin(heading*PI/180.0),yOLD+linewidth/2*sin(heading*PI/180.0),heading,heading,linewidth);
+            addLine(xOLD-lineWidth/2*cos(heading*PI/180.0),xOLD+lineWidth/2*cos(heading*PI/180.0),yOLD-lineWidth/2*sin(heading*PI/180.0),yOLD+lineWidth/2*sin(heading*PI/180.0),heading,heading,lineWidth);
         }
         // Rectangle update
         rectangle.setPosition(x,y);
         rectangle.setRotation(heading);
     }
 }
-// Client Version of Update_Position
-void Player::Update_Position(const Config &config, sf::Packet &packet){
+// Client Version of updatePosition
+void Player::updatePosition(const Config &config, sf::Packet &packet){
     // Unpack
     xOLD=x;
     yOLD=y;
     hOLD=heading;
-    packet >> x >> y >> heading >> linewidth >> noline;
+    packet >> x >> y >> heading >> lineWidth >> noLine;
     // Set Circle size
-    circle.setRadius(linewidth/2);
+    circle.setRadius(lineWidth/2);
     //
-    int maxdiffw=config.window_width-config.statuswidth-4*config.wallwidth;
-    int maxdiffh=config.window_height-4*config.wallwidth;
-    if(!noline&& abs(x-xOLD)<maxdiffw && abs(y-yOLD)<maxdiffh){
-        Add_Line(xOLD,x,yOLD,y,heading,hOLD,linewidth);
+    int maxdiffw=config.windowWidth-config.statusWidth-4*config.wallWidth;
+    int maxdiffh=config.windowHeight-4*config.wallWidth;
+    if(!noLine&& abs(x-xOLD)<maxdiffw && abs(y-yOLD)<maxdiffh){
+        addLine(xOLD,x,yOLD,y,heading,hOLD,lineWidth);
     }
     // Update Circle
-    if(!rightangle){
-        circle.setPosition(x-linewidth/2,y-linewidth/2);
+    if(!rightAngle){
+        circle.setPosition(x-lineWidth/2,y-lineWidth/2);
     }
     else{
-        // Check if we need to make the right angle really right
-        if(!noline&&abs(heading-hOLD)>60){
-            Add_Line(xOLD-linewidth/2*cos(heading*PI/180.0),xOLD+linewidth/2*cos(heading*PI/180.0),yOLD-linewidth/2*sin(heading*PI/180.0),yOLD+linewidth/2*sin(heading*PI/180.0),heading,heading,linewidth);
+        // check if we need to make the right angle really right
+        if(!noLine&&abs(heading-hOLD)>60){
+            addLine(xOLD-lineWidth/2*cos(heading*PI/180.0),xOLD+lineWidth/2*cos(heading*PI/180.0),yOLD-lineWidth/2*sin(heading*PI/180.0),yOLD+lineWidth/2*sin(heading*PI/180.0),heading,heading,lineWidth);
         }
         // Rectangle update
         rectangle.setPosition(x,y);
@@ -239,83 +239,83 @@ void Player::Update_Position(const Config &config, sf::Packet &packet){
     }
 }
 //
-void Player::Add_Line(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &linewidth){
+void Player::addLine(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &lineWidth){
     sf::Vertex quad;
     quad.color=color;
     //
-    quad.position = sf::Vector2f( X1+sin(H2*PI/180.0)*linewidth/2.0, Y1-cos(H2*PI/180.0)*linewidth/2.0);
+    quad.position = sf::Vector2f( X1+sin(H2*PI/180.0)*lineWidth/2.0, Y1-cos(H2*PI/180.0)*lineWidth/2.0);
     line.append(quad);
     //
-    quad.position = sf::Vector2f( X1-sin(H2*PI/180.0)*linewidth/2.0, Y1+cos(H2*PI/180.0)*linewidth/2.0);
+    quad.position = sf::Vector2f( X1-sin(H2*PI/180.0)*lineWidth/2.0, Y1+cos(H2*PI/180.0)*lineWidth/2.0);
     line.append(quad);
     //
-    quad.position = sf::Vector2f( X2-sin(H1*PI/180.0)*linewidth/2.0, Y2+cos(H1*PI/180.0)*linewidth/2.0);
+    quad.position = sf::Vector2f( X2-sin(H1*PI/180.0)*lineWidth/2.0, Y2+cos(H1*PI/180.0)*lineWidth/2.0);
     line.append(quad);
     //
-    quad.position = sf::Vector2f( X2+sin(H1*PI/180.0)*linewidth/2.0, Y2-cos(H1*PI/180.0)*linewidth/2.0);
+    quad.position = sf::Vector2f( X2+sin(H1*PI/180.0)*lineWidth/2.0, Y2-cos(H1*PI/180.0)*lineWidth/2.0);
     line.append(quad);
 }
 //
-void Player::Calculate_Gap(const Config &config){
+void Player::calculateGap(const Config &config){
     if(!gapping){
-        gap[0]=config.min_to_gap + ( rand() % (config.rand_to_gap+1) ) / 1000.0;
+        gap[0]=config.minToGap + ( rand() % (config.randToGap+1) ) / 1000.0;
     }
     else{
-        gap[0]=config.min_to_gap_powerup + ( rand() % (config.rand_to_gap_powerup+1) ) / 1000.0;
+        gap[0]=config.minToGapPowerup + ( rand() % (config.rand_to_gap_powerup+1) ) / 1000.0;
     }
-    gap[1]=config.min_width_gap + ( ( rand() % (config.rand_width_gap+1) ) / 1000.0 );
+    gap[1]=config.minWidthGap + ( ( rand() % (config.randWidthGap+1) ) / 1000.0 );
 }
 //
-void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
+void Player::calculatePowerupEffect(const Config &config,const Game &game){
     // Set the normal things
     shift=config.shift;
     turn=config.turn;
-    linewidth=config.linewidth;
-    rightangle=false;
+    lineWidth=config.lineWidth;
+    rightAngle=false;
     invisible=false;
     inverted=false;
     gapping=false;
     sine=false;
     int speed=0;
     int line_size=0;
-    // Check for effects
-    for(unsigned int i=0;i<game.player_powerup_effect.size();i++){
-        if(game.player_powerup_effect[i].impact==Powerup::Impact::All
-           ||(game.player_powerup_effect[i].impact==Powerup::Impact::Other&&game.player_powerup_effect[i].player!=place)
-           ||(game.player_powerup_effect[i].impact==Powerup::Impact::Self&&game.player_powerup_effect[i].player==place)){
+    // check for effects
+    for(unsigned int i=0;i<game.playerPowerupEffect.size();i++){
+        if(game.playerPowerupEffect[i].impact==Powerup::Impact::All
+           ||(game.playerPowerupEffect[i].impact==Powerup::Impact::Other&&game.playerPowerupEffect[i].player!=place)
+           ||(game.playerPowerupEffect[i].impact==Powerup::Impact::Self&&game.playerPowerupEffect[i].player==place)){
             // Speed
-            if(game.player_powerup_effect[i].type==Powerup::Type::Fast){
+            if(game.playerPowerupEffect[i].type==Powerup::Type::Fast){
                 speed++;
             }
-            else if(game.player_powerup_effect[i].type==Powerup::Type::Slow){
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::Slow){
                 speed--;
             }
             // Linewidth
-            else if(game.player_powerup_effect[i].type==Powerup::Type::Small){
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::Small){
                 line_size--;
             }
-            else if(game.player_powerup_effect[i].type==Powerup::Type::Big){
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::Big){
                 line_size++;
             }
             // Right Angle
-            else if(game.player_powerup_effect[i].type==Powerup::Type::Right_Angle){
-                rightangle=true;
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::RightAngle){
+                rightAngle=true;
             }
             // Invisible
-            else if(game.player_powerup_effect[i].type==Powerup::Type::Invisible){
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::Invisible){
                 invisible=true;
             }
             // Invert directions
-            else if(game.player_powerup_effect[i].type==Powerup::Type::Invert_Keys){
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::InvertKeys){
                 inverted=true;
             }
             // Gapping
-            else if(game.player_powerup_effect[i].type==Powerup::Type::Gap){
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::Gap){
                 gapping=true;
                 gap[0]=0;
             }
             // Sine
-            else if(game.player_powerup_effect[i].type==Powerup::Type::Sine){
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::Sine){
                 sine=true;
             }
         }
@@ -324,37 +324,37 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
     //
     if(speed>0){
         // To make sure it won't go to fast I could use a function like max*(1-exp(-a*x)). Max is the maximum speed multiplier and a is a scaling factor
-        shift*=config.fast_max_multiplier * ( 1 - exp( - config.fast_scaling * speed ) ); // 2.1742    3.5606    4.4446 (max=6&a=0.45)
-        turn*=config.fast_turn_max_multiplier * ( 1 - exp( - config.fast_turn_scaling * speed ) );
+        shift*=config.fastMaxMultiplier * ( 1 - exp( - config.fastScaling * speed ) ); // 2.1742    3.5606    4.4446 (max=6&a=0.45)
+        turn*=config.fastTurnMaxMultiplier * ( 1 - exp( - config.fastTurnScaling * speed ) );
     }
     else if(speed<0){
         // Function min+exp(a*x); min is the minimum multiplier and a is a scaling factor. As x is already negative no minus sign is needed.
-        //float multiplier=config.min_slow_multiplier+exp(config.slow_scaling*speed); // -1=0.6;-2=0.36;-3=0.22 (min=0&a=0.5)
-        shift*=config.slow_min_multiplier+exp(config.slow_scaling*speed);;
-        turn*=config.slow_turn_min_multiplier+exp(config.slow_turn_scaling*speed);;
+        //float multiplier=config.min_slow_multiplier+exp(config.slowScaling*speed); // -1=0.6;-2=0.36;-3=0.22 (min=0&a=0.5)
+        shift*=config.slowMinMultiplier+exp(config.slowScaling*speed);;
+        turn*=config.slowTurnMinMultiplier+exp(config.slowTurnScaling*speed);;
     }
     // Linewidth is calculated on the server, Same goes for the sine things
     if(!game.client[1]){
         if(line_size>0){
-            linewidth*=pow(config.big_multiplier,line_size);
+            lineWidth*=pow(config.bigMultiplier,line_size);
         }
         else if(line_size<0){
-            linewidth*=pow(config.small_multiplier,(-1)*line_size);
-            if(linewidth<1){
-                linewidth=1;
+            lineWidth*=pow(config.smalMultiplier,(-1)*line_size);
+            if(lineWidth<1){
+                lineWidth=1;
             }
         }
         // Sine things
         if(!sine){
-            sine_phase=0;
+            sinePhase=0;
         }
         else{
-            sine_linewidth=linewidth;
-            sine_shift=shift;
+            sineLineWidth=lineWidth;
+            sineShift=shift;
         }
     }
     // Right Angle
-    if(!rightangle){
+    if(!rightAngle){
         // Circle Style
         if(inverted){
             circle.setFillColor(sf::Color::Blue);
@@ -362,18 +362,18 @@ void Player::Calculate_Powerup_Effect(const Config &config,const Game &game){
         else{
             circle.setFillColor(color);
         }
-        circle.setRadius(linewidth/2);
+        circle.setRadius(lineWidth/2);
         // Rectangle style
     }
     else{
-        rectangle.setSize(sf::Vector2f(linewidth,linewidth));
+        rectangle.setSize(sf::Vector2f(lineWidth,lineWidth));
         if(inverted){
             rectangle.setFillColor(sf::Color::Blue);
         }
         else{
             rectangle.setFillColor(color);
         }
-        rectangle.setOrigin(linewidth/2,linewidth/2);
+        rectangle.setOrigin(lineWidth/2,lineWidth/2);
     }
 }
 //

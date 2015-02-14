@@ -1,8 +1,8 @@
-// Contains functions and constructors for the Game Setup class
+// Contains functions and constructors for the Game setup class
 // Needed Header
-#include "game_setup.h"
+#include "GameSetup.h"
 // Constructor
-Game_Setup::Game_Setup(){
+GameSetup::GameSetup(){
     // Color things
     color[0]=sf::Color::Red;
     color[1]=sf::Color::Yellow;
@@ -11,29 +11,29 @@ Game_Setup::Game_Setup(){
     color[4]=sf::Color::Magenta;
     color[5]=sf::Color::Blue;
     for(int i=0;i<6;i++){
-        color_used[i]=false;
+        colorUsed[i]=false;
     }
     // Key Change
-    key_change[0]=key_change[1]=-1;
+    keyChange[0]=keyChange[1]=-1;
 }
 //
-void Game_Setup::Initialize(const Config &config,Game &game,std::vector<Player> &player){
+void GameSetup::initialize(const Config &config,Game &game,std::vector<Player> &player){
     //
     if(player.size()==0){
         for(int i=0;i<6;i++){
-            color_used[i]=false;
+            colorUsed[i]=false;
         }
     }
-    game.Switch_Mode(Game::Mode::Setup);
+    game.switchMode(Game::Mode::setup);
 }
 //
-void Game_Setup::Add_Player(Game &game,std::vector<Player> &player){
+void GameSetup::addPlayer(Game &game,std::vector<Player> &player){
     // Find Available color
     int new_col;
     for(int i=0;i<6;i++){
-        if(!color_used[i]){
+        if(!colorUsed[i]){
             new_col=i;
-            color_used[i]=true;
+            colorUsed[i]=true;
             break;
         }
     }
@@ -47,7 +47,7 @@ void Game_Setup::Add_Player(Game &game,std::vector<Player> &player){
     std::cout << "Number of players: " << player.size() << std::endl;
 }
 //
-void Game_Setup::Remove_Player(Game &game,std::vector<Player> &player, const int &i){
+void GameSetup::removePlayer(Game &game,std::vector<Player> &player, const int &i){
     // Backup color
     sf::Color col=player[i].color;
     // Remove player
@@ -55,7 +55,7 @@ void Game_Setup::Remove_Player(Game &game,std::vector<Player> &player, const int
     // Set Color Available
     for(int i=0;i<6;i++){
         if(col==color[i]){
-            color_used[i]=false;
+            colorUsed[i]=false;
             break;
         }
     }
@@ -63,12 +63,12 @@ void Game_Setup::Remove_Player(Game &game,std::vector<Player> &player, const int
     std::cout << "Number of players: " << player.size() << std::endl;
 }
 //
-bool Game_Setup::Key_Available(const std::vector<Player> &player,const sf::Keyboard::Key &key){
+bool GameSetup::keyAvailable(const std::vector<Player> &player,const sf::Keyboard::Key &key){
     // Space and escape are not allowed!
     if(key==sf::Keyboard::Escape||key==sf::Keyboard::Space){
         return false;
     }
-    // Check if a player already has that key
+    // check if a player already has that key
     for(unsigned int i=0;i<player.size();i++){
         if(player[i].keyL==key||player[i].keyR==key){
             return false;
@@ -77,7 +77,7 @@ bool Game_Setup::Key_Available(const std::vector<Player> &player,const sf::Keybo
     return true;
 }
 //
-void Game_Setup::Quit(const Config &config,Game &game,std::vector<Player> &player){
+void GameSetup::quit(const Config &config,Game &game,std::vector<Player> &player){
     // Quit Server and Client and clear up
     if(game.client[1]){
         game.client[2]=true;
@@ -86,45 +86,45 @@ void Game_Setup::Quit(const Config &config,Game &game,std::vector<Player> &playe
         game.server[2]=true;
     }
     //
-    game.Switch_Mode(Game::Mode::Main_Menu);
+    game.switchMode(Game::Mode::mainMenu);
 }
 //
-void Game_Setup::Start_Game(const Config &config,Game &game,std::vector<Player> &player,const Server &server){
-    // Check if there are at least two players
+void GameSetup::startGame(const Config &config,Game &game,std::vector<Player> &player,const Server &server){
+    // check if there are at least two players
     if(player.size()<2){
         std::cout << "Not enough players!" << std::endl;
         return;
     }
-    // Check keys
+    // check keys
     for(unsigned int i=0;i<player.size();i++){
         if( (player[i].local&&(player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown))){
             std::cout << "Keys not set!" << std::endl;
             return;
         }
     }
-    // Check ready
+    // check ready
     for(unsigned int i=0;i<server.clients.size();i++){
         if(!server.clients[i].ready){
             std::cout << "Someone is not ready!" << std::endl;
             return;
         }
     }
-    // Shutdown server if no clients
+    // shutdown server if no clients
     if(server.clients.size()==0&&game.server[1]){
         game.server[2]=true;
     }
     // If they are start init
-    game.Initialize(config,player);
+    game.initialize(config,player);
 }
 //
-void Game_Setup::Auto_Add_Players(const Config &config,Game &game,std::vector<Player> &player){
+void GameSetup::autoAddPlayers(const Config &config,Game &game,std::vector<Player> &player){
     if(player.size()>0){
         return;
     }
-    Add_Player(game,player);
+    addPlayer(game,player);
     player[0].keyL=sf::Keyboard::Left;
     player[0].keyR=sf::Keyboard::Right;
-    Add_Player(game,player);
+    addPlayer(game,player);
     player[1].keyL=sf::Keyboard::Z;
     player[1].keyR=sf::Keyboard::X;
 }

@@ -1,22 +1,22 @@
 // Contains Pacer class declaration
-// pace is the minimum run time in milliseconds
+// minRunTime is the minimum run time in milliseconds
 #ifndef CURVE_PACER
 #define CURVE_PACER
-// SFML Headers
+// Headers
 #include <SFML/System.hpp>
 //
 class Pacer{
     // Vars
     sf::Clock clock;
-    unsigned int pace;
+    unsigned int minRunTime;
     public:
         // Functions
-        void setPace(const unsigned int &Pace);
+        void setPace(const unsigned int &i_minRunTime);
         unsigned int getPace();
         void resetClock();
-        void Pace();
+        void pace();
         // Constructor
-        Pacer(const unsigned int &Pace);
+        Pacer(const unsigned int &i_minRunTime);
 };
 
 #endif // CURVE_PACER

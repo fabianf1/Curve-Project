@@ -1,5 +1,5 @@
-#ifndef CURVE_COL
-#define CURVE_COL
+#ifndef CURVE_COLOR
+#define CURVE_COLOR
 
 #include <SFML/Network.hpp>
 #include <SFML/Graphics.hpp>
@@ -8,4 +8,4 @@
 sf::Packet& operator << (sf::Packet& packet, const sf::Color &j);
 sf::Packet& operator >> (sf::Packet& packet, sf::Color &j);
 
-#endif // CURVE_COL
+#endif // CURVE_COLOR

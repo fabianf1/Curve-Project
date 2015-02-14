@@ -13,5 +13,5 @@ To-Do List
 * Use same code conventions everywhere
 * Add checks to check incoming data
 * Prevent possible data races
-* Wait until everyone is ready before starting countdown
+* Wait until everyone is ready before starting countdownClock
 * Ensure latest data is present when doing things like bomb

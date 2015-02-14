@@ -2,9 +2,9 @@
 #ifndef CURVE_POWERUP_EFFECT
 #define CURVE_POWERUP_EFFECT
 // Class Headers
-#include "powerup.h"
+#include "Powerup.h"
 //
-class Powerup_Effect{
+class PowerupEffect{
     public:
         // Vars
         int player;
@@ -13,7 +13,7 @@ class Powerup_Effect{
         float time;
         int id;
         // Constructor
-        Powerup_Effect(const Powerup::Type &Type,const float &Time,const int &ID); //  Game effects
-        Powerup_Effect(const int &Player,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,const int &ID); // Player effects
+        PowerupEffect(const Powerup::Type &Type,const float &Time,const int &ID); //  Game effects
+        PowerupEffect(const int &Player,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,const int &ID); // Player effects
 };
 #endif // CURVE_POWERUP_EFFECT

@@ -1,15 +1,14 @@
 // All functions that operate outside of classes
-#ifndef CURVE_FUNCTIONS
-#define CURVE_FUNCTIONS
+#ifndef CURVE_GENERAL
+#define CURVE_GENERAL
 
 // Needed Headers
 #include <string>
-#include <SFML/Graphics.hpp>
 #include <sstream>
 #include <Windows.h> // I really should test on linux
+#include <SFML/Graphics.hpp>
 
-// General.cpp
-std::string int2string(const int &x);
+std::string int2str(const int &x);
 sf::Image LoadImageFromResource(const std::string& name);
 
-#endif // CURVE_FUNCTIONS
+#endif // CURVE_GENERAL

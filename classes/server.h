@@ -1,51 +1,46 @@
-// Contains Game Setup class declaration
+// Contains Game setup class declaration
 #ifndef CURVE_SERVER
 #define CURVE_SERVER
-// Needed Headers
-//#include "..\curve.h"
 // Standard headers
 #include <thread>
 #include <iostream>
 #include <vector>
-// SFML Headers
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
-// Class Headers
-#include "config.h"
-#include "game.h"
-#include "game_setup.h"
-#include "player.h"
-#include "client_info.h"
-#include "color.h"
-#include "pacer.h"
-//
-#include "../functions/functions.h"
+#include "Config.h"
+#include "Game.h"
+#include "GameSetup.h"
+#include "Player.h"
+#include "ClientInfo.h"
+#include "Color.h"
+#include "Pacer.h"
+
+#include "../functions/general.h"
 //
 class Server{
     public:
         // Vars
-        std::vector<Client_Info> clients;
+        std::vector<ClientInfo> clients;
         sf::SocketSelector selector;
         sf::TcpListener listener;
         sf::Packet packet;
-        Pacer sender_pacer;
+        Pacer senderPacer;
         // Threads
         std::thread thread_listener;
         std::thread thread_sender;
         // Functions
-        void Start(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
-        void Server_Listener(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player);
-        void Server_Sender(const Config &config,Game &game,std::vector<Player> &player);
-        void New_Client(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player, const unsigned int &n, const bool &new_client);
-        void Disconnect_Client(Game_Setup &game_setup, Game &game,std::vector<Player> &player, const unsigned int &n);
-        void Process_Package(const Config &config,Game_Setup &game_setup,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
-        void Shutdown(Game &game);
-        void Shutdown(Game &game,std::vector<Player> &player,Game_Setup &game_setup);
-        void Sync_Clients(Game &game,const std::vector<Player> &player);
-        void Update_Player_id(const std::vector<Player> &player,const unsigned int &n);
+        void start(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player);
+        void serverListener(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player);
+        void serverSender(const Config &config,Game &game,std::vector<Player> &player);
+        void newClient(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player, const unsigned int &n, const bool &new_client);
+        void disconnectClient(GameSetup &gameSetup, Game &game,std::vector<Player> &player, const unsigned int &n);
+        void processPackage(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
+        void shutdown(Game &game);
+        void shutdown(Game &game,std::vector<Player> &player,GameSetup &gameSetup);
+        void syncClients(Game &game,const std::vector<Player> &player);
+        void updatePlayerID(const std::vector<Player> &player,const unsigned int &n);
         // Constructor
-        Server(): sender_pacer(25){}
-        // Functions
+        Server();
 };
 
 #endif // CURVE_SERVER

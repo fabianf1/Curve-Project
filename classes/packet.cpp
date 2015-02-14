@@ -1,4 +1,4 @@
-#include "packet.h"
+#include "Packet.h"
 
 sf::Packet& operator <<(sf::Packet& packet, const Packet &j){
     //int i=static_cast<int>(j);

@@ -1,22 +1,22 @@
 // Contains functions and constructors for the Pacer class
 // Needed Header
-#include "pacer.h"
+#include "Pacer.h"
 // Constructor
-Pacer::Pacer(const unsigned int &Pace){
-    setPace(Pace);
+Pacer::Pacer(const unsigned int &i_minRunTime){
+    setPace(i_minRunTime);
 }
 // Functions
-void Pacer::setPace(const unsigned int &Pace){
-    pace=Pace;
+void Pacer::setPace(const unsigned int &i_minRunTime){
+    minRunTime=i_minRunTime;
 }
 unsigned int Pacer::getPace(){
-    return pace;
+    return minRunTime;
 }
 void Pacer::resetClock(){
     clock.restart();
 }
-void Pacer::Pace(){
-    int wait=pace-clock.restart().asMilliseconds();
+void Pacer::pace(){
+    int wait=minRunTime-clock.restart().asMilliseconds();
     if(wait>0){
         sf::sleep(sf::milliseconds(wait));
     }

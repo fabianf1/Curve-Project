@@ -8,103 +8,100 @@
 #include <time.h>
 #include <iostream>
 #include <random>
-// Class Headers
-#include "powerup.h"
-#include "powerup_field.h"
-#include "powerup_effect.h"
-#include "pending.h"
-#include "player.h"
-#include "pacer.h"
-#include "packet.h"
+#include "Powerup.h"
+#include "PowerupField.h"
+#include "PowerupEffect.h"
+#include "Pending.h"
+#include "Player.h"
+#include "Pacer.h"
+#include "Packet.h"
 //
-class Renderer_Objects;
+class RendererObjects;
 //
 class Game{
     public:
-        // Thread Var
-        std::thread thread; // Stores Thread
+        // thread Var
+        std::thread gameThread; // Stores thread
         //
         int frame; // Keeps track of current frame
         //unsigned int game_frame;
-        enum class Mode : int {Main_Menu,Setup,Play} mode; // Keeps track of current modus
-        int keychange[2]; // Keeps track of keychanges, 1 is player, 0 is key(left=0 or right=1)
-        int name_change;
-        int maxpoints;
-        bool powerup_enabled;
-        bool countdown_enabled;
-        bool multiple_players_enabled;
-        bool pause;
+        enum class Mode : int {mainMenu,setup,Play} mode; // Keeps track of current modus
+        int keyChange[2]; // Keeps track of keychanges, 1 is player, 0 is key(left=0 or right=1)
+        int nameChange;
+        int maxPoints;
+        bool powerupEnabled;
+        bool countdownEnabled;
+        bool multiplePlayersEnabled;
+        bool paused;
         unsigned int round;
-        unsigned int deathcount;
-        bool round_finished;
-        bool game_finished;
-        bool end_message_set;
-        int round_winner;
-        int last_fps;
-        int countdown_int;
-        sf::Clock countdown;
-        std::recursive_mutex mode_mutex;
+        unsigned int deathCount;
+        bool roundFinished;
+        bool gameFinished;
+        bool endMessageSet;
+        int roundWinner;
+        //int lastFps;
+        int countdownInt;
+        sf::Clock countdownClock;
+        std::recursive_mutex modeMutex;
         //
-        bool refresh_players;
-        bool refresh_options;
+        bool refreshPlayers;
+        bool refreshOptions;
         //
-        bool wallsaway;
-        float wallsaway_timer;
+        bool wallsAway;
+        float wallsAwayTimer;
         bool darkness;
-        float darkness_timer;
+        float darknessTimer;
         int morepowerups;
         float elapsed;
-        float powerup_spawn_time;
+        float powerupSpawnTime;
         //
-        int total_chance;
+        int totalChance;
         std::vector<Powerup> powerups;
-        std::vector<Powerup_Field> powerup_field; // Keeps track of all powerups on the field
-        std::vector<Powerup_Effect> powerup_effect; // Stores powerupeffects that effect whole game;
-        std::vector<Powerup_Effect> player_powerup_effect;
+        std::vector<PowerupField> powerupField; // Keeps track of all powerups on the field
+        std::vector<PowerupEffect> powerupEffect; // Stores powerupeffects that effect whole game;
+        std::vector<PowerupEffect> playerPowerupEffect;
         //
-        bool update_thread[3];// 0=Cleanup required,1=running,2=shutdown;
+        bool updateThread[3];// 0=Cleanup required,1=running,2=shutdown;
         bool server[3];
         bool client[3];
         unsigned int id;
-        sf::IpAddress server_ip;
-        int packetnumber;
-        float packettime;
+        sf::IpAddress serverIp;
+        int packetNumber;
+        float packetTime;
         //
         std::vector<Pending> packets;
-        sf::Mutex mutex;
-        //
-        //std::mutex mode_lock;
+        sf::Mutex packetMutex;
         // Clocks
-        sf::Clock fps_clock; // For calculating fps
+        sf::Clock fpsClock; // For calculating fps
         sf::Clock game_clock; // For game update
         sf::Clock packetclock; // Measuring time between packets;
         //
-        Pacer game_pacer;
+        Pacer gamePacer;
         // Random
-        std::default_random_engine rand_generator;
-        std::uniform_int_distribution<int> rand_powerup;
-        std::uniform_int_distribution<int> rand_spawn;
+        std::default_random_engine randGenerator;
+        std::uniform_int_distribution<int> randPowerup;
+        std::uniform_int_distribution<int> randSpawn;
         // Constructor
         Game(const Config &config);
         // Functions
-        void Switch_Mode(const Game::Mode &Mode);
-        void Initialize(const Config &config,std::vector<Player> &player);
-        void Initialize_Powerups(const Config &config);
-        void Thread(const Config &config,std::vector<Player> &player);
-        void New_Round(const Config &config,std::vector<Player> &player);
-        void Hit_Detector(const Config &config,std::vector<Player> &player);
-        void Player_Death(std::vector<Player> &player,const std::vector<unsigned int> &death_vec);
-        void End_Round(const Config &config,std::vector<Player> &player);
-        void Quit(const Config &config);
-        void PowerUp_Manager(const Config &config,std::vector<Player> &player);
-        void PowerUp_Manager(const Config &config);
-        void Choose_PowerUp(Powerup::Type &type, Powerup::Impact &impact, int &place);
-        void PowerUp_Bomb(const Config &config,std::vector<Player> &player, const int &i, const unsigned int &bomb_number);
-        void Pause(const bool &Pause);
-        void Options_Changed(Renderer_Objects &objects);
-        void Shutdown();
+        void switchMode(const Game::Mode &Mode);
+        void initialize(const Config &config,std::vector<Player> &player);
+        void initializePowerups(const Config &config);
+        void thread(const Config &config,std::vector<Player> &player);
+        void newRound(const Config &config,std::vector<Player> &player);
+        void hitDetector(const Config &config,std::vector<Player> &player);
+        void playerDeath(std::vector<Player> &player,const std::vector<unsigned int> &death_vec);
+        void endRound(const Config &config,std::vector<Player> &player);
+        void quit(const Config &config);
+        void powerUpManager(const Config &config,std::vector<Player> &player);
+        void powerUpManager(const Config &config);
+        void choosePowerUp(Powerup::Type &type, Powerup::Impact &impact, int &place);
+        void powerUpBomb(const Config &config,std::vector<Player> &player, const int &i, const unsigned int &bomb_number);
+        void pause(const bool &pause);
+        void optionsChanged(RendererObjects &objects);
+        void shutdown();
 };
 //
-#include "renderer_objects.h"
+#include "rendererObjects.h"
 //
 #endif // CURVE_GAME

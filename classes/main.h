@@ -3,15 +3,14 @@
 #define CURVE_MAIN
 // Standard Headers
 #include <vector>
-// Class Headers
-#include "config.h"
-#include "game.h"
-#include "game_setup.h"
-#include "player.h"
-#include "server.h"
-#include "client.h"
-#include "renderer.h"
-#include "pacer.h"
+#include "Config.h"
+#include "Game.h"
+#include "GameSetup.h"
+#include "Player.h"
+#include "Server.h"
+#include "Client.h"
+#include "Renderer.h"
+#include "Pacer.h"
 
 //
 class Main{
@@ -19,22 +18,22 @@ class Main{
         // Vars
         Config config;
         Game game;
-        Game_Setup game_setup;
+        GameSetup gameSetup;
         std::vector<Player> player;
         Server server;
         Client client;
         Renderer renderer;
         sf::Event event;
-        Pacer thread_pacer;
+        Pacer threadPacer;
         // Constructor
-        Main() :game(config), renderer(config),thread_pacer(config.main_thread_min_time) {};
+        Main() :game(config), renderer(config),threadPacer(config.mainThreadMinTime) {};
         // Functions
-        void Curve_Project();
-        void Event_Handler();
-        void Main_Menu_Handler();
-        void Game_Setup_Handler();
-        void Change_Button(const int &button,unsigned const int &pl);
-        void Play_Handler();
+        void curveProject();
+        void eventHandler();
+        void mainMenuHandler();
+        void gameSetupHandler();
+        void changeButton(const int &button,unsigned const int &pl);
+        void gameHandler();
 };
 
 #endif // CURVE_MAIN
