@@ -44,7 +44,7 @@ void Client::thread(const Config &config,Game &game,std::vector<Player> &player)
     // Send version check
     Pending pending;
     pending.packet << Packet::Version << config.version;
-    game.packets.push_back(pending);
+    game.queuePacket(pending);
     // Main loop
     while(!game.client[2]){
         // check if receiving something
@@ -107,9 +107,7 @@ void Client::toggleReady(Game &game,std::vector<Player> &player){
         if(ready){
             Pending pending;
             pending.packet << Packet::Ready << true;
-            game.packetMutex.lock();
-            game.packets.push_back(pending);
-            game.packetMutex.unlock();
+            game.queuePacket(pending);
         }
     }
     else{
@@ -117,9 +115,7 @@ void Client::toggleReady(Game &game,std::vector<Player> &player){
         // Send packet
         Pending pending;
         pending.packet << Packet::Ready << false;
-        game.packetMutex.lock();
-        game.packets.push_back(pending);
-        game.packetMutex.unlock();
+        game.queuePacket(pending);
     }
 }
 //
@@ -193,9 +189,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
             // Send packet
             Pending pending;
             pending.packet << Packet::Lag << game.id;
-            game.packetMutex.lock();
-            game.packets.push_back(pending);
-            game.packetMutex.unlock();
+            game.queuePacket(pending);
         }
         // Unpack Basics
         int number;
@@ -383,9 +377,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         ready=false;
         Pending pending;
         pending.packet << Packet::Ready << false;
-        game.packetMutex.lock();
-        game.packets.push_back(pending);
-        game.packetMutex.unlock();
+        game.queuePacket(pending);
         game.switchMode(Game::Mode::setup);
     }
     else if(type==Packet::RequestPlayer){

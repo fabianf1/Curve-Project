@@ -40,10 +40,7 @@ void Game::initialize(const Config &config, std::vector<Player> &player){
     if(server[1]){
         Pending pending;
         pending.packet << Packet::StartGame;
-        pending.send_id.push_back(-1);
-        packetMutex.lock();
-        packets.push_back(pending);
-        packetMutex.unlock();
+        queuePacket(pending);
     }
     //
     playerPowerupEffect.clear();
@@ -138,7 +135,6 @@ void Game::thread(const Config &config,std::vector<Player> &player){
             // Update
             Pending pending;
             if(server[1]){
-                pending.send_id.push_back(-1);
                 packetNumber++;
                 pending.packet << Packet::Update << packetNumber;
             }
@@ -151,9 +147,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
                 }
             }
             if(server[1]){
-                packetMutex.lock();
-                packets.push_back(pending);
-                packetMutex.unlock();
+                queuePacket(pending);
                 //
                 packetTime=packetclock.restart().asSeconds();
             }
@@ -171,9 +165,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
                         // Send package
                         Pending pending;
                         pending.packet << Packet::KeyL << i << player[i].left;
-                        packetMutex.lock();
-                        packets.push_back(pending);
-                        packetMutex.unlock();
+                        queuePacket(pending);
                     }
                     // KeyR changed
                     if( (!player[i].right&&sf::Keyboard::isKeyPressed(player[i].keyR)) || (player[i].right&&!sf::Keyboard::isKeyPressed(player[i].keyR)) ){
@@ -181,9 +173,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
                         // Send package
                         Pending pending;
                         pending.packet << Packet::KeyR << i << player[i].right;
-                        packetMutex.lock();
-                        packets.push_back(pending);
-                        packetMutex.unlock();
+                        queuePacket(pending);
                     }
                 }
             }
@@ -218,10 +208,7 @@ void Game::newRound(const Config &config,std::vector<Player> &player){
         for(unsigned int i=0;i<player.size();i++){
             pending.packet << i << player[i].x << player[i].y << player[i].heading;
         }
-        pending.send_id.push_back(-1);
-        packetMutex.lock();
-        packets.push_back(pending);
-        packetMutex.unlock();
+        queuePacket(pending);
     }
     // Reset Some vars
     deathCount=0;
@@ -244,11 +231,8 @@ void Game::newRound(const Config &config,std::vector<Player> &player){
         countdownClock.restart();
         countdownInt=3;
         Pending pending;
-        pending.send_id.push_back(-1);
         pending.packet << Packet::Countdown;
-        packetMutex.lock();
-        packets.push_back(pending);
-        packetMutex.unlock();
+        queuePacket(pending);
     }
     else if(!client[1]&&countdownEnabled){
         countdownClock.restart();
@@ -358,10 +342,7 @@ void Game::playerDeath(std::vector<Player> &player,const std::vector<unsigned in
         for(unsigned int i=0;i<death_vec.size();i++){
             pending.packet << death_vec[i];
         }
-        pending.send_id.push_back(-1);
-        packetMutex.lock();
-        packets.push_back(pending);
-        packetMutex.unlock();
+        queuePacket(pending);
     }
     // Do these actions for all dead people
     for(unsigned int i=0;i<death_vec.size();i++){
@@ -402,10 +383,7 @@ void Game::endRound(const Config &config,std::vector<Player> &player){
         if(server[1]){
             Pending pending;
             pending.packet << Packet::GameEnd << roundWinner;
-            pending.send_id.push_back(-1);
-            packetMutex.lock();
-            packets.push_back(pending);
-            packetMutex.unlock();
+            queuePacket(pending);
         }
     }
     // Game continues, someone has just won a round;
@@ -419,10 +397,7 @@ void Game::endRound(const Config &config,std::vector<Player> &player){
         if(server[1]){
             Pending pending;
             pending.packet << Packet::RoundEnd << roundWinner;
-            pending.send_id.push_back(-1);
-            packetMutex.lock();
-            packets.push_back(pending);
-            packetMutex.unlock();
+            queuePacket(pending);
         }
     }
 }
@@ -438,11 +413,8 @@ void Game::quit(const Config &config){
         // If Server let clients also return to setup
         if(server[1]){
             Pending pending;
-            pending.send_id.push_back(-1);
             pending.packet << Packet::ReturnSetup;
-            packetMutex.lock();
-            packets.push_back(pending);
-            packetMutex.unlock();
+            queuePacket(pending);
         }
         //
         switchMode(Game::Mode::setup);
@@ -468,10 +440,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             if(server[1]){
                 Pending pending;
                 pending.packet << Packet::PowerupDelF << powerupField[i].id;
-                pending.send_id.push_back(-1);
-                packetMutex.lock();
-                packets.push_back(pending);
-                packetMutex.unlock();
+                queuePacket(pending);
             }
             //
             powerupField.erase(powerupField.begin()+i);
@@ -486,10 +455,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             if(server[1]){
                 Pending pending;
                 pending.packet << Packet::PowerupDelP << playerPowerupEffect[i].id;
-                pending.send_id.push_back(-1);
-                packetMutex.lock();
-                packets.push_back(pending);
-                packetMutex.unlock();
+                queuePacket(pending);
             }
             //
             playerPowerupEffect.erase(playerPowerupEffect.begin()+i);
@@ -521,10 +487,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             if(server[1]){
                 Pending pending;
                 pending.packet << Packet::PowerupEnd << Powerup::Type::WallsAway;
-                pending.send_id.push_back(-1);
-                packetMutex.lock();
-                packets.push_back(pending);
-                packetMutex.unlock();
+                queuePacket(pending);
             }
         }
     }
@@ -536,10 +499,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             if(server[1]){
                 Pending pending;
                 pending.packet << Packet::PowerupEnd << Powerup::Type::Darkness;
-                pending.send_id.push_back(-1);
-                packetMutex.lock();
-                packets.push_back(pending);
-                packetMutex.unlock();
+                queuePacket(pending);
             }
         }
     }
@@ -595,10 +555,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             if(server[1]){
                 Pending pending;
                 pending.packet << Packet::PowerupS << id << X << Y << type << impact << D;
-                pending.send_id.push_back(-1);
-                packetMutex.lock();
-                packets.push_back(pending);
-                packetMutex.unlock();
+                queuePacket(pending);
             }
             //
         }
@@ -667,10 +624,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
                 if(server[1]){
                     Pending pending;
                     pending.packet << Packet::PowerupHit << i << id;
-                    pending.send_id.push_back(-1);
-                    packetMutex.lock();
-                    packets.push_back(pending);
-                    packetMutex.unlock();
+                    queuePacket(pending);
                 }
                 // Remove powerup!
                 powerupField.erase(powerupField.begin()+j);
@@ -703,7 +657,7 @@ void Game::choosePowerUp(Powerup::Type &type, Powerup::Impact &impact, int &plac
     }
 }
 //
-void Game::powerUpBomb(const Config &config,std::vector<Player> &player, const int &i, const unsigned int &bomb_number){
+void Game::powerUpBomb(const Config &config,std::vector<Player> &player, const int &i, const unsigned int &bombNumber){
     // Remove lines
     int xc,yc;
     for(unsigned int k=0;k<player.size();k++){
@@ -712,7 +666,7 @@ void Game::powerUpBomb(const Config &config,std::vector<Player> &player, const i
             xc=(player[k].line[l].position.x+player[k].line[l+1].position.x+player[k].line[l+2].position.x+player[k].line[l+3].position.x)/4;
             yc=(player[k].line[l].position.y+player[k].line[l+1].position.y+player[k].line[l+2].position.y+player[k].line[l+3].position.y)/4;
             if( (xc-player[i].x)*(xc-player[i].x) + (yc-player[i].y)*(yc-player[i].y) < config.bombRadius*config.bombRadius ){
-                // Remove; Erase doesn't work due to the wrapper. I just move the lines out of sight for now; Moving to 0,0 would be problematic with wallsAway
+                // Remove; Erase doesn't work due to the wrapper. I just move the lines out of sight for now;
                 // Fix would be to use std::vector<sf::Vertex>
                 player[k].line[l].position=sf::Vector2f(-100, -100);
                 player[k].line[l+1].position=sf::Vector2f(-100, -100);
@@ -723,11 +677,13 @@ void Game::powerUpBomb(const Config &config,std::vector<Player> &player, const i
     }
     // Remove Powerups
     for(unsigned int k=0;k<powerupField.size();k++){
-        xc=player[i].x-powerupField[k].x;
-        yc=player[i].y-powerupField[k].y;
-        if( xc*xc + yc*yc < config.bombRadius*config.bombRadius && k!=bomb_number ){
-            powerupField.erase(powerupField.begin()+k);
-            k--;
+        if(k!=bombNumber){
+            xc=player[i].x-powerupField[k].x;
+            yc=player[i].y-powerupField[k].y;
+            if( xc*xc + yc*yc < config.bombRadius*config.bombRadius){
+                powerupField.erase(powerupField.begin()+k);
+                k--;
+            }
         }
     }
 }
@@ -738,10 +694,7 @@ void Game::pause(const bool &pause){
         if(server[1]){
             Pending pending;
             pending.packet << Packet::Pause << true;
-            pending.send_id.push_back(-1);
-            packetMutex.lock();
-            packets.push_back(pending);
-            packetMutex.unlock();
+            queuePacket(pending);
         }
     }
     else{
@@ -751,10 +704,7 @@ void Game::pause(const bool &pause){
         if(server[1]){
             Pending pending;
             pending.packet << Packet::Pause << false;
-            pending.send_id.push_back(-1);
-            packetMutex.lock();
-            packets.push_back(pending);
-            packetMutex.unlock();
+            queuePacket(pending);
         }
         countdownInt=0;
     }
@@ -764,11 +714,17 @@ void Game::optionsChanged(RendererObjects &objects){
     if(server[1]){
         Pending pending;
         pending.packet << Packet::Options << maxPoints << powerupEnabled << multiplePlayersEnabled;
-        pending.send_id.push_back(-1);
-        packetMutex.lock();
-        packets.push_back(pending);
-        packetMutex.unlock();
+        queuePacket(pending);
     }
     objects.setOptions(*this);
+}
+//
+void Game::queuePacket(Pending &packet){
+    if(packet.sendID.size()==0){
+        packet.sendID.emplace_back(-1);
+    }
+    packetMutex.lock();
+    packets.push_back(packet);
+    packetMutex.unlock();
 }
 //

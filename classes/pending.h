@@ -11,7 +11,7 @@ class Pending{
     public:
         // Vars
         sf::Packet packet;
-        std::vector<int> send_id;
+        std::vector<int> sendID;
 };
 
 #endif // CURVE_PENDING

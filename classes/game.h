@@ -96,9 +96,10 @@ class Game{
         void powerUpManager(const Config &config,std::vector<Player> &player);
         void powerUpManager(const Config &config);
         void choosePowerUp(Powerup::Type &type, Powerup::Impact &impact, int &place);
-        void powerUpBomb(const Config &config,std::vector<Player> &player, const int &i, const unsigned int &bomb_number);
+        void powerUpBomb(const Config &config,std::vector<Player> &player, const int &i, const unsigned int &bombNumber);
         void pause(const bool &pause);
         void optionsChanged(RendererObjects &objects);
+        void queuePacket(Pending &packet);
         void shutdown();
 };
 //

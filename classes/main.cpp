@@ -117,10 +117,7 @@ void Main::eventHandler(){
                 if(game.server[1]||game.client[1]){
                     Pending pending;
                     pending.packet << Packet::Name << game.nameChange << player[game.nameChange].name;
-                    pending.send_id.push_back(-1);
-                    game.packetMutex.lock();
-                    game.packets.push_back(pending);
-                    game.packetMutex.unlock();
+                    game.queuePacket(pending);
                 }
             }
             renderer.objects.s_names[game.nameChange].setActive(false);
@@ -141,10 +138,7 @@ void Main::eventHandler(){
                 // Then send a return setup package
                 Pending pending;
                 pending.packet << Packet::ReturnSetup;
-                pending.send_id.emplace_back(-1);
-                game.packetMutex.lock();
-                game.packets.push_back(pending);
-                game.packetMutex.unlock();
+                game.queuePacket(pending);
             }
         }
         // New Round
@@ -162,7 +156,7 @@ void Main::eventHandler(){
             game.pause(false);
         }
         else if(!game.server[1]&&!game.client[1]&&game.countdownInt==0&&event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
-            game.pause(!game.pause);
+            game.pause(!game.paused);
         }
         #endif
     }
@@ -213,10 +207,7 @@ void Main::gameSetupHandler(){
                         if(game.server[1]||game.client[1]){
                             Pending pending;
                             pending.packet << Packet::Name << i << player[i].name;
-                            pending.send_id.push_back(-1);
-                            game.packetMutex.lock();
-                            game.packets.push_back(pending);
-                            game.packetMutex.unlock();
+                            game.queuePacket(pending);
                         }
                     }
                     renderer.objects.s_names[i].setActive(false);
@@ -280,10 +271,7 @@ void Main::gameSetupHandler(){
                     //
                     Pending pending;
                     pending.packet << Packet::Disconnect << i;
-                    pending.send_id.push_back(-1);
-                    game.packetMutex.lock();
-                    game.packets.push_back(pending);
-                    game.packetMutex.unlock();
+                    game.queuePacket(pending);
                 }
                 //
                 gameSetup.removePlayer(game,player,i);
@@ -293,10 +281,7 @@ void Main::gameSetupHandler(){
                 player[i].local=false;
                 Pending pending;
                 pending.packet << Packet::RemovePlayer << i;
-                pending.send_id.push_back(-1);
-                game.packetMutex.lock();
-                game.packets.push_back(pending);
-                game.packetMutex.unlock();
+                game.queuePacket(pending);
             }
             break;
         }
@@ -348,9 +333,7 @@ void Main::gameSetupHandler(){
         if(game.client[1]){
             Pending pending;
             pending.packet << Packet::RequestPlayer;
-            game.packetMutex.lock();
-            game.packets.push_back(pending);
-            game.packetMutex.unlock();
+            game.queuePacket(pending);
         }
         else{
             // Add new player

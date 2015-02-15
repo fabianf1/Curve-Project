@@ -117,41 +117,41 @@ void Server::serverSender(const Config &config,Game &game,std::vector<Player> &p
                 continue;
             }
             // check if send id has been set
-            else if(game.packets[i].send_id.size()==0){
+            else if(game.packets[i].sendID.size()==0){
                 continue;
             }
-            // Send to all if send_id[0]=-1;
-            else if(game.packets[i].send_id[0]==-1){
-                game.packets[i].send_id.clear();
+            // Send to all if sendID[0]=-1;
+            else if(game.packets[i].sendID[0]==-1){
+                game.packets[i].sendID.clear();
                 for(unsigned int j=0;j<clients.size();j++){
-                    game.packets[i].send_id.push_back(j);
+                    game.packets[i].sendID.push_back(j);
                 }
             }
             // Send loop
-            for(int j=game.packets[i].send_id.size()-1;j>=0;j--){
+            for(int j=game.packets[i].sendID.size()-1;j>=0;j--){
                 // check if client still exists
-                if(game.packets[i].send_id[j]>=clients.size()){
-                    game.packets[i].send_id.erase(game.packets[i].send_id.begin()+j);
+                if(game.packets[i].sendID[j]>=clients.size()){
+                    game.packets[i].sendID.erase(game.packets[i].sendID.begin()+j);
                 }
                 else{
-                    switch(clients[game.packets[i].send_id[j]].socket->send(game.packets[i].packet)){
+                    switch(clients[game.packets[i].sendID[j]].socket->send(game.packets[i].packet)){
                         case sf::Socket::Done:
                             // Remove Send id
-                            game.packets[i].send_id.erase(game.packets[i].send_id.begin()+j);
+                            game.packets[i].sendID.erase(game.packets[i].sendID.begin()+j);
                             break;
                         case sf::Socket::NotReady:
-                            std::cout << "Client not ready: " << clients[game.packets[i].send_id[j]].socket->getRemoteAddress().toString()  << std::endl;
+                            std::cout << "Client not ready: " << clients[game.packets[i].sendID[j]].socket->getRemoteAddress().toString()  << std::endl;
                             break;
                         case sf::Socket::Disconnected:
                         case sf::Socket::Error:
                         default:
-                            std::cout << "Failed to send packet:" << clients[game.packets[i].send_id[j]].socket->getRemoteAddress().toString()  << std::endl;
+                            std::cout << "Failed to send packet:" << clients[game.packets[i].sendID[j]].socket->getRemoteAddress().toString()  << std::endl;
                             break;
                     } // End toggle case
                 }
             } // End Send id for loop
             // Remove empty packets
-            if(game.packets[i].send_id.size()==0){
+            if(game.packets[i].sendID.size()==0){
                 game.packetMutex.lock();
                 game.packets.erase(game.packets.begin()+i);
                 game.packetMutex.unlock();
@@ -179,18 +179,14 @@ void Server::newClient(const Config &config,GameSetup &gameSetup,Game &game,std:
     if(new_client){
         Pending pending;
         pending.packet << Packet::ID << (player.size()-1);
-        pending.send_id.push_back(n);
-        game.packetMutex.lock();
-        game.packets.push_back(pending);
-        game.packetMutex.unlock();
+        pending.sendID.push_back(n);
+        game.queuePacket(pending);
     }
     else{
         Pending pending;
         pending.packet << Packet::RequestPlayer << (player.size()-1);
-        pending.send_id.push_back(n);
-        game.packetMutex.lock();
-        game.packets.push_back(pending);
-        game.packetMutex.unlock();
+        pending.sendID.push_back(n);
+        game.queuePacket(pending);
     }
     // Send options
     game.refreshOptions=true;
@@ -215,10 +211,7 @@ void Server::disconnectClient(GameSetup &gameSetup, Game &game,std::vector<Playe
         }
     }
     // Pend Packed
-    pending.send_id.push_back(-1);
-    game.packetMutex.lock();
-    game.packets.push_back(pending);
-    game.packetMutex.unlock();
+    game.queuePacket(pending);
 }
 // n is the place in the client vector
 void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player,sf::Packet &packet, const unsigned int &n){
@@ -237,10 +230,8 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
                 std::cout << "Incorrect client version!" << std::endl;
                 Pending pending;
                 pending.packet << Packet::Version << false;
-                pending.send_id.push_back(n);
-                game.packetMutex.lock();
-                game.packets.push_back(pending);
-                game.packetMutex.unlock();
+                pending.sendID.push_back(n);
+                game.queuePacket(pending);
                 sf::sleep(sf::seconds(0.5));
                 disconnectClient(gameSetup,game,player,n);
             }
@@ -267,12 +258,10 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
             for(unsigned int j=0;j<clients.size();j++){
                 // For loop here too?
                 if(j!=clients[j].id[0]){
-                    pending.send_id.push_back(j);
+                    pending.sendID.push_back(j);
                 }
             }
-            game.packetMutex.lock();
-            game.packets.push_back(pending);
-            game.packetMutex.unlock();
+            game.queuePacket(pending);
         }
         game.refreshPlayers=true;
     }
@@ -288,12 +277,10 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
             // Only send to other clients
             for(unsigned int j=0;j<clients.size();j++){
                 if(j!=n){
-                    pending.send_id.push_back(j);
+                    pending.sendID.push_back(j);
                 }
             }
-            game.packetMutex.lock();
-            game.packets.push_back(pending);
-            game.packetMutex.unlock();
+            game.queuePacket(pending);
         }
     }
     else if(type==Packet::KeyL){
@@ -334,10 +321,8 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
             // If not then mention it to the client
             Pending pending;
             pending.packet << Packet::RequestPlayer << -1;
-            pending.send_id.push_back(n);
-            game.packetMutex.lock();
-            game.packets.push_back(pending);
-            game.packetMutex.unlock();
+            pending.sendID.push_back(n);
+            game.queuePacket(pending);
             return;
         }
         // Create new player
@@ -366,10 +351,7 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
         // Send to other clients
         Pending pending;
         pending.packet << Packet::Disconnect << id;
-        pending.send_id.push_back(-1);
-        game.packetMutex.lock();
-        game.packets.push_back(pending);
-        game.packetMutex.unlock();
+        game.queuePacket(pending);
     }
 }
 //
@@ -401,10 +383,7 @@ void Server::syncClients(Game &game,const std::vector<Player> &player){
     for(unsigned int i=0;i<player.size();i++){
         pending.packet << i << player[i].name << player[i].color << player[i].server << player[i].ready;
     }
-    pending.send_id.push_back(-1);
-    game.packetMutex.lock();
-    game.packets.push_back(pending);
-    game.packetMutex.unlock();
+    game.queuePacket(pending);
 }
 // n denotes the player that will be removed
 void Server::updatePlayerID(const std::vector<Player> &player,const unsigned int &n){
