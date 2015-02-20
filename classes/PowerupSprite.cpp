@@ -81,4 +81,12 @@ PowerupSprite::PowerupSprite(const Config &config){
     sineRed.setTexture(texture);
     sineRed.setTextureRect(sf::IntRect(300, 400, 100, 100));
     sineRed.setScale(config.powerupScale,config.powerupScale);
+    // Glitch Blue
+    glitchBlue.setTexture(texture);
+    glitchBlue.setTextureRect(sf::IntRect(0, 500, 100, 100));
+    glitchBlue.setScale(config.powerupScale,config.powerupScale);
+    // Radius Blue
+    radiusBlue.setTexture(texture);
+    radiusBlue.setTextureRect(sf::IntRect(100, 500, 100, 100));
+    radiusBlue.setScale(config.powerupScale,config.powerupScale);
 }

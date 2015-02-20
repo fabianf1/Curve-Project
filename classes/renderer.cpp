@@ -318,6 +318,14 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
         else if(game.powerupField[i].type==Powerup::Type::Sine){
             draw=&sprite.sineRed;
         }
+        // Glitch
+        else if(game.powerupField[i].type==Powerup::Type::Glitch){
+            draw=&sprite.glitchBlue;
+        }
+        // Radius
+        else if(game.powerupField[i].type==Powerup::Type::Radius){
+            draw=&sprite.radiusBlue;
+        }
         else{
             std::cout << "Error! No sprite!" << int2str( game.powerupField[i].place ) << std::endl;
             draw=&sprite.questionMarkBlue;

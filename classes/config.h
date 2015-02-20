@@ -50,6 +50,20 @@ class Config{
         float sineFrequency;
         float sineAmplitude;
         //
+        float glitchMinWait;
+        float glitchMaxWait;
+        int glitchMoveChance;
+        int glitchMaxMove;
+        int glitchWidthChance;
+        float glitchMaxWidthIncrease;
+        float glitchMaxWidthDecrease;
+        int glitchSpeedChance;
+        float glitchMaxSpeedIncrease;
+        float glitchMaxSpeedDecrease;
+        //
+        float radiusMinScale;
+        float radiusScaleFactor;
+        //
         float powerupScale;
         int powerupRadius;
         int powerupSpawnChance;

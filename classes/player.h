@@ -30,9 +30,9 @@ class Player{
         bool keyrelease;
         //
         int lineWidth;
-        int sineLineWidth; // Linewidth without the sine;
+        int originalLineWidth; // Linewidth without the sine;
         float shift;
-        float sineShift; // Speed without the sine;
+        float originalShift; // Speed without the sine;
         float turn;
         bool rightAngle;
         bool invisible;
@@ -41,6 +41,12 @@ class Player{
         bool gapping;
         bool sine;
         float sinePhase;
+        bool glitch;
+        float glitchWait;
+        sf::Clock glitchClock;
+        float glitchWidthScale;
+        float glitchSpeedScale;
+        bool radius;
         //
         unsigned int id; // Place in client vector;
         int place; // Place in player array

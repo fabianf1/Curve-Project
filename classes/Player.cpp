@@ -90,12 +90,67 @@ void Player::draw(sf::RenderWindow &window){
 }
 // Server and local version of updatePosition
 void Player::updatePosition(const Config &config, Game &game){
+    // Reset linewidth and shift
+    lineWidth=originalLineWidth;
+    shift=originalShift;
     // Sine things
     if(sine){
         sinePhase+=(game.elapsed*config.sineFrequency*2)*PI;
-        lineWidth=sineLineWidth*(1+sin(sinePhase)*config.sineAmplitude);
-        shift=sineShift*(1+sin(sinePhase+PI)*config.sineAmplitude);
-        circle.setRadius(lineWidth/2);
+        lineWidth*=(1+sin(sinePhase)*config.sineAmplitude);
+        shift*=(1+sin(sinePhase+PI)*config.sineAmplitude);
+    }
+    // Radius things
+    if(radius){
+        // Calculate distance from middle
+        int xMiddle=(config.windowWidth-config.statusWidth-2*config.wallWidth)/2;
+        int yMiddle=(config.windowHeight-2*config.wallWidth)/2;
+        int distance=sqrt(pow(xMiddle-x,2)+pow(yMiddle-y,2));
+        shift*=(distance*(config.radiusScaleFactor)+config.radiusMinScale);
+    }
+    // Glitchy
+    if(glitch){
+        // Check if need to recalculate
+        if(glitchClock.getElapsedTime().asSeconds()>glitchWait){
+            glitchClock.restart();
+            glitchWait=config.glitchMinWait + ( (rand() % (100+1) ) /100.0*(config.glitchMaxWait-config.glitchMinWait));
+            // Do Move
+            int randomChance = rand() % (100+1);
+            if(randomChance<config.glitchMoveChance){
+                // Move Left
+                int randomMove= rand() % (config.glitchMaxMove+1);
+                x+=cos((heading-90)*PI/180.0)*(randomMove);
+                y+=sin((heading-90)*PI/180.0)*(randomMove);
+            }
+            else if(randomChance>=config.glitchMoveChance && randomChance<2*config.glitchMoveChance){
+                // Move right
+                int randomMove= rand() % (config.glitchMaxMove+1);
+                x+=cos((heading+90)*PI/180.0)*(randomMove);
+                y+=sin((heading+90)*PI/180.0)*(randomMove);
+            }
+            // Do Linewidth
+            randomChance = rand() % (100+1);
+            if(randomChance<config.glitchWidthChance){
+                // Bigger
+                glitchWidthScale=1.0 + ( (rand() % (100+1) ) /100.0*config.glitchMaxWidthIncrease);
+            }
+            else if(randomChance>=config.glitchWidthChance && randomChance<2*config.glitchWidthChance){
+                // Smaller
+                glitchWidthScale=1.0 - ( (rand() % (100+1) ) /100.0*config.glitchMaxWidthDecrease);
+            }
+            // Do Speed
+            randomChance = rand() % (100+1);
+            if(randomChance<config.glitchWidthChance){
+                // Bigger
+                glitchSpeedScale=1.0 + ( (rand() % (100+1) ) /100.0*config.glitchMaxWidthIncrease);
+            }
+            else if(randomChance>=config.glitchWidthChance && randomChance<2*config.glitchWidthChance){
+                // Smaller
+                glitchSpeedScale=1.0 - ( (rand() % (100+1) ) /100.0*config.glitchMaxWidthDecrease);
+            }
+        }
+        // Set Linewidth and speed
+        lineWidth*=glitchSpeedScale;
+        shift*=glitchSpeedScale;
     }
     // check keys
     if(local){
@@ -197,9 +252,11 @@ void Player::updatePosition(const Config &config, Game &game){
     }
     // Update Circle
     circle.setPosition(x-lineWidth/2,y-lineWidth/2);
+    circle.setRadius(lineWidth/2);
     // Rectangle update
     rectangle.setPosition(x,y);
     rectangle.setRotation(heading);
+    rectangle.setSize(sf::Vector2f(lineWidth,lineWidth));
     // Check if we need to make the right angle really right
     if(rightAngle&&!invisible&&gap[0]>0.0&&abs(heading-hOLD)>60){
         addLine(xOLD-lineWidth/2*cos(heading*PI/180.0),xOLD+lineWidth/2*cos(heading*PI/180.0),yOLD-lineWidth/2*sin(heading*PI/180.0),yOLD+lineWidth/2*sin(heading*PI/180.0),heading,heading,lineWidth);
@@ -272,6 +329,8 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
     inverted=false;
     gapping=false;
     sine=false;
+    glitch=false;
+    radius=false;
     int speed=0;
     int line_size=0;
     // check for effects
@@ -314,6 +373,17 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
             else if(game.playerPowerupEffect[i].type==Powerup::Type::Sine){
                 sine=true;
             }
+            // Glitch
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::Glitch){
+                glitch=true;
+                glitchSpeedScale=1.0;
+                glitchWidthScale=1.0;
+                glitchWait=0.0;
+            }
+            // Radius
+            else if(game.playerPowerupEffect[i].type==Powerup::Type::Radius){
+                radius=true;
+            }
         }
     }
     // Do speed and line size effects
@@ -344,10 +414,9 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
         if(!sine){
             sinePhase=0;
         }
-        else{
-            sineLineWidth=lineWidth;
-            sineShift=shift;
-        }
+        // Save original linewidth and shift (without glitch and Sine effects)
+        originalLineWidth=lineWidth;
+        originalShift=shift;
     }
     // Right Angle
     if(!rightAngle){

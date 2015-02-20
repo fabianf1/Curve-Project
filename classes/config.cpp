@@ -23,7 +23,11 @@ Config::Config(){
     safeSpawn=5; // Extra separation between wall and line at start
     wallColor=sf::Color::White;
     // Speed Settings
-    shift=50; //75; // Per second
+    #ifdef DEBUG
+    shift=50;
+    #else
+    shift=75;
+    #endif // DEBUG
     turn=shift*13/8;
     // Powerup Settings
     // Slow
@@ -45,6 +49,20 @@ Config::Config(){
     //
     sineFrequency=0.5; // T=2sec;
     sineAmplitude=0.6;
+    //
+    glitchMinWait=0.1;// Seconds;
+    glitchMaxWait=0.5;
+    glitchMoveChance=20; // For left and right separately
+    glitchMaxMove=20;
+    glitchWidthChance=30;
+    glitchMaxWidthIncrease=1;
+    glitchMaxWidthDecrease=0.5;
+    glitchSpeedChance=30;
+    glitchMaxSpeedIncrease=1;
+    glitchMaxSpeedDecrease=0.5;
+    //
+    radiusMinScale=0.01;
+    radiusScaleFactor= 0.0075 ; // Per unit of length. Additive;
     //
     powerupSpawnChance=10; //5;// % per powerupSpawnCheck second
     powerupSpawnCheck=0.5;
@@ -74,5 +92,5 @@ Config::Config(){
     attemptDelay=100;
     lagTime=1.0;
     //
-    version="0.2";
+    version="0.3";
 }

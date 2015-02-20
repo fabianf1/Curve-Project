@@ -24,7 +24,8 @@ public:
     sf::Sprite gapRed;
     sf::Sprite bombBlue;
     sf::Sprite sineRed;
-    //sf::Sprite allpowerups;
+    sf::Sprite glitchBlue;
+    sf::Sprite radiusBlue;
     // Constructor
     PowerupSprite(const Config &config);
 };
