@@ -65,7 +65,7 @@ Config::Config(){
     radiusScaleFactor= 0.0075 ; // Per unit of length. Additive;
     //
     powerupSpawnChance=10; //5;// % per powerupSpawnCheck second
-    powerupSpawnCheck=0.5;
+    powerupSpawnCheck=1;
     powerupScale=0.4; // Textures are 100x100
     powerupRadius=40/2; // 40 is full width
     powerupMinDisappear=15.0;

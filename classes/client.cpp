@@ -237,7 +237,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         game.pause(true);
         game.endMessageSet=false;
     }
-    else if(type==Packet::PowerupDelF){
+    else if(type==Packet::PowerupDeleteField){
         int id;
         packet >> id;
         for(unsigned int i=0;i<game.powerupField.size();i++){
@@ -247,7 +247,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
             }
         }
     }
-    else if(type==Packet::PowerupDelP){
+    else if(type==Packet::PowerupDeletePlayer){
         int id;
         packet >> id;
         for(unsigned int i=0;i<game.playerPowerupEffect.size();i++){
@@ -260,7 +260,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
             }
         }
     }
-    else if(type==Packet::PowerupS){
+    else if(type==Packet::PowerupSpawn){
         int id;
         packet >> id;
         float D;
@@ -268,8 +268,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         Powerup::Type type;
         Powerup::Impact impact;
         packet >> X >> Y >> type >> impact >> D;
-        PowerupField powerup(X,Y,type,impact,D,id);
-        game.powerupField.push_back(powerup);
+        game.powerupField.emplace_back(X,Y,type,impact,D,id);
     }
     else if(type==Packet::PowerupHit){
         // check
@@ -286,17 +285,11 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         for(unsigned int i=0;i<game.powerupField.size();i++){
             if(game.powerupField[i].id==ID){
                 // Actions
+                // Most things are calculated server side and only the powerup has to be removed from the field.
                 int D=0;
                 switch (game.powerupField[i].type){
-                    case Powerup::Type::Slow:
-                    case Powerup::Type::Fast:
-                    case Powerup::Type::Small:
-                    case Powerup::Type::Big:
                     case Powerup::Type::RightAngle:
-                    case Powerup::Type::Invisible:
                     case Powerup::Type::InvertKeys:
-                    case Powerup::Type::Sine:
-                    case Powerup::Type::Gap:
                         game.playerPowerupEffect.emplace_back(id,game.powerupField[i].type,game.powerupField[i].impact,D,ID);
                         for(unsigned int k=0;k<player.size();k++){
                             // Calculate powerup effects
@@ -315,7 +308,6 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
                         game.darkness=true;
                         break;
                     case Powerup::Type::Bomb:
-                        // Boem!
                         game.powerUpBomb(config,player,id,i);
                         break;
                     default:

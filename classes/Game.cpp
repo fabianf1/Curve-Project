@@ -112,6 +112,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
     updateThread[1]=true;
     while(!updateThread[2]){
         // Only run if not paused and not round finished
+        // I should remove the integer and only work with the float.
         if(countdownInt!=0){
             float elapsed = 3.0 - countdownClock.getElapsedTime().asSeconds();
             if(elapsed<=0.0){
@@ -443,7 +444,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             //
             if(server[1]){
                 Pending pending;
-                pending.packet << Packet::PowerupDelF << powerupField[i].id;
+                pending.packet << Packet::PowerupDeleteField << powerupField[i].id;
                 queuePacket(pending);
             }
             //
@@ -451,23 +452,24 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
         }
     }
     // Remove Powerups for players
-    bool del=false;
+    bool deleted=false;
     for(unsigned int i=0;i<playerPowerupEffect.size();i++){
         playerPowerupEffect[i].time-=elapsed;
         if(playerPowerupEffect[i].time<0.0){
-            //
-            if(server[1]){
+            // Only Right angle and inverted need to be reported
+            if(server[1] &&
+               (playerPowerupEffect[i].type==Powerup::Type::RightAngle || playerPowerupEffect[i].type==Powerup::Type::InvertKeys) ){
                 Pending pending;
-                pending.packet << Packet::PowerupDelP << playerPowerupEffect[i].id;
+                pending.packet << Packet::PowerupDeletePlayer << playerPowerupEffect[i].id;
                 queuePacket(pending);
             }
             //
             playerPowerupEffect.erase(playerPowerupEffect.begin()+i);
-            del=true;
+            deleted=true;
         }
     }
-    // If del then recalculate effects
-    if(del){
+    // If deleted the effects have to be recalculated
+    if(deleted){
         for(unsigned int i=0;i<player.size();i++){
                 player[i].calculatePowerupEffect(config,*this);
         }
@@ -482,7 +484,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             powerupEffect.erase(powerupEffect.begin()+j);
         }
     }
-    // Process Wallsaway and darkness
+    // Process wallsAway and darkness
     if(wallsAway){
         wallsAwayTimer-=elapsed;
         if(wallsAwayTimer<0.0){
@@ -558,10 +560,9 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             //
             if(server[1]){
                 Pending pending;
-                pending.packet << Packet::PowerupS << id << X << Y << type << impact << D;
+                pending.packet << Packet::PowerupSpawn << id << X << Y << type << impact << D;
                 queuePacket(pending);
             }
-            //
         }
     }
     // End with checking if a player hits a powerup
