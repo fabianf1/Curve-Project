@@ -240,41 +240,61 @@ void Main::gameSetupHandler(){
         if(player[i].server){
             renderer.objects.s_status[i].setString("Server");
         }
+        // Server side
         else if(!player[i].server&&!player[i].local
-                && ( (game.server[1] && !server.clients[player[i].id].ready) || (game.client[1] && !player[i].ready ) ) ){
-            renderer.objects.s_status[i].setString("Not ready: " + int2str(player[i].local) );
+                && (game.server[1] && !server.clients[player[i].id].ready) ){
+            renderer.objects.s_status[i].setString("Not ready: " + int2str(player[i].id) );
         }
         else if(!player[i].server&&!player[i].local
-                && ( (game.server[1] && server.clients[player[i].id].ready) || (game.client[1] && player[i].ready ) ) ){
-            renderer.objects.s_status[i].setString("Ready: " + int2str(player[i].local) );
+                && (game.server[1] && server.clients[player[i].id].ready) ){
+            renderer.objects.s_status[i].setString("Ready: " + int2str(player[i].id) );
+        }
+        // Clients
+        else if(!player[i].server&&!player[i].local
+                && (game.client[1] && !player[i].ready ) ){
+            renderer.objects.s_status[i].setString("Not ready");
+        }
+        else if(!player[i].server&&!player[i].local
+                && (game.client[1] && player[i].ready ) ){
+            renderer.objects.s_status[i].setString("Ready");
         }
         // Kick
         // Local: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
         if( ( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server[1]&&!game.client[1] ) ) && renderer.objects.s_kick[i].check(renderer.window)){
             // Remove from server
             if(!game.client[1]){
-                if(game.server[1]&&!player[i].local){
-                    // Remove from clients
-                    for(unsigned int j=0;j<server.clients[player[i].id].id.size();j++){
-                        if(server.clients[player[i].id].id[j]==i){
-                            server.clients[player[i].id].id.erase(server.clients[player[i].id].id.begin()+j);
-                            break;
+                if(game.server[1]){
+                    if(!player[i].local){
+                        // Remove from clients
+                        for(unsigned int j=0;j<server.clients[player[i].id].id.size();j++){
+                            if(server.clients[player[i].id].id[j]==i){
+                                server.clients[player[i].id].id.erase(server.clients[player[i].id].id.begin()+j);
+                                break;
+                            }
                         }
+                        // Remove if no player left
+                        if(server.clients[player[i].id].id.size()==0){
+                            server.clientMutex.lock();
+                            server.selector.remove(*server.clients[player[i].id].socket);
+                            server.clients.erase(server.clients.begin()+player[i].id);
+                            server.clientMutex.unlock();
+                        }
+                        // Update player id's
+                        gameSetup.removePlayer(game,player,i);
+                        server.updatePlayerID(player,i);
                     }
-                    // Update player id's
-                    server.updatePlayerID(player,i);
-                    // Remove if no player left
-                    if(server.clients[player[i].id].id.size()==0){
-                        server.selector.remove(*server.clients[player[i].id].socket);
-                        server.clients.erase(server.clients.begin()+player[i].id);
+                    else{
+                        gameSetup.removePlayer(game,player,i);
                     }
                     //
                     Pending pending;
                     pending.packet << Packet::Disconnect << i;
                     game.queuePacket(pending);
                 }
+                else{
+                    gameSetup.removePlayer(game,player,i);
+                }
                 //
-                gameSetup.removePlayer(game,player,i);
                 renderer.objects.syncPlayers(config,player);
             }
             else{
@@ -366,7 +386,7 @@ void Main::gameSetupHandler(){
             server.start(config,gameSetup,game,player);
         }
         else{
-            server.shutdown(game,player,gameSetup);
+            server.shutdown(game);
         }
     }
     // start Button

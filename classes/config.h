@@ -88,8 +88,7 @@ class Config{
         float maxElapsed; // Maximum game update time difference;
         //
         int port;
-        int maxAttempts;
-        int attemptDelay;
+        int attemptDuration;
         float lagTime;
         //
         std::string version;

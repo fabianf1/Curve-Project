@@ -12,30 +12,24 @@ void Client::start(const Config &config, Game &game,std::vector<Player> &player)
     if(game.client[0]){
         shutdown(game);
     }
-    //
-    std::cout << "Connecting!" << std::endl;
     socket.setBlocking(true);
-    for(int i=0; i<config.maxAttempts&&!game.client[1];i++){
-        sf::Socket::Status status= socket.connect(game.serverIp,config.port,sf::milliseconds(100));
-        if(status==sf::Socket::Error){
-            std::cout << "Server connection Error!" << std::endl;
-            sf::sleep(sf::milliseconds(config.attemptDelay));
-        }
-        else if(status==sf::Socket::NotReady){
-            // When the client tries to reconnect this always occurs for some reason. Trying again results in a succeeded connection attempt.
-            // This was fixed by making the socket block again
-            std::cout << "Not ready?!" << std::endl;
-            sf::sleep(sf::milliseconds(config.attemptDelay));
-        }
-        else{
-            std::cout << "Connected to server! Checking version..." << std::endl;
-            socket.setBlocking(false);
-            sync=false;
-            ready=false;
-            // start server connection thread
-            clientThread = std::thread(&Client::thread,this,std::cref(config),std::ref(game),std::ref(player));
-            game.client[1]=true;
-        }
+    sf::Socket::Status status= socket.connect(game.serverIp,config.port,sf::milliseconds(config.attemptDuration));
+    if(status==sf::Socket::Error){
+        std::cout << "Server connection Error!" << std::endl;
+    }
+    else if(status==sf::Socket::NotReady){
+        // When the client tries to reconnect this always occurs for some reason. Trying again results in a succeeded connection attempt.
+        // This was fixed by making the socket block again
+        std::cout << "No response from server." << std::endl;
+    }
+    else{
+        std::cout << "Connected to server! Checking version..." << std::endl;
+        socket.setBlocking(false);
+        sync=false;
+        ready=false;
+        // start server connection thread
+        clientThread = std::thread(&Client::thread,this,std::cref(config),std::ref(game),std::ref(player));
+        game.client[1]=true;
     }
 }
 //

@@ -5,6 +5,7 @@
 #include <thread>
 #include <iostream>
 #include <vector>
+#include <mutex>
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 #include "Config.h"
@@ -21,6 +22,7 @@ class Server{
     public:
         // Vars
         std::vector<ClientInfo> clients;
+        std::mutex clientMutex;
         sf::SocketSelector selector;
         sf::TcpListener listener;
         sf::Packet packet;
@@ -36,9 +38,8 @@ class Server{
         void disconnectClient(GameSetup &gameSetup, Game &game,std::vector<Player> &player, const unsigned int &n);
         void processPackage(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
         void shutdown(Game &game);
-        void shutdown(Game &game,std::vector<Player> &player,GameSetup &gameSetup);
         void syncClients(Game &game,const std::vector<Player> &player);
-        void updatePlayerID(const std::vector<Player> &player,const unsigned int &n);
+        void updatePlayerID(std::vector<Player> &player,const unsigned int &n);
         // Constructor
         Server();
 };
