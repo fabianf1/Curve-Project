@@ -83,13 +83,13 @@ Config::Config(){
     minWidthGap=0.2;
     randWidthGap=300;
     //
-    mainThreadMinTime=1000/30;
-    gameUpdateThreadMinTime=1000/30;
+    mainThreadMinRate=30;
+    gameUpdateThreadMinRate=60;
     maxElapsed=0.1;
     //
     port=55003;
     attemptDuration=250;
-    lagTime=1.0;
+    lagTime=1.5;
     //
     majorVersion="0.3";
     minorVersion="1";

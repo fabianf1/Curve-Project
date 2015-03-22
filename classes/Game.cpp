@@ -2,7 +2,7 @@
 // Needed Header
 #include "Game.h"
 // Constructor
-Game::Game(const Config &config): gamePacer(config.gameUpdateThreadMinTime), randGenerator(std::time(nullptr)){
+Game::Game(const Config &config): gamePacer(config.gameUpdateThreadMinRate), randGenerator(std::time(nullptr)){
     frame=0;
     keyChange[0]=-1;
     nameChange=-1;
@@ -153,8 +153,6 @@ void Game::thread(const Config &config,std::vector<Player> &player){
             }
             if(server[1]){
                 queuePacket(pending);
-                //
-                packetTime=packetclock.restart().asSeconds();
             }
             // End Update
             // Hit detection

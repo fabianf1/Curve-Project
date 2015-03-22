@@ -50,26 +50,20 @@ void Renderer::thread(const Config &config,Game &game,const std::vector<Player> 
 }
 //
 void Renderer::mainMenu(){
-    // Title
     window.draw(objects.m_title);
-    // Buttons
-    // Create Button
+    window.draw(objects.m_version);
     window.draw(objects.m_create);
-    // Join
     window.draw(objects.m_join);
-    // Quit
     window.draw(objects.m_quit);
-    // Prompt
     objects.m_ipPrompt.draw(window);
 }
 //
 void Renderer::setup(const Config &config,const Game &game,const std::vector<Player> &player){
-    //
     window.draw(objects.s_title);
     window.draw(objects.s_name);
     window.draw(objects.s_left);
     window.draw(objects.s_right);
-    // Vectors
+    // Players
     for(unsigned int i=0;i<objects.vectorLength;i++){
         objects.s_names[i].draw(window);
         if(player[i].local){
@@ -84,7 +78,6 @@ void Renderer::setup(const Config &config,const Game &game,const std::vector<Pla
             window.draw(objects.s_kick[i]);
         }
     }
-    // More
     if(objects.vectorLength<config.maxPlayers&&( (game.client[1]&&!player[game.id].ready&&game.multiplePlayersEnabled) || !game.client[1] ) ){
         window.draw(objects.s_add);
     }
@@ -196,8 +189,11 @@ void Renderer::play(const Config &config,const Game &game,const std::vector<Play
     window.draw(objects.g_round[1]);
     window.draw(objects.g_fps[0]);
     window.draw(objects.g_fps[1]);
-    //window.draw(objects.g_packet[0]);
-    //window.draw(objects.g_packet[1]);
+    if(game.client[1]){
+        window.draw(objects.g_packet[0]);
+        objects.g_packet[1].setString(int2str(config.gameUpdateThreadMinRate/game.packetTime));
+        window.draw(objects.g_packet[1]);
+    }
     window.draw(objects.g_quit);
     if(game.roundFinished&&game.endMessageSet){window.draw(objects.g_endRoundMessage);}
     if(game.countdownInt>0){window.draw(objects.g_countdown);}

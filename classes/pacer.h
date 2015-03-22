@@ -8,15 +8,15 @@
 class Pacer{
     // Vars
     sf::Clock clock;
-    unsigned int minRunTime;
+    sf::Time minRunTime;
     public:
         // Functions
-        void setPace(const unsigned int &i_minRunTime);
+        void setPace(const unsigned int &i_minRunRate);
         unsigned int getPace();
         void resetClock();
         void pace();
         // Constructor
-        Pacer(const unsigned int &i_minRunTime);
+        Pacer(const unsigned int &i_minRunRate);
 };
 
 #endif // CURVE_PACER

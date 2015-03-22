@@ -26,7 +26,7 @@ class Main{
         sf::Event event;
         Pacer threadPacer;
         // Constructor
-        Main() :game(config), renderer(config),threadPacer(config.mainThreadMinTime) {};
+        Main() :game(config), renderer(config),threadPacer(config.mainThreadMinRate) {};
         // Functions
         void curveProject();
         void eventHandler();

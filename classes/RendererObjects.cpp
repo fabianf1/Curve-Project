@@ -23,6 +23,13 @@ void RendererObjects::initMainMenu(const Config &config){
     m_title.setColor(sf::Color::White);
     m_title.setStyle(sf::Text::Bold);
     m_title.setPosition( (config.windowWidth/2)-(m_title.getLocalBounds().width/2) ,10); // Middle top
+    // Version
+    m_version.setString(config.majorVersion + "." + config.minorVersion);
+    m_version.setFont(font);
+    m_version.setCharacterSize(fontSize);
+    m_version.setColor(sf::Color::White);
+    m_version.setStyle(sf::Text::Bold);
+    m_version.setPosition( (config.windowWidth/2)-(m_version.getLocalBounds().width/2) ,60); // Middle top
     // start
     m_create.setButton("Create Game",font,fontSize,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Regular);
     m_create.setPosition( 50 , config.windowHeight/2); // Left middle

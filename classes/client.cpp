@@ -2,7 +2,7 @@
 // Needed Header
 #include "Client.h"
 // Constructor
-Client::Client(): pacer(25){}
+Client::Client(): pacer(200){}
 // Functions
 void Client::start(const Config &config, Game &game,std::vector<Player> &player){
     if(player.size()>0){
@@ -182,18 +182,21 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
     }
     else if(type==Packet::Update){
         // Time Between packets measurement
-        game.packetTime=game.packetclock.restart().asSeconds();
-        // check for lag
-        if(game.packetTime>config.lagTime){
-            // Send packet
-            Pending pending;
-            pending.packet << Packet::Lag << game.id;
-            game.queuePacket(pending);
+        if(game.packetNumber%config.gameUpdateThreadMinRate==0){
+            game.packetTime=game.packetclock.restart().asSeconds();
+            // check for lag
+            if(game.packetTime>config.lagTime){
+                // Send packet
+                Pending pending;
+                pending.packet << Packet::Lag << game.id;
+                game.queuePacket(pending);
+            }
         }
         // Unpack Basics
         int number;
         packet >> number;
         if(number>game.packetNumber){
+            game.packetNumber=number;
             // Unpack Player Data
             int id;
             while(!packet.endOfPacket()){

@@ -27,6 +27,7 @@ class RendererObjects{
         const sf::Font font;
         // Main Menu
         sf::Text m_title;
+        sf::Text m_version;
         TextButton m_create;
         TextButton m_join;
         TextButton m_quit;

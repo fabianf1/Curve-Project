@@ -2,7 +2,7 @@
 // Needed Header
 #include "server.h"
 // Constructor
-Server::Server(): senderPacer(25){}
+Server::Server(): senderPacer(200){}
 // Functions
 void Server::start(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player){
     // check if clean
@@ -42,7 +42,7 @@ void Server::serverListener(const Config &config,GameSetup &gameSetup,Game &game
     while(!game.server[2]){
         // Selector
         if(selector.wait(sf::milliseconds(1000))){
-            // Als het de listener is
+            // Check Listener
             if(selector.isReady(listener)){
                 clients.emplace_back(ClientInfo());
                 if (listener.accept(*clients.back().socket) != sf::Socket::Done){
@@ -62,7 +62,7 @@ void Server::serverListener(const Config &config,GameSetup &gameSetup,Game &game
                     }
                 }
             }
-            // Loop clients
+            // Check clients
             if(clientMutex.try_lock()){
                 bool stop=false; // Stop when disconnection!
                 for(unsigned int i=0;i<clients.size()&&!stop;i++){
@@ -130,10 +130,6 @@ void Server::serverSender(const Config &config,Game &game,std::vector<Player> &p
                 i--;
                 continue;
             }
-            // check if send id has been set
-            else if(game.packets[i].sendID.size()==0){
-                continue;
-            }
             // Send to all if sendID[0]=-1;
             else if(game.packets[i].sendID[0]==-1){
                 game.packets[i].sendID.clear();
@@ -177,7 +173,7 @@ void Server::serverSender(const Config &config,Game &game,std::vector<Player> &p
     // shutdown
     std::cout << "Server Sender ended!" << std::endl;
 }
-// Great to use a variable named new client that can be false and the function name is New_Client too
+// Great to use a variable named new client that can be false and the function name is New_Client
 void Server::newClient(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player, const unsigned int &n, const bool &new_client){
     //
     clients[n].versionCorrect=true;
@@ -270,7 +266,6 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
             Pending pending;
             pending.packet << Packet::Name << id << player[id].name;
             for(unsigned int j=0;j<clients.size();j++){
-                // For loop here too?
                 if(j!=clients[j].id[0]){
                     pending.sendID.push_back(j);
                 }

@@ -83,8 +83,8 @@ class Config{
         float minWidthGap;
         int randWidthGap;
         //
-        int mainThreadMinTime;
-        int gameUpdateThreadMinTime;
+        int mainThreadMinRate;
+        int gameUpdateThreadMinRate;
         float maxElapsed; // Maximum game update time difference;
         //
         int port;
