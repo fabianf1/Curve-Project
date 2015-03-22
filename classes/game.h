@@ -39,7 +39,6 @@ class Game{
         bool gameFinished;
         bool endMessageSet;
         int roundWinner;
-        //int lastFps;
         int countdownInt;
         sf::Clock countdownClock;
         std::recursive_mutex modeMutex;

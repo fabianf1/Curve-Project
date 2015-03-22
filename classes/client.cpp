@@ -37,7 +37,7 @@ void Client::thread(const Config &config,Game &game,std::vector<Player> &player)
     std::cout << "Client thread started!" << std::endl;
     // Send version check
     Pending pending;
-    pending.packet << Packet::Version << config.version;
+    pending.packet << Packet::Version << config.majorVersion;
     game.queuePacket(pending);
     // Main loop
     while(!game.client[2]){
@@ -49,7 +49,12 @@ void Client::thread(const Config &config,Game &game,std::vector<Player> &player)
                 break;
             case sf::Socket::Disconnected:
             case sf::Socket::Error:
-                std::cout << "Connection error!" << std::endl;
+                if(!sync){
+                    std::cout << "Server full!" << std::endl;
+                }
+                else{
+                    std::cout << "Disconnected from server!" << std::endl;
+                }
                 // Break connection!
                 game.client[2]=true;
                 game.mode=Game::Mode::mainMenu;

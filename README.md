@@ -14,3 +14,4 @@ To-Do List
 * Prevent possible data races
 * Wait until everyone is ready before starting countdownClock
 * Ensure latest data is present when doing things like bomb
+* Add spectator mode

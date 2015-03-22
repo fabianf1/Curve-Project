@@ -43,15 +43,23 @@ void Server::serverListener(const Config &config,GameSetup &gameSetup,Game &game
         // Selector
         if(selector.wait(sf::milliseconds(1000))){
             // Als het de listener is
-            if(selector.isReady(listener)&&player.size()<6&&game.mode!=Game::Mode::Play){
+            if(selector.isReady(listener)){
                 clients.emplace_back(ClientInfo());
                 if (listener.accept(*clients.back().socket) != sf::Socket::Done){
                     std::cout << "Incoming connection failed.\n";
                     clients.pop_back();
                 }
                 else{
-                    selector.add(*clients.back().socket);
-                    std::cout << "Remote client " + clients.back().socket->getRemoteAddress().toString() + " has connected to the server. \n";
+                    // Check if new Clients can be added
+                    if(player.size()<6&&game.mode!=Game::Mode::Play){
+                        selector.add(*clients.back().socket);
+                        std::cout << "Remote client " + clients.back().socket->getRemoteAddress().toString() + " has connected to the server. \n";
+                    }
+                    else{
+                        // Disconnect
+                        std::cout << "Remote client " + clients.back().socket->getRemoteAddress().toString() + " tried to connect. \n";
+                        clients.pop_back();
+                    }
                 }
             }
             // Loop clients
@@ -228,7 +236,7 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
         if(type==Packet::Version){
             std::string version;
             packet >> version;
-            if(version==config.version){
+            if(version==config.majorVersion){
                 std::cout << "Client version correct!" << std::endl;
                 newClient(config,gameSetup,game,player,n,true);
             }
@@ -389,7 +397,6 @@ void Server::updatePlayerID(std::vector<Player> &player,const unsigned int &n){
             if(clients[i].id[j]>n){
                 clients[i].id[j]--;
             }
-            std::cout << player[clients[i].id[j]].id << ";" << clients[i].id[j] << ";" << i <<std::endl;
             player[clients[i].id[j]].id=i;
         }
     }

@@ -91,7 +91,8 @@ class Config{
         int attemptDuration;
         float lagTime;
         //
-        std::string version;
+        std::string majorVersion;
+        std::string minorVersion;
         // Constructor
         Config();
 };
