@@ -95,11 +95,11 @@ void Game::initializePowerups(const Config &config){
     // Bomb
     powerups.emplace_back(Powerup::Type::Bomb,Powerup::Impact::All,50,0,0);
     // Sine
-    powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,50,(1/config.sineFrequency)*5,0);
+    powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,75,(1/config.sineFrequency)*5,0);
     // Glitch
     powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::All,15,5,0);
     // Radius
-    powerups.emplace_back(Powerup::Type::Radius,Powerup::Impact::All,15,5,0);
+    powerups.emplace_back(Powerup::Type::Radius,Powerup::Impact::All,25,5,0);
     // Calculate total chance
     totalChance=0;
     for(unsigned int i=0;i<powerups.size();i++){
@@ -301,7 +301,6 @@ void Game::hitDetector(const Config &config,std::vector<Player> &player){
                         }
                         // Note that it is possible that having a very slow speed and then accelerating fast could maybe also trigger a hit
                         // This is to check if the line is long enough.
-                        // I think I could better add all this scaling to player::powerupEffect.
                         if(player[j].line.getVertexCount()>delay){
                             for(unsigned int k=0;k<player[j].line.getVertexCount()-delay;k++){
                                 if( pow(x-player[j].line[k].position.x,2) + pow(y-player[j].line[k].position.y,2) < pow(player[i].lineWidth/2,2) ){

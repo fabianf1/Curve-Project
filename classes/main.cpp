@@ -231,9 +231,17 @@ void Main::gameSetupHandler(){
             // Buttons
             if(renderer.objects.s_leftButton[i].check(renderer.window) && (!game.client[1] || (game.client[1]&&!client.ready) )){
                 changeButton(0,i);
+                if(game.nameChange>-1){
+                    renderer.objects.s_names[i].setActive(false);
+                    game.nameChange=-1;
+                }
             }
             if(renderer.objects.s_rightButton[i].check(renderer.window) && (!game.client[1] || (game.client[1]&&!client.ready) )){
                 changeButton(1,i);
+                if(game.nameChange>-1){
+                    renderer.objects.s_names[i].setActive(false);
+                    game.nameChange=-1;
+                }
             }
         }
         // Status

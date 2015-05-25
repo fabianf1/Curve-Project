@@ -51,20 +51,20 @@ Config::Config(){
     sineAmplitude=0.6;
     //
     glitchMinWait=0.1;// Seconds;
-    glitchMaxWait=1.0;
+    glitchMaxWait=0.8;
     glitchMoveChance=15; // For left and right separately
     glitchMaxMove=20;
     glitchWidthChance=30;
-    glitchMaxWidthIncrease=1;
+    glitchMaxWidthIncrease=1.5;
     glitchMaxWidthDecrease=0.5;
     glitchSpeedChance=30;
-    glitchMaxSpeedIncrease=1;
-    glitchMaxSpeedDecrease=0.5;
+    glitchMaxSpeedIncrease=1.5;
+    glitchMaxSpeedDecrease=0.3;
     //
     radiusMinScale=0.01;
     radiusScaleFactor= 0.0075 ; // Per unit of length. Additive;
     //
-    powerupSpawnChance=10; // % per powerupSpawnCheck second
+    powerupSpawnChance=11; // % per powerupSpawnCheck second
     powerupSpawnCheck=1.0;
     powerupScale=0.4; // Textures are 100x100
     powerupRadius=40/2; // 40 is full width
@@ -89,8 +89,8 @@ Config::Config(){
     //
     port=55003;
     attemptDuration=250;
-    lagTime=1.5;
+    lagTime=0.5;
     //
     majorVersion="0.3";
-    minorVersion="1";
+    minorVersion="2";
 }
