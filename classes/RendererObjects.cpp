@@ -216,14 +216,19 @@ void RendererObjects::initGame(const Config &config){
     g_countdown.setStyle(sf::Text::Bold);
 }
 // Vector things
-void RendererObjects::syncPlayers(const Config &config,const std::vector<Player> &player){
+void RendererObjects::syncPlayers(const Config &config,Game &game, const std::vector<Player> &player){
     //
+    bool lengthChange=false;
     if(vectorLength<player.size()){
         for(unsigned int i=0;i<(player.size()-vectorLength);i++){
             addPlayer(config,player);
         }
+        lengthChange=true;
     }
     else if(vectorLength>player.size()){
+        if(game.nameChange!=-1&&game.nameChange>game.removedPlayer){
+            s_names[game.nameChange-1].setString(s_names[game.nameChange].getString());
+        }
         for(unsigned int i=0;i<(vectorLength-player.size());i++){
             vectorLength--;
             s_names.erase(s_names.end());
@@ -234,20 +239,67 @@ void RendererObjects::syncPlayers(const Config &config,const std::vector<Player>
             g_names.erase(g_names.end());
             g_scores.erase(g_scores.end());
         }
+        lengthChange=true;
     }
+    if(lengthChange){
+        // Player removed
+        if(game.removedPlayer!=-1){
+            // Name Change
+            if(game.nameChange>game.removedPlayer){
+                game.nameChange--;
+            }
+            else if(game.nameChange==game.removedPlayer){
+                game.nameChange=-1;
+            }
+            // Button
+            if(game.keyChange[0]!=-1){
+                if(game.keyChange[1]>game.removedPlayer){
+                    game.keyChange[1]--;
+                }
+                else if(game.nameChange==game.removedPlayer){
+                    game.keyChange[0]=-1;
+                }
+            }
+        }
+        // Player added if total condition false
+        else if( !(s_names.size()>0&&s_names.back().getString().isEmpty()) ){
+            std::cout << "Unexpected length change" << std::endl;
+            game.nameChange=-1;
+            game.keyChange[0]=-1;
+        }
+    }
+    game.removedPlayer=-1;
     // Synchronize
     for(unsigned int i=0;i<vectorLength&&i<player.size();i++){
-        s_names[i].setString(player[i].name);
+        if(game.nameChange!=i){
+            s_names[i].setString(player[i].name);
+            s_names[i].setActive(false);
+        }
+        else{
+            s_names[i].setActive(true);
+        }
         s_names[i].setColors(player[i].color,player[i].color);
         s_names[i].setPosition(40,195+(i)*45);
         //
         s_leftButton[i].setString(getKeyName(player[i].keyL));
         s_leftButton[i].setColors(player[i].color,player[i].color);
         s_leftButton[i].setPosition(200,195+(i)*45);
+        if(game.keyChange[0]==-1||game.keyChange[1]!=i||game.keyChange[0]!=0){
+            s_leftButton[i].setActive(false);
+        }
+        else{
+            s_leftButton[i].setActive(true);
+        }
         //
         s_rightButton[i].setString(getKeyName(player[i].keyR));
         s_rightButton[i].setColors(player[i].color,player[i].color);
         s_rightButton[i].setPosition(300,195+(i)*45);
+        if(game.keyChange[0]==-1||game.keyChange[1]!=i||game.keyChange[0]!=1){
+            s_rightButton[i].setActive(false);
+        }
+        else{
+            s_rightButton[i].setActive(true);
+        }
         //
         if(!player[i].local&&!player[i].server&&!player[i].ready){
             s_status[i].setString("Not ready");
@@ -279,7 +331,7 @@ void RendererObjects::syncPlayers(const Config &config,const std::vector<Player>
 //
 void RendererObjects::addPlayer(const Config &config,const std::vector<Player> &player){
     // Game setup
-    s_names.emplace_back(player[vectorLength].name,font,fontSize,player[vectorLength].color,player[vectorLength].color,sf::Text::Regular,sf::Text::Italic,8);
+    s_names.emplace_back("",font,fontSize,player[vectorLength].color,player[vectorLength].color,sf::Text::Regular,sf::Text::Italic,8);
     s_names[vectorLength].setPosition(40,195+(vectorLength)*45 );;
     //
     s_leftButton.emplace_back("None",font,fontSize,player[vectorLength].color,player[vectorLength].color,sf::Text::Regular,sf::Text::Italic);

@@ -28,6 +28,7 @@ class Game{
         enum class Mode : int {mainMenu,setup,Play} mode; // Keeps track of current modus
         int keyChange[2]; // Keeps track of keychanges, 1 is player, 0 is key(left=0 or right=1)
         int nameChange;
+        int removedPlayer;
         int maxPoints;
         bool powerupEnabled;
         bool countdownEnabled;

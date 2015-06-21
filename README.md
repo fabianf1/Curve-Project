@@ -1,6 +1,6 @@
 Curve Project
 ===================
-Curve Project is just a clone of Achtung die Kurve written in C++ and uses [SFML](https://github.com/LaurentGomila/SFML) so it is fast and simple. It was my first project in C++ and is therefore a big mess.
+Curve Project is just a clone of Achtung die Kurve written in C++ and uses [SFML](https://github.com/LaurentGomila/SFML) so it is fast and simple.
 
 Build
 -------
@@ -15,4 +15,3 @@ To-Do List
 * Wait until everyone is ready before starting countdownClock
 * Ensure latest data is present when doing things like bomb
 * Add spectator mode
-* Fix name reset when another player changes his name

@@ -338,13 +338,21 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
     }
     else if(type==Packet::Disconnect){
         int id;
+        int counter=0;
         while(!packet.endOfPacket()){
             packet >> id;
             // check if not self
             if( (game.mode==Game::Mode::Play&&!player[id].local)||(game.mode!=Game::Mode::Play) ) {
                 // Remove from list
                 player.erase(player.begin()+id);
+                if(game.id>id){
+                    game.id--;
+                }
             }
+            counter++;
+        }
+        if(counter==1){
+            game.removedPlayer=id;
         }
         game.refreshPlayers=true;
     }

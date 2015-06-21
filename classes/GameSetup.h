@@ -17,7 +17,7 @@ class GameSetup{
         sf::Color color[6];
         bool colorUsed[6];
         //
-        int keyChange[2]; // [0] for key: 0 is left, 1 is right; [1] for player
+        //int keyChange[2]; // [0] for key: 0 is left, 1 is right; [1] for player
         // Constructor
         GameSetup();
         // Functions

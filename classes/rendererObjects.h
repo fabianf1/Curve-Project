@@ -80,7 +80,7 @@ class RendererObjects{
         void initGameSetup(const Config &config);
         void initGame(const Config &config);
         // Vector things
-        void syncPlayers(const Config &config,const std::vector<Player> &player);
+        void syncPlayers(const Config &config,Game &game, const std::vector<Player> &player);
         void addPlayer(const Config &config,const std::vector<Player> &player);
         //
         void setOptions(const Game &game);

@@ -92,5 +92,5 @@ Config::Config(){
     lagTime=0.5;
     //
     majorVersion="0.3";
-    minorVersion="2";
+    minorVersion="3";
 }

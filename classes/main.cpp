@@ -25,7 +25,7 @@ void Main::curveProject(){
             }
             // check if player change
             if(renderer.objects.vectorLength<player.size()||renderer.objects.vectorLength>player.size()||game.refreshPlayers){
-                renderer.objects.syncPlayers(config,player);
+                renderer.objects.syncPlayers(config,game,player);
                 game.refreshPlayers=false;
             }
             // Options changed
@@ -70,26 +70,26 @@ void Main::eventHandler(){
     // setup screen things
     else if(game.mode==Game::Mode::setup){
         // Key changer
-        if(gameSetup.keyChange[0]!=-1){
+        if(game.keyChange[0]!=-1){
             if(event.type==sf::Event::KeyPressed){
                 if(event.key.code==sf::Keyboard::Escape){
                     changeButton(-1,0);
                 }
-                else if(gameSetup.keyChange[0]==0){
+                else if(game.keyChange[0]==0){
                     // check availability
                     if(gameSetup.keyAvailable(player,event.key.code)){
-                        player[gameSetup.keyChange[1]].keyL=event.key.code;
+                        player[game.keyChange[1]].keyL=event.key.code;
                         changeButton(-1,0);
                     }
                 }
-                else if(gameSetup.keyChange[0]==1){
+                else if(game.keyChange[0]==1){
                     if(gameSetup.keyAvailable(player,event.key.code)){
-                        player[gameSetup.keyChange[1]].keyR=event.key.code;
+                        player[game.keyChange[1]].keyR=event.key.code;
                         changeButton(-1,0);
                     }
                 }
                 // Update renderer.objects
-                renderer.objects.syncPlayers(config,player);
+                renderer.objects.syncPlayers(config,game,player);
             }
         }
         // End key-changer
@@ -97,7 +97,7 @@ void Main::eventHandler(){
         // Auto adder, only in debug
         else if(event.type==sf::Event::KeyPressed&&event.key.code==sf::Keyboard::Space){
             gameSetup.autoAddPlayers(config,game,player);
-            renderer.objects.syncPlayers(config,player);
+            renderer.objects.syncPlayers(config,game,player);
         }
         #endif
         // Name Changer
@@ -105,11 +105,11 @@ void Main::eventHandler(){
             renderer.objects.s_names[game.nameChange].setActive(false);
             game.nameChange=-1;
             // Reset
-            renderer.objects.syncPlayers(config,player);
+            renderer.objects.syncPlayers(config,game,player);
         }
         else if(game.nameChange>-1&&event.type==sf::Event::KeyPressed&& (event.key.code==sf::Keyboard::Return) ){
             if(renderer.objects.s_names[game.nameChange].getString().getSize()==0){
-                renderer.objects.syncPlayers(config,player);
+                renderer.objects.syncPlayers(config,game,player);
             }
             else{
                 player[game.nameChange].name=renderer.objects.s_names[game.nameChange].getString();
@@ -200,7 +200,7 @@ void Main::gameSetupHandler(){
             if(player[i].local && (!game.client[1] || (game.client[1]&&!client.ready) ) ){
                 if(game.nameChange==i){
                     if(renderer.objects.s_names[i].getString().getSize()==0){
-                        renderer.objects.syncPlayers(config,player);
+                        renderer.objects.syncPlayers(config,game,player);
                     }
                     else{
                         player[i].name=renderer.objects.s_names[i].getString();
@@ -269,6 +269,7 @@ void Main::gameSetupHandler(){
         // Kick
         // Local: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
         if( ( (game.client[1] && i!=game.id && player[i].local) || (game.server[1] && i!=0 ) || (!game.server[1]&&!game.client[1] ) ) && renderer.objects.s_kick[i].check(renderer.window)){
+            game.removedPlayer=i;
             // Remove from server
             if(!game.client[1]){
                 if(game.server[1]){
@@ -303,7 +304,7 @@ void Main::gameSetupHandler(){
                     gameSetup.removePlayer(game,player,i);
                 }
                 //
-                renderer.objects.syncPlayers(config,player);
+                renderer.objects.syncPlayers(config,game,player);
             }
             else{
                 player[i].local=false;
@@ -366,7 +367,7 @@ void Main::gameSetupHandler(){
         else{
             // Add new player
             gameSetup.addPlayer(game,player);
-            renderer.objects.syncPlayers(config,player);
+            renderer.objects.syncPlayers(config,game,player);
             // Send to clients
             if(game.server[1]){
                server.syncClients(game,player);
@@ -408,7 +409,7 @@ void Main::gameSetupHandler(){
             if(game.nameChange>-1){
                 renderer.objects.s_names[game.nameChange].setActive(false);
                 game.nameChange=-1;
-                renderer.objects.syncPlayers(config,player);
+                renderer.objects.syncPlayers(config,game,player);
             }
             // Client Things
             client.toggleReady(game,player);
@@ -423,7 +424,7 @@ void Main::gameSetupHandler(){
         renderer.objects.s_start.setPosition(config.windowWidth/2-renderer.objects.s_start.getLocalBounds().width/2,config.windowHeight-100);
     }
     else if(renderer.objects.s_start.getString()!="Start Game"){
-        renderer.objects.s_start.setString("start Game");
+        renderer.objects.s_start.setString("Start Game");
         renderer.objects.s_start.setPosition(config.windowWidth/2-renderer.objects.s_start.getLocalBounds().width/2,config.windowHeight-100);
     }
 //
@@ -435,8 +436,8 @@ void Main::gameSetupHandler(){
 //
 void Main::changeButton(const int &button,unsigned const int &pl){
     // Set game variables
-    gameSetup.keyChange[0]=button;
-    gameSetup.keyChange[1]=pl;
+    game.keyChange[0]=button;
+    game.keyChange[1]=pl;
     // Set graphics
     for(unsigned int i=0;i<player.size()&&i<renderer.objects.vectorLength;i++){
         if(button!=-1&&pl==i){

@@ -6,6 +6,7 @@ Game::Game(const Config &config): gamePacer(config.gameUpdateThreadMinRate), ran
     frame=0;
     keyChange[0]=-1;
     nameChange=-1;
+    removedPlayer=-1;
     maxPoints=10;
     mode=Mode::mainMenu;
     powerupEnabled=true;
@@ -670,8 +671,7 @@ void Game::powerUpBomb(const Config &config,std::vector<Player> &player, const i
             xc=(player[k].line[l].position.x+player[k].line[l+1].position.x+player[k].line[l+2].position.x+player[k].line[l+3].position.x)/4;
             yc=(player[k].line[l].position.y+player[k].line[l+1].position.y+player[k].line[l+2].position.y+player[k].line[l+3].position.y)/4;
             if( (xc-player[i].x)*(xc-player[i].x) + (yc-player[i].y)*(yc-player[i].y) < config.bombRadius*config.bombRadius ){
-                // Remove; Erase doesn't work due to the wrapper. I just move the lines out of sight for now;
-                // Fix would be to use std::vector<sf::Vertex>
+                // Erase doesn't work due to the wrapper. I just move the lines out of sight
                 player[k].line[l].position=sf::Vector2f(-100, -100);
                 player[k].line[l+1].position=sf::Vector2f(-100, -100);
                 player[k].line[l+2].position=sf::Vector2f(-100, -100);

@@ -210,6 +210,9 @@ void Server::disconnectClient(GameSetup &gameSetup, Game &game,std::vector<Playe
         pending.packet << clients[n].id[j];
         gameSetup.removePlayer(game,player,clients[n].id[j]);
     }
+    if(clients[n].id.size()==1){
+        game.removedPlayer=clients[n].id[0];
+    }
     game.refreshPlayers=true;
     // Remove out of list
     selector.remove(*clients[n].socket);
@@ -346,6 +349,7 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
         }
         // Remove
         gameSetup.removePlayer(game,player,id);
+        game.removedPlayer=id;
         game.refreshPlayers=true;
         //
         // Remove from clients

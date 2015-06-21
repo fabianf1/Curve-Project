@@ -13,8 +13,6 @@ GameSetup::GameSetup(){
     for(int i=0;i<6;i++){
         colorUsed[i]=false;
     }
-    // Key Change
-    keyChange[0]=keyChange[1]=-1;
 }
 //
 void GameSetup::initialize(const Config &config,Game &game,std::vector<Player> &player){
