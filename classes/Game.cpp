@@ -99,6 +99,7 @@ void Game::initializePowerups(const Config &config){
     powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,75,(1/config.sineFrequency)*5,0);
     // Glitch
     powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::All,15,5,0);
+    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::Other,10,5,0);
     // Radius
     powerups.emplace_back(Powerup::Type::Radius,Powerup::Impact::All,25,5,0);
     // Calculate total chance

@@ -3,17 +3,17 @@
 #include "renderer.h"
 //
 void Renderer::start(const Config &config,Game &game,const std::vector<Player> &player){
-    // Window
+    // Create and initialize render window
+    std::cout << "Initializing window" << std::endl;
     window.create(sf::VideoMode(config.windowWidth, config.windowHeight), config.title, config.windowStyle, sf::ContextSettings(24,8,config.windowAntialiasing));
     window.setIcon(202,202,config.icon.getPixelsPtr());
     window.clear(config.windowBackgroundColor);
-    window.display();
-    // Limit fps
     window.setFramerateLimit(config.fps);
-    // start Render thread
+    window.display();
+    // Start the render thread
+    std::cout << "Starting render thread" << std::endl;
     window.setActive(false);
     renderThread = std::thread(&Renderer::thread,this,std::cref(config),std::ref(game),std::cref(player));
-    // Done
 }
 // Render thread Function
 void Renderer::thread(const Config &config,Game &game,const std::vector<Player> &player){
@@ -21,9 +21,8 @@ void Renderer::thread(const Config &config,Game &game,const std::vector<Player> 
     // start main loop
     while(window.isOpen()){
         window.clear(config.windowBackgroundColor);
-        // Lock the mode mutex. Not rendering while mode is changing solves font problems
+        // Locking the mutex when changing modes solves font rendering problems
         game.modeMutex.lock();
-        // Render the things
         if(game.mode==Game::Mode::mainMenu){
             mainMenu();
         }
@@ -34,15 +33,12 @@ void Renderer::thread(const Config &config,Game &game,const std::vector<Player> 
             play(config,game,player);
             if(game.powerupEnabled){powerUp(config,game,player);}
         }
-        // Unlock
         game.modeMutex.unlock();
-        //
+        // Draw everything to window and update fps
         window.display();
         game.frame++;
-        // FPS
         if(game.frame%(config.fps)==0){
             sf::Time temp=game.fpsClock.restart();
-            //std::cout << temp.asSeconds() << std::endl;
             objects.g_fps[1].setString(int2str( (1.0/temp.asSeconds())*(config.fps) ));
         }
     }
@@ -63,7 +59,7 @@ void Renderer::setup(const Config &config,const Game &game,const std::vector<Pla
     window.draw(objects.s_name);
     window.draw(objects.s_left);
     window.draw(objects.s_right);
-    // Players
+    // Render players
     for(unsigned int i=0;i<objects.vectorLength;i++){
         objects.s_names[i].draw(window);
         if(player[i].local){
@@ -81,7 +77,7 @@ void Renderer::setup(const Config &config,const Game &game,const std::vector<Pla
     if(objects.vectorLength<config.maxPlayers&&( (game.client[1]&&!player[game.id].ready&&game.multiplePlayersEnabled) || !game.client[1] ) ){
         window.draw(objects.s_add);
     }
-    // Options
+    // Render ptions
     window.draw(objects.s_options);
     window.draw(objects.s_maxPoints);
     window.draw(objects.s_max10);
@@ -107,9 +103,8 @@ void Renderer::setup(const Config &config,const Game &game,const std::vector<Pla
 }
 //
 void Renderer::play(const Config &config,const Game &game,const std::vector<Player> &player){
-    // draw Player Things
+    // Draw player lines, circles and rectangles
     for(unsigned int i=0;i<player.size();i++){
-        //player[i].draw(window);
         if(!game.darkness){
             window.draw(player[i].line);
             if(!player[i].rightAngle){
@@ -120,15 +115,10 @@ void Renderer::play(const Config &config,const Game &game,const std::vector<Play
             }
         }
         else{
-            // Line
-            int xc;
-            int yc;
-            // create a quad; Maybe change it to pointers;
+            int xc; // To define x-center of line
+            int yc; // To define y-center of line
+            // Create quad; This has to be done to be able to draw parts of the line; Or at least I think so
             sf::VertexArray quad(sf::Quads, 4);
-            quad[0].color=player[i].color;
-            quad[1].color=player[i].color;
-            quad[2].color=player[i].color;
-            quad[3].color=player[i].color;
             //
             for(unsigned int j=0;j+3<player[i].line.getVertexCount();j=j+4){
                 xc=(player[i].line[j].position.x+player[i].line[j+1].position.x+player[i].line[j+2].position.x+player[i].line[j+3].position.x)/4;
@@ -136,10 +126,10 @@ void Renderer::play(const Config &config,const Game &game,const std::vector<Play
                 for(unsigned int k=0;k<player.size();k++){
                     // Calculate center
                     if( (xc-player[k].x)*(xc-player[k].x) + (yc-player[k].y)*(yc-player[k].y) < (config.darknessRadius*config.darknessRadius) ){
-                        quad[0].position = sf::Vector2f(player[i].line[j].position.x, player[i].line[j].position.y);
-                        quad[1].position = sf::Vector2f(player[i].line[j+1].position.x, player[i].line[j+1].position.y);
-                        quad[2].position = sf::Vector2f(player[i].line[j+2].position.x, player[i].line[j+2].position.y);
-                        quad[3].position = sf::Vector2f(player[i].line[j+3].position.x, player[i].line[j+3].position.y);
+                        quad[0] = player[i].line[j];
+                        quad[1] = player[i].line[j+1];
+                        quad[2] = player[i].line[j+2];
+                        quad[3] = player[i].line[j+3];
                         window.draw(quad);
                         break;
                     }
@@ -201,7 +191,7 @@ void Renderer::play(const Config &config,const Game &game,const std::vector<Play
 //
 void Renderer::powerUp(const Config &config,const Game &game,const std::vector<Player> &player){
     for(unsigned int i=0;i<game.powerupField.size();i++){
-        // check if withing FOV
+        // If darkness powerup is enabled only draw powerups within FoV
         if(game.darkness){
             bool draw=false;
             int diffx;
@@ -218,7 +208,7 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
                 continue;
             }
         }
-        // Set opacity
+        // Set opacity for fade in and out effects
         int opacity=255;
         if(game.powerupField[i].time1<config.powerupFadeTime){
             opacity=(game.powerupField[i].time1/config.powerupFadeTime)*255;
@@ -227,9 +217,8 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
             opacity=(game.powerupField[i].time2/config.powerupFadeTime)*255;
         }
         sf::Color color(255,255,255,opacity);
-        // Choose Sprite
+        // Set sprite to draw
         sf::Sprite *draw;
-        // Fast
         if(game.powerupField[i].type==Powerup::Type::Fast){
             if(game.powerupField[i].impact==Powerup::Impact::Self){
                 draw=&sprite.fastGreen;
@@ -238,7 +227,6 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
                 draw=&sprite.fastRed;
             }
         }
-        // Slow
         else if(game.powerupField[i].type==Powerup::Type::Slow){
             if(game.powerupField[i].impact==Powerup::Impact::Self){
                 draw=&sprite.slowGreen;
@@ -247,7 +235,6 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
                 draw=&sprite.slowRed;
             }
         }
-        // Small
         else if(game.powerupField[i].type==Powerup::Type::Small){
             if(game.powerupField[i].impact==Powerup::Impact::Self){
                 draw=&sprite.smallGreen;
@@ -256,7 +243,6 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
                 draw=&sprite.smallRed;
             }
         }
-        // Big
         else if(game.powerupField[i].type==Powerup::Type::Big){
             if(game.powerupField[i].impact==Powerup::Impact::Self){
                 draw=&sprite.bigGreen;
@@ -265,7 +251,6 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
                 draw=&sprite.bigRed;
             }
         }
-        // Right Angle
         else if(game.powerupField[i].type==Powerup::Type::RightAngle){
             if(game.powerupField[i].impact==Powerup::Impact::Self){
                 draw=&sprite.angleGreen;
@@ -274,51 +259,44 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
                 draw=&sprite.angleRed;
             }
         }
-        // Clear
         else if(game.powerupField[i].type==Powerup::Type::Clear){
             draw=&sprite.clearBlue;
         }
-        // Invisible
         else if(game.powerupField[i].type==Powerup::Type::Invisible){
             draw=&sprite.invisibleGreen;
         }
-        // Walls Away
         else if(game.powerupField[i].type==Powerup::Type::WallsAway){
             draw=&sprite.wallsAwayBlue;
         }
-        // More
         else if(game.powerupField[i].type==Powerup::Type::MorePowerups){
             draw=&sprite.morePowerupsBlue;
         }
-        // Inverted
         else if(game.powerupField[i].type==Powerup::Type::InvertKeys){
             draw=&sprite.invertedRed;
         }
-        // Question Mark
         else if(game.powerupField[i].type==Powerup::Type::QuestionMark){
             draw=&sprite.questionMarkBlue;
         }
-        // Darkness
         else if(game.powerupField[i].type==Powerup::Type::Darkness){
             draw=&sprite.darknessBlue;
         }
-        // Gap
         else if(game.powerupField[i].type==Powerup::Type::Gap){
             draw=&sprite.gapRed;
         }
-        // Bomb
         else if(game.powerupField[i].type==Powerup::Type::Bomb){
             draw=&sprite.bombBlue;
         }
-        // Sine
         else if(game.powerupField[i].type==Powerup::Type::Sine){
             draw=&sprite.sineRed;
         }
-        // Glitch
         else if(game.powerupField[i].type==Powerup::Type::Glitch){
-            draw=&sprite.glitchBlue;
+            if(game.powerupField[i].impact==Powerup::Impact::All){
+                draw=&sprite.glitchBlue;
+            }
+            else if(game.powerupField[i].impact==Powerup::Impact::Other){
+                draw=&sprite.glitchRed;
+            }
         }
-        // Radius
         else if(game.powerupField[i].type==Powerup::Type::Radius){
             draw=&sprite.radiusBlue;
         }
@@ -326,12 +304,11 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
             std::cout << "Error! No sprite!" << int2str( game.powerupField[i].place ) << std::endl;
             draw=&sprite.questionMarkBlue;
         }
-        // Do the things
+        // Set sprite and draw
         draw->setPosition( game.powerupField[i].x-config.powerupRadius , game.powerupField[i].y-config.powerupRadius );
         draw->setColor(color);
         window.draw(*draw);
     }
-    //
 }
 //
 void Renderer::shutdown(){

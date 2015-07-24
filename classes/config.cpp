@@ -51,7 +51,7 @@ Config::Config(){
     sineAmplitude=0.6;
     //
     glitchMinWait=0.1;// Seconds;
-    glitchMaxWait=0.8;
+    glitchMaxWait=0.5;
     glitchMoveChance=15; // For left and right separately
     glitchMaxMove=20;
     glitchWidthChance=30;
