@@ -28,11 +28,8 @@ Game::Game(const Config &config): gamePacer(config.gameUpdateThreadMinRate), ran
 }
 // Functions
 void Game::switchMode(const Game::Mode &Mode){
-    // Lock
     modeMutex.lock();
-    // toggle mode
     mode=Mode;
-    // Unlock
     modeMutex.unlock();
 }
 //
@@ -63,24 +60,23 @@ void Game::initialize(const Config &config, std::vector<Player> &player){
 }
 //
 void Game::initializePowerups(const Config &config){
-    // Set the different powerups
     // Slow
-    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Self,100,7.5,2500);
-    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Other,100,7.5,5000);
+    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Self,100,5,2500);
+    powerups.emplace_back(Powerup::Type::Slow,Powerup::Impact::Other,100,5,5000);
     // Fast
-    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Self,100,7.5,2500);
-    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Other,100,7.5,5000);
+    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Self,100,5,2500);
+    powerups.emplace_back(Powerup::Type::Fast,Powerup::Impact::Other,100,5,5000);
     // Small
-    powerups.emplace_back(Powerup::Type::Small,Powerup::Impact::Self,100,10,5000);
+    powerups.emplace_back(Powerup::Type::Small,Powerup::Impact::Self,100,5,5000);
     // Big
-    powerups.emplace_back(Powerup::Type::Big,Powerup::Impact::Other,100,10,5000);
+    powerups.emplace_back(Powerup::Type::Big,Powerup::Impact::Other,100,5,5000);
     // Right Angles
-    powerups.emplace_back(Powerup::Type::RightAngle,Powerup::Impact::Self,50,7.5,5000);
-    powerups.emplace_back(Powerup::Type::RightAngle,Powerup::Impact::Other,100,7.5,5000);
+    powerups.emplace_back(Powerup::Type::RightAngle,Powerup::Impact::Self,50,5,5000);
+    powerups.emplace_back(Powerup::Type::RightAngle,Powerup::Impact::Other,100,5,5000);
     // Clear
     powerups.emplace_back(Powerup::Type::Clear,Powerup::Impact::All,100,0,0);
     // Invisible
-    powerups.emplace_back(Powerup::Type::Invisible,Powerup::Impact::Self,100,7.5,2500);
+    powerups.emplace_back(Powerup::Type::Invisible,Powerup::Impact::Self,100,5,5000);
     // Walls Away
     powerups.emplace_back(Powerup::Type::WallsAway,Powerup::Impact::All,100,10,0);
     // More Powerups
@@ -98,10 +94,13 @@ void Game::initializePowerups(const Config &config){
     // Sine
     powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,75,(1/config.sineFrequency)*5,0);
     // Glitch
-    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::All,15,5,0);
-    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::Other,10,5,0);
+    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::All,15,5,5000);
+    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::Other,10,5,5000);
     // Radius
     powerups.emplace_back(Powerup::Type::Radius,Powerup::Impact::All,25,5,0);
+    // NoTurtle
+    powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::All,25,5,0);
+    powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::Other,40,5,0);
     // Calculate total chance
     totalChance=0;
     for(unsigned int i=0;i<powerups.size();i++){
@@ -130,7 +129,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
         }
         else if( !client[1] && !paused && !roundFinished ){
             // Get elapsed time since last iteration. If the time is too long it will be set to a fixed value.
-            elapsed=game_clock.restart().asSeconds();
+            elapsed=gameClock.restart().asSeconds();
             if(elapsed>config.maxElapsed){
                 elapsed=config.maxElapsed;
                 std::cout << "Slow execution!" << std::endl;
@@ -184,7 +183,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
             }
             // Powerup
             if(!paused){
-                elapsed=game_clock.restart().asSeconds();
+                elapsed=gameClock.restart().asSeconds();
                 powerUpManager(config);
             };
         }
@@ -293,7 +292,7 @@ void Game::hitDetector(const Config &config,std::vector<Player> &player){
                         if(player[j].lineWidth>config.lineWidth){
                             delay*=player[j].lineWidth/config.lineWidth;
                         }
-                        // Right Angles
+                        // Right Angles; Bug: With right angles it is possible to move back over own line and not getting detected for a while
                         if(player[j].rightAngle){
                             delay*=1.5;
                         }
@@ -301,8 +300,7 @@ void Game::hitDetector(const Config &config,std::vector<Player> &player){
                         if(player[j].shift<config.shift){
                             delay*=config.shift/player[j].shift;
                         }
-                        // Note that it is possible that having a very slow speed and then accelerating fast could maybe also trigger a hit
-                        // This is to check if the line is long enough.
+                        // Only when the line is long enough it will be checked
                         if(player[j].line.getVertexCount()>delay){
                             for(unsigned int k=0;k<player[j].line.getVertexCount()-delay;k++){
                                 if( pow(x-player[j].line[k].position.x,2) + pow(y-player[j].line[k].position.y,2) < pow(player[i].lineWidth/2,2) ){
@@ -317,7 +315,7 @@ void Game::hitDetector(const Config &config,std::vector<Player> &player){
             } // End frame>gap
         }// End else
     } // End for loop
-    // Process the death people
+    // Process the death
     if(death_vec.size()>0){
         //
         playerDeath(player,death_vec);
@@ -348,7 +346,7 @@ void Game::playerDeath(std::vector<Player> &player,const std::vector<unsigned in
         }
         queuePacket(pending);
     }
-    // Do these actions for all dead people
+    // Declare people death. This is done after the points are given so this is done correctly
     for(unsigned int i=0;i<death_vec.size();i++){
         deathCount++;
         player[death_vec[i]].death=true;
@@ -360,7 +358,7 @@ void Game::endRound(const Config &config,std::vector<Player> &player){
     darkness=false;
     // Round is always finished so set the var
     roundFinished=true;
-    // check if someone won the game
+    // Check if someone won the game
     int points=0; // Numer of points winner has
     roundWinner=-1; // The player number
     for(unsigned int i=0;i<player.size();i++){
@@ -599,13 +597,18 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
                     case Powerup::Type::Radius:
                         playerPowerupEffect.emplace_back(i,powerupField[j].type,powerupField[j].impact,D,id);
                         for(unsigned int k=0;k<player.size();k++){
-                            // Calculate powerup effects
                             player[k].calculatePowerupEffect(config,*this);
+                        }
+                        break;
+                    case Powerup::Type::NoTurtle:
+                        for(unsigned int k=0;k<player.size();k++){
+                            player[k].calculateNoTurtleEffect(config,i,powerupField[j].impact);
                         }
                         break;
                     case Powerup::Type::Clear:
                         for(unsigned int k=0;k<player.size();k++){
                             player[k].line.clear();
+                            player[k].noTurtleLine.clear();
                         }
                         break;
                     case Powerup::Type::WallsAway:
@@ -620,10 +623,10 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
                         darkness=true;
                         break;
                     case Powerup::Type::Bomb:
-                        // Remove lines
                         powerUpBomb(config,player,i,j);
                         break;
                     default:
+                        std::cout << "Powerup case uncaptured!" << std::endl;
                         break;
                 }
                 //
@@ -704,8 +707,8 @@ void Game::pause(const bool &pause){
     }
     else{
         paused=false;
-        game_clock.restart();
-        packetclock.restart();
+        gameClock.restart();
+        packetClock.restart();
         if(server[1]){
             Pending pending;
             pending.packet << Packet::Pause << false;

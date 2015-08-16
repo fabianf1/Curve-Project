@@ -4,7 +4,7 @@ Curve Project is just a clone of Achtung die Kurve written in C++ and uses [SFML
 
 Build
 -------
-To build it look [here](http://sfml-dev.org/tutorials/2.2/) on how to setup SFML.
+To build it look [here](http://sfml-dev.org/tutorials/) on how to setup SFML.
 
 To-Do List
 ----------------------------
@@ -15,3 +15,5 @@ To-Do List
 * Wait until everyone is ready before starting countdownClock
 * Ensure latest data is present when doing things like bomb
 * Add spectator mode
+* Fix long loading of main class
+* Change glitch things to a different distribution (Exponential?)

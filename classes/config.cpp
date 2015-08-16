@@ -52,17 +52,21 @@ Config::Config(){
     //
     glitchMinWait=0.1;// Seconds;
     glitchMaxWait=0.5;
-    glitchMoveChance=15; // For left and right separately
-    glitchMaxMove=20;
+    glitchMoveChance=20; // For left and right separately; So total chance that line is moved is this times two.
+    glitchMaxMove=25;
     glitchWidthChance=30;
-    glitchMaxWidthIncrease=1.5;
-    glitchMaxWidthDecrease=0.5;
+    glitchMaxWidthIncrease=2.0;
+    glitchMaxWidthDecrease=0.9;
     glitchSpeedChance=30;
-    glitchMaxSpeedIncrease=1.5;
-    glitchMaxSpeedDecrease=0.3;
+    glitchMaxSpeedIncrease=2.0;
+    glitchMaxSpeedDecrease=0.9;
     //
     radiusMinScale=0.01;
     radiusScaleFactor= 0.0075 ; // Per unit of length. Additive;
+    //
+    noTurtleTime=3.0;
+    noTurtleRadius=shift*1.5;
+    noTurtlePoints=180;
     //
     powerupSpawnChance=11; // % per powerupSpawnCheck second
     powerupSpawnCheck=1.0;
@@ -89,8 +93,8 @@ Config::Config(){
     //
     port=55003;
     attemptDuration=250;
-    lagTime=0.5;
+    lagTime=1.5; // 1 would be the normal time
     //
-    majorVersion="0.3";
-    minorVersion="3";
+    majorVersion="0.4";
+    minorVersion="0";
 }

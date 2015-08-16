@@ -64,6 +64,10 @@ class Config{
         float radiusMinScale;
         float radiusScaleFactor;
         //
+        float noTurtleTime;
+        int noTurtleRadius;
+        int noTurtlePoints;
+        //
         float powerupScale;
         int powerupRadius;
         int powerupSpawnChance;

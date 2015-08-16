@@ -27,6 +27,8 @@ public:
     sf::Sprite glitchBlue;
     sf::Sprite glitchRed;
     sf::Sprite radiusBlue;
+    sf::Sprite noTurtleBlue;
+    sf::Sprite noTurtleRed;
     // Constructor
     PowerupSprite(const Config &config);
 };

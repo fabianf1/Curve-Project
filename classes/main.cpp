@@ -3,6 +3,7 @@
 
 //
 void Main::curveProject(){
+    std::cout << "Starting..." << std::endl;
     // start Renderer
     renderer.start(config,game,player);
     // Main loop

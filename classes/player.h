@@ -42,11 +42,12 @@ class Player{
         bool sine;
         float sinePhase;
         bool glitch;
-        float glitchWait;
-        sf::Clock glitchClock;
+        float glitchTimer;
         float glitchWidthScale;
         float glitchSpeedScale;
         bool radius;
+        float noTurtleTimer;
+        sf::VertexArray noTurtleLine;
         //
         unsigned int id; // Place in client vector;
         int place; // Place in player array
@@ -65,6 +66,8 @@ class Player{
         void addLine(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &lineWidth);
         void calculateGap(const Config &config);
         void calculatePowerupEffect(const Config &config,const Game &game);
+        void calculateNoTurtleEffect(const Config &config, const int &i, const Powerup::Impact &Impact);
+        void finalizeTurtle(Game &game);
 };
 //
 #include "Game.h"

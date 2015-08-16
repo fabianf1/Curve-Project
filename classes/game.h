@@ -23,8 +23,7 @@ class Game{
         // thread Var
         std::thread gameThread; // Stores thread
         //
-        int frame; // Keeps track of current frame
-        //unsigned int game_frame;
+        unsigned int frame; // Keeps track of current render frame
         enum class Mode : int {mainMenu,setup,Play} mode; // Keeps track of current modus
         int keyChange[2]; // Keeps track of keychanges, 1 is player, 0 is key(left=0 or right=1)
         int nameChange;
@@ -73,8 +72,8 @@ class Game{
         sf::Mutex packetMutex;
         // Clocks
         sf::Clock fpsClock; // For calculating fps
-        sf::Clock game_clock; // For game update
-        sf::Clock packetclock; // Measuring time between packets;
+        sf::Clock gameClock; // For game update
+        sf::Clock packetClock; // Measuring time between packets;
         //
         Pacer gamePacer;
         // Random

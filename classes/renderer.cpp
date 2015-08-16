@@ -107,6 +107,7 @@ void Renderer::play(const Config &config,const Game &game,const std::vector<Play
     for(unsigned int i=0;i<player.size();i++){
         if(!game.darkness){
             window.draw(player[i].line);
+            window.draw(player[i].noTurtleLine);
             if(!player[i].rightAngle){
                 window.draw(player[i].circle);
             }
@@ -119,7 +120,7 @@ void Renderer::play(const Config &config,const Game &game,const std::vector<Play
             int yc; // To define y-center of line
             // Create quad; This has to be done to be able to draw parts of the line; Or at least I think so
             sf::VertexArray quad(sf::Quads, 4);
-            //
+            // line
             for(unsigned int j=0;j+3<player[i].line.getVertexCount();j=j+4){
                 xc=(player[i].line[j].position.x+player[i].line[j+1].position.x+player[i].line[j+2].position.x+player[i].line[j+3].position.x)/4;
                 yc=(player[i].line[j].position.y+player[i].line[j+1].position.y+player[i].line[j+2].position.y+player[i].line[j+3].position.y)/4;
@@ -130,6 +131,22 @@ void Renderer::play(const Config &config,const Game &game,const std::vector<Play
                         quad[1] = player[i].line[j+1];
                         quad[2] = player[i].line[j+2];
                         quad[3] = player[i].line[j+3];
+                        window.draw(quad);
+                        break;
+                    }
+                }
+            }
+            // noTurtle line
+            for(unsigned int j=0;j+3<player[i].noTurtleLine.getVertexCount();j=j+4){
+                xc=(player[i].noTurtleLine[j].position.x+player[i].noTurtleLine[j+1].position.x+player[i].noTurtleLine[j+2].position.x+player[i].noTurtleLine[j+3].position.x)/4;
+                yc=(player[i].noTurtleLine[j].position.y+player[i].noTurtleLine[j+1].position.y+player[i].noTurtleLine[j+2].position.y+player[i].noTurtleLine[j+3].position.y)/4;
+                for(unsigned int k=0;k<player.size();k++){
+                    // Calculate center
+                    if( (xc-player[k].x)*(xc-player[k].x) + (yc-player[k].y)*(yc-player[k].y) < (config.darknessRadius*config.darknessRadius) ){
+                        quad[0] = player[i].noTurtleLine[j];
+                        quad[1] = player[i].noTurtleLine[j+1];
+                        quad[2] = player[i].noTurtleLine[j+2];
+                        quad[3] = player[i].noTurtleLine[j+3];
                         window.draw(quad);
                         break;
                     }
@@ -149,18 +166,12 @@ void Renderer::play(const Config &config,const Game &game,const std::vector<Play
             }
         }
     }
-    // check if walls away effect is there and change wallColor(Decouple from fps?)
+    // Check if walls away effect is there and change wallColor(Decouple from fps?)
     sf::Color color=config.wallColor;
     if(game.wallsAway){
-        int remainder=(game.frame% (config.fps*2) )-config.fps;
-        if(remainder<0){
-            color.a=255/(config.fps)*(-1)*remainder;
-        }
-        else{
-            color.a=255/(config.fps)*remainder;
-        }
+        color.a= pow(cos( (float) (game.frame % (config.fps*2) )/ config.fps * (PI)  ),2) * 255;
     }
-    // draw Walls
+    // Draw walls
     window.draw(objects.g_leftWall);
     objects.g_leftWall.setFillColor(color);
     window.draw(objects.g_topWall);
@@ -299,6 +310,14 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
         }
         else if(game.powerupField[i].type==Powerup::Type::Radius){
             draw=&sprite.radiusBlue;
+        }
+        else if(game.powerupField[i].type==Powerup::Type::NoTurtle){
+             if(game.powerupField[i].impact==Powerup::Impact::All){
+                draw=&sprite.noTurtleBlue;
+            }
+            else if(game.powerupField[i].impact==Powerup::Impact::Other){
+                draw=&sprite.noTurtleRed;
+            }
         }
         else{
             std::cout << "Error! No sprite!" << int2str( game.powerupField[i].place ) << std::endl;

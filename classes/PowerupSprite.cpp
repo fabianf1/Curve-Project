@@ -93,4 +93,12 @@ PowerupSprite::PowerupSprite(const Config &config){
     glitchRed.setTexture(texture);
     glitchRed.setTextureRect(sf::IntRect(300, 500, 100, 100));
     glitchRed.setScale(config.powerupScale,config.powerupScale);
+    // No Turtle Red
+    noTurtleRed.setTexture(texture);
+    noTurtleRed.setTextureRect(sf::IntRect(0, 600, 100, 100));
+    noTurtleRed.setScale(config.powerupScale,config.powerupScale);
+    // No Turtle Blue
+    noTurtleBlue.setTexture(texture);
+    noTurtleBlue.setTextureRect(sf::IntRect(100, 600, 100, 100));
+    noTurtleBlue.setScale(config.powerupScale,config.powerupScale);
 }

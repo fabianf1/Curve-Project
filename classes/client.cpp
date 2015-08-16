@@ -183,7 +183,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
     else if(type==Packet::Update){
         // Time Between packets measurement
         if(game.packetNumber%config.gameUpdateThreadMinRate==0){
-            game.packetTime=game.packetclock.restart().asSeconds();
+            game.packetTime=game.packetClock.restart().asSeconds();
             // check for lag
             if(game.packetTime>config.lagTime){
                 // Send packet
@@ -298,9 +298,15 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
                             player[k].calculatePowerupEffect(config,game);
                         }
                         break;
+                    case Powerup::Type::NoTurtle:
+                        for(unsigned int k=0;k<player.size();k++){
+                            player[k].calculateNoTurtleEffect(config,id,game.powerupField[i].impact);
+                        }
+                        break;
                     case Powerup::Type::Clear:
                         for(unsigned int k=0;k<player.size();k++){
                             player[k].line.clear();
+                            player[k].noTurtleLine.clear();
                         }
                         break;
                     case Powerup::Type::WallsAway:
@@ -398,6 +404,11 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
             player[id].local=true;
             game.refreshPlayers=true;
         }
+    }
+    else if(type==Packet::NoTurtleFinalize){
+        int id;
+        packet >> id;
+        player[id].finalizeTurtle(game);
     }
     else{
         std::cout << "Unknown packet type!" << std::endl;

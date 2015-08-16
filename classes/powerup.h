@@ -7,7 +7,7 @@
 class Powerup{
     public:
         // Enums vars
-        enum class Type : int {Slow,Fast,Small,Big,RightAngle,Clear,Invisible,WallsAway,MorePowerups,InvertKeys,QuestionMark,Darkness,Gap,Bomb,Sine,Glitch,Radius} type;
+        enum class Type : int {Slow,Fast,Small,Big,RightAngle,Clear,Invisible,WallsAway,MorePowerups,InvertKeys,QuestionMark,Darkness,Gap,Bomb,Sine,Glitch,Radius,NoTurtle} type;
         enum class Impact : int {Self,Other,All} impact;
         // Vars
         int spawnChance; // Overal spawn chance depends on the other powerups

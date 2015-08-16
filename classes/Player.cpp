@@ -5,6 +5,7 @@
 // Constructor
 Player::Player(){
     line.setPrimitiveType(sf::Quads);
+    noTurtleLine.setPrimitiveType(sf::Quads);
     keyL=keyR=sf::Keyboard::Unknown;
     local=server=false;
 }
@@ -14,12 +15,12 @@ Player::Player(const sf::String &Name,const sf::Color &Color){
     color=Color;
     circle.setFillColor(color);
     line.setPrimitiveType(sf::Quads);
+    noTurtleLine.setPrimitiveType(sf::Quads);
     keyL=keyR=sf::Keyboard::Unknown;
     local=server=false;
 }
 // Functions
 void Player::New_Game(){
-    // Set points
     points=0;
     ready=false;
 }
@@ -90,12 +91,17 @@ void Player::draw(sf::RenderWindow &window){
 }
 // Server and local version of updatePosition
 void Player::updatePosition(const Config &config, Game &game){
+    // Check if turtle
+    noTurtleTimer-=game.elapsed;
+    if(noTurtleTimer<=0.0){
+        finalizeTurtle(game);
+    }
     // Reset linewidth and shift
     lineWidth=originalLineWidth;
     shift=originalShift;
     // Sine things
     if(sine){
-        sinePhase+=(game.elapsed*config.sineFrequency*2)*PI;
+        sinePhase+=(game.elapsed*config.sineFrequency)*(2*PI);
         lineWidth*=(1+sin(sinePhase)*config.sineAmplitude);
         shift*=(1+sin(sinePhase+PI)*config.sineAmplitude);
     }
@@ -110,9 +116,9 @@ void Player::updatePosition(const Config &config, Game &game){
     // Glitchy
     if(glitch){
         // Check if need to recalculate
-        if(glitchClock.getElapsedTime().asSeconds()>glitchWait){
-            glitchClock.restart();
-            glitchWait=config.glitchMinWait + ( (rand() % (100+1) ) /100.0*(config.glitchMaxWait-config.glitchMinWait));
+        glitchTimer-=game.elapsed;
+        if(glitchTimer<=0.0){
+            glitchTimer=config.glitchMinWait + ( (rand() % (100+1) ) /100.0*(config.glitchMaxWait-config.glitchMinWait));
             // Do Move
             int randomChance = rand() % (100+1);
             if(randomChance<config.glitchMoveChance){
@@ -157,11 +163,11 @@ void Player::updatePosition(const Config &config, Game &game){
         left=sf::Keyboard::isKeyPressed(keyL);
         right=sf::Keyboard::isKeyPressed(keyR);
     }
-    // check keyrelease
+    // Check keyrelease
     if(keyrelease==false&&!left&&!right){
         keyrelease=true;
     }
-    // Heading Change
+    // Heading change
     hOLD=heading;
     if(!rightAngle){
         // Move left
@@ -376,9 +382,6 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
             // Glitch
             else if(game.playerPowerupEffect[i].type==Powerup::Type::Glitch){
                 glitch=true;
-                glitchSpeedScale=1.0;
-                glitchWidthScale=1.0;
-                glitchWait=0.0;
             }
             // Radius
             else if(game.playerPowerupEffect[i].type==Powerup::Type::Radius){
@@ -389,13 +392,12 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
     // Do speed and line size effects
     //
     if(speed>0){
-        // To make sure it won't go to fast I could use a function like max*(1-exp(-a*x)). Max is the maximum speed multiplier and a is a scaling factor
-        shift*=config.fastMaxMultiplier * ( 1 - exp( - config.fastScaling * speed ) ); // 2.1742    3.5606    4.4446 (max=6&a=0.45)
+        // Increase is exponential to maximum value
+        shift*=config.fastMaxMultiplier * ( 1 - exp( - config.fastScaling * speed ) ); // First few values: 2.1742    3.5606    4.4446 (max=6&a=0.45)
         turn*=config.fastTurnMaxMultiplier * ( 1 - exp( - config.fastTurnScaling * speed ) );
     }
     else if(speed<0){
         // Function min+exp(a*x); min is the minimum multiplier and a is a scaling factor. As x is already negative no minus sign is needed.
-        //float multiplier=config.min_slow_multiplier+exp(config.slowScaling*speed); // -1=0.6;-2=0.36;-3=0.22 (min=0&a=0.5)
         shift*=config.slowMinMultiplier+exp(config.slowScaling*speed);;
         turn*=config.slowTurnMinMultiplier+exp(config.slowTurnScaling*speed);;
     }
@@ -410,17 +412,20 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
                 lineWidth=1;
             }
         }
-        // Sine things
         if(!sine){
             sinePhase=0;
+        }
+        if(!glitch){
+            glitchTimer=0.0;
+            glitchSpeedScale=1.0;
+            glitchWidthScale=1.0;
         }
         // Save original linewidth and shift (without glitch and Sine effects)
         originalLineWidth=lineWidth;
         originalShift=shift;
     }
-    // Right Angle
+    // Set rectangle or circle
     if(!rightAngle){
-        // Circle Style
         if(inverted){
             circle.setFillColor(sf::Color::Blue);
         }
@@ -428,7 +433,6 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
             circle.setFillColor(color);
         }
         circle.setRadius(lineWidth/2);
-        // Rectangle style
     }
     else{
         rectangle.setSize(sf::Vector2f(lineWidth,lineWidth));
@@ -439,6 +443,66 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
             rectangle.setFillColor(color);
         }
         rectangle.setOrigin(lineWidth/2,lineWidth/2);
+    }
+}
+//
+void Player::calculateNoTurtleEffect(const Config &config, const int &i, const Powerup::Impact &Impact){
+    if(Impact==Powerup::Impact::Other&&i==place){
+        return;
+    }
+    noTurtleTimer=config.noTurtleTime;
+    // Add new temporary circle;
+    float posX,posY,posX2,posY2;
+    int angle=0;
+    int angle2=360/config.noTurtlePoints;
+    for(int j=0;j<config.noTurtlePoints;j++){
+        // Calculater center
+        posX=x+cos(angle*PI/180.0)*config.noTurtleRadius;
+        posY=y+sin(angle*PI/180.0)*config.noTurtleRadius;
+        posX2=x+cos(angle2*PI/180.0)*config.noTurtleRadius;
+        posY2=y+sin(angle2*PI/180.0)*config.noTurtleRadius;
+        // Add quads
+        sf::Vertex quad;
+        quad.color=color;
+        quad.color.a=128;
+        //
+        quad.position = sf::Vector2f( posX+sin((angle+90)*PI/180.0)*lineWidth/2.0, posY-cos((angle+90)*PI/180.0)*lineWidth/2.0);
+        noTurtleLine.append(quad);
+        //
+        quad.position = sf::Vector2f( posX-sin((angle+90)*PI/180.0)*lineWidth/2.0, posY+cos((angle+90)*PI/180.0)*lineWidth/2.0);
+        noTurtleLine.append(quad);
+        //
+        quad.position = sf::Vector2f( posX2-sin((angle+90)*PI/180.0)*lineWidth/2.0, posY2+cos((angle+90)*PI/180.0)*lineWidth/2.0);
+        noTurtleLine.append(quad);
+        //
+        quad.position = sf::Vector2f( posX2+sin((angle+90)*PI/180.0)*lineWidth/2.0, posY2-cos((angle+90)*PI/180.0)*lineWidth/2.0);
+        noTurtleLine.append(quad);
+        // Increment angle
+        angle=angle2;
+        angle2+=360/config.noTurtlePoints;
+    }
+}
+//
+void Player::finalizeTurtle(Game &game){
+    // Copy from noTurtleLine to line and remove opacity
+    for(unsigned int j=0;j<noTurtleLine.getVertexCount();j=j+4){
+        sf::Vertex quad;
+        quad.color=color;
+        quad.position = noTurtleLine[j].position;
+        line.append(quad);
+        quad.position = noTurtleLine[j+1].position;
+        line.append(quad);
+        quad.position = noTurtleLine[j+2].position;
+        line.append(quad);
+        quad.position = noTurtleLine[j+3].position;
+        line.append(quad);
+    }
+    noTurtleLine.clear();
+    // Server things
+    if(game.server[1]){
+        Pending pending;
+        pending.packet << Packet::NoTurtleFinalize << place;
+        game.queuePacket(pending);
     }
 }
 //

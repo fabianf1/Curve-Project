@@ -3,7 +3,7 @@
 
 // Main Loop
 int main(){
-    // initialize class and start main loop
+    // Initialize class and start main loop
     Main main;
     main.curveProject();
     // Wait a little so it is possible to read the console
