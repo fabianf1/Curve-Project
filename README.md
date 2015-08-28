@@ -11,9 +11,7 @@ To-Do List
 * Clean up code
 * Add AI
 * Add checks to check incoming data
-* Prevent possible data races
-* Wait until everyone is ready before starting countdownClock
-* Ensure latest data is present when doing things like bomb
 * Add spectator mode
-* Fix long loading of main class
+* Fix long loading of main class <- RenderWindow
 * Change glitch things to a different distribution (Exponential?)
+* Expand multiplier effect

@@ -298,7 +298,12 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
             draw=&sprite.bombBlue;
         }
         else if(game.powerupField[i].type==Powerup::Type::Sine){
-            draw=&sprite.sineRed;
+         if(game.powerupField[i].impact==Powerup::Impact::Self){
+                draw=&sprite.sineGreen;
+            }
+            else if(game.powerupField[i].impact==Powerup::Impact::Other){
+                draw=&sprite.sineRed;
+            }
         }
         else if(game.powerupField[i].type==Powerup::Type::Glitch){
             if(game.powerupField[i].impact==Powerup::Impact::All){
@@ -318,6 +323,9 @@ void Renderer::powerUp(const Config &config,const Game &game,const std::vector<P
             else if(game.powerupField[i].impact==Powerup::Impact::Other){
                 draw=&sprite.noTurtleRed;
             }
+        }
+        else if(game.powerupField[i].type==Powerup::Type::Multiplier){
+            draw=&sprite.multiplierGreen;
         }
         else{
             std::cout << "Error! No sprite!" << int2str( game.powerupField[i].place ) << std::endl;

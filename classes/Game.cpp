@@ -92,6 +92,7 @@ void Game::initializePowerups(const Config &config){
     // Bomb
     powerups.emplace_back(Powerup::Type::Bomb,Powerup::Impact::All,50,0,0);
     // Sine
+    powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Self,50,(1/config.sineFrequency)*5,0);
     powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,75,(1/config.sineFrequency)*5,0);
     // Glitch
     powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::All,15,5,5000);
@@ -101,6 +102,8 @@ void Game::initializePowerups(const Config &config){
     // NoTurtle
     powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::All,25,5,0);
     powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::Other,40,5,0);
+    // Multiplier
+    powerups.emplace_back(Powerup::Type::Multiplier,Powerup::Impact::Self,20,5,0);
     // Calculate total chance
     totalChance=0;
     for(unsigned int i=0;i<powerups.size();i++){
@@ -254,7 +257,11 @@ void Game::hitDetector(const Config &config,std::vector<Player> &player){
         float x=player[i].x;
         float y=player[i].y;
         // Out of bounds check, Only if there are walls
-        if(!wallsAway&& (x-player[i].lineWidth/2<config.wallWidth||x+player[i].lineWidth/2>config.windowWidth-config.statusWidth-config.wallWidth||y-player[i].lineWidth/2<config.wallWidth||y+player[i].lineWidth/2>config.windowHeight-config.wallWidth) ){
+        if(!wallsAway &&
+           ( x-player[i].lineWidth/2<config.wallWidth ||
+            x+player[i].lineWidth/2>config.windowWidth-config.statusWidth-config.wallWidth ||
+            y-player[i].lineWidth/2<config.wallWidth ||
+            y+player[i].lineWidth/2>config.windowHeight-config.wallWidth) ){
             death_vec.emplace_back(i);
         }
         else{
@@ -393,6 +400,7 @@ void Game::endRound(const Config &config,std::vector<Player> &player){
         for(unsigned int i=0;i<player.size();i++){
             if(!player[i].death){
                 roundWinner=i;
+                break;
             }
         }
         // Server Part :D
@@ -507,7 +515,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
         }
     }
     // Spawn new ones
-    // This is done every 0.5 seconds if it succeeds the second if
+    // This is done every 'config.powerupSpawnCheck' seconds if it succeeds the second if
     powerupSpawnTime-=elapsed;
     if(powerupSpawnTime<0.0){
         powerupSpawnTime=config.powerupSpawnCheck;
@@ -575,6 +583,10 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             if( (dx*dx) + (dy*dy) < radius*radius ) {
                 // Effect Time
                 int D=powerups[powerupField[j].place].effectMinDisappear + ( ( rand() % (powerups[powerupField[j].place].effectRandDisappear+1) ) / 1000.0 );
+                while(powerupField[j].type!=Powerup::Type::Multiplier && player[i].multiplier>0){
+                    D*=config.lengthMultiplier;
+                    player[i].multiplier--;
+                }
                 //
                 int id=powerupField[j].id;
                 // Question Mark
@@ -624,6 +636,9 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
                         break;
                     case Powerup::Type::Bomb:
                         powerUpBomb(config,player,i,j);
+                        break;
+                    case Powerup::Type::Multiplier:
+                        player[i].multiplier++;
                         break;
                     default:
                         std::cout << "Powerup case uncaptured!" << std::endl;

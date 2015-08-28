@@ -23,12 +23,11 @@ public:
     sf::Sprite darknessBlue;
     sf::Sprite gapRed;
     sf::Sprite bombBlue;
-    sf::Sprite sineRed;
-    sf::Sprite glitchBlue;
-    sf::Sprite glitchRed;
+    sf::Sprite sineRed,sineGreen;
+    sf::Sprite glitchBlue,glitchRed;
     sf::Sprite radiusBlue;
-    sf::Sprite noTurtleBlue;
-    sf::Sprite noTurtleRed;
+    sf::Sprite noTurtleBlue,noTurtleRed;
+    sf::Sprite multiplierGreen;
     // Constructor
     PowerupSprite(const Config &config);
 };

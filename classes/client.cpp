@@ -1,8 +1,6 @@
 // Contains functions and constructors for the Client class
 // Needed Header
 #include "Client.h"
-// Constructor
-Client::Client(): pacer(200){}
 // Functions
 void Client::start(const Config &config, Game &game,std::vector<Player> &player){
     if(player.size()>0){

@@ -79,15 +79,11 @@ void Player::newRound(const Config &config,const Game &game){
     left=right=false;
     line.clear();
     death=false;
+    multiplier=0;
     circle.setPosition(x-lineWidth/2,y-lineWidth/2);
     circle.setRadius(lineWidth/2);
     // Client
     noLine=false;
-}
-//
-void Player::draw(sf::RenderWindow &window){
-    window.draw(line);
-    window.draw(circle);
 }
 // Server and local version of updatePosition
 void Player::updatePosition(const Config &config, Game &game){
@@ -256,16 +252,21 @@ void Player::updatePosition(const Config &config, Game &game){
             addLine(xOLD,x,yOLD,y,heading,hOLD,lineWidth);
         }
     }
-    // Update Circle
-    circle.setPosition(x-lineWidth/2,y-lineWidth/2);
-    circle.setRadius(lineWidth/2);
-    // Rectangle update
-    rectangle.setPosition(x,y);
-    rectangle.setRotation(heading);
-    rectangle.setSize(sf::Vector2f(lineWidth,lineWidth));
-    // Check if we need to make the right angle really right
-    if(rightAngle&&!invisible&&gap[0]>0.0&&abs(heading-hOLD)>60){
-        addLine(xOLD-lineWidth/2*cos(heading*PI/180.0),xOLD+lineWidth/2*cos(heading*PI/180.0),yOLD-lineWidth/2*sin(heading*PI/180.0),yOLD+lineWidth/2*sin(heading*PI/180.0),heading,heading,lineWidth);
+    if(!rightAngle){
+        // Update Circle
+        circle.setPosition(x-lineWidth/2,y-lineWidth/2);
+        circle.setRadius(lineWidth/2);
+    }
+    else{
+        // Rectangle update
+        rectangle.setSize(sf::Vector2f(lineWidth,lineWidth));
+        rectangle.setOrigin(lineWidth/2,lineWidth/2);
+        rectangle.setPosition(x,y);
+        rectangle.setRotation(heading);
+        // Check if we need to make the right angle really right
+        if(!invisible&&gap[0]>0.0&&abs(heading-hOLD)>60){
+            addLine(xOLD-lineWidth/2*cos(heading*PI/180.0),xOLD+lineWidth/2*cos(heading*PI/180.0),yOLD-lineWidth/2*sin(heading*PI/180.0),yOLD+lineWidth/2*sin(heading*PI/180.0),heading,heading,lineWidth);
+        }
     }
 }
 // Client Version of updatePosition
@@ -275,8 +276,6 @@ void Player::updatePosition(const Config &config, sf::Packet &packet){
     yOLD=y;
     hOLD=heading;
     packet >> x >> y >> heading >> lineWidth >> noLine;
-    // Set Circle size
-    circle.setRadius(lineWidth/2);
     //
     int maxdiffw=config.windowWidth-config.statusWidth-4*config.wallWidth;
     int maxdiffh=config.windowHeight-4*config.wallWidth;
@@ -285,6 +284,7 @@ void Player::updatePosition(const Config &config, sf::Packet &packet){
     }
     // Update Circle
     if(!rightAngle){
+        circle.setRadius(lineWidth/2);
         circle.setPosition(x-lineWidth/2,y-lineWidth/2);
     }
     else{
@@ -293,6 +293,8 @@ void Player::updatePosition(const Config &config, sf::Packet &packet){
             addLine(xOLD-lineWidth/2*cos(heading*PI/180.0),xOLD+lineWidth/2*cos(heading*PI/180.0),yOLD-lineWidth/2*sin(heading*PI/180.0),yOLD+lineWidth/2*sin(heading*PI/180.0),heading,heading,lineWidth);
         }
         // Rectangle update
+        rectangle.setSize(sf::Vector2f(lineWidth,lineWidth));
+        rectangle.setOrigin(lineWidth/2,lineWidth/2);
         rectangle.setPosition(x,y);
         rectangle.setRotation(heading);
     }
@@ -424,25 +426,20 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
         originalLineWidth=lineWidth;
         originalShift=shift;
     }
-    // Set rectangle or circle
-    if(!rightAngle){
-        if(inverted){
-            circle.setFillColor(sf::Color::Blue);
-        }
-        else{
-            circle.setFillColor(color);
-        }
-        circle.setRadius(lineWidth/2);
+    // Set rectangle and circle
+    circle.setPosition(x-lineWidth/2,y-lineWidth/2);
+    circle.setRadius(lineWidth/2);
+    rectangle.setSize(sf::Vector2f(lineWidth,lineWidth));
+    rectangle.setOrigin(lineWidth/2,lineWidth/2);
+    rectangle.setPosition(x,y);
+    rectangle.setRotation(heading);
+    if(inverted){
+        circle.setFillColor(sf::Color::Blue);
+        rectangle.setFillColor(sf::Color::Blue);
     }
     else{
-        rectangle.setSize(sf::Vector2f(lineWidth,lineWidth));
-        if(inverted){
-            rectangle.setFillColor(sf::Color::Blue);
-        }
-        else{
-            rectangle.setFillColor(color);
-        }
-        rectangle.setOrigin(lineWidth/2,lineWidth/2);
+        circle.setFillColor(color);
+        rectangle.setFillColor(color);
     }
 }
 //

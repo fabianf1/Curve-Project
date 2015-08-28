@@ -114,13 +114,10 @@ void Server::serverListener(const Config &config,GameSetup &gameSetup,Game &game
 }
 //
 void Server::serverSender(const Config &config,Game &game,std::vector<Player> &player){
-    // Init delay
-    sf::sleep(sf::milliseconds(250));
     std::cout << "Server Sender started!!" << std::endl;
     // Main Loop
     while(!game.server[2]){
         // check if there are packages
-        //for(int i=game.packets.size()-1;i>=0;i--){
         for(unsigned int i=0;i<game.packets.size();i++){
             // Remove packet if no clients
             if(clients.size()==0){

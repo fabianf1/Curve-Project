@@ -101,4 +101,12 @@ PowerupSprite::PowerupSprite(const Config &config){
     noTurtleBlue.setTexture(texture);
     noTurtleBlue.setTextureRect(sf::IntRect(100, 600, 100, 100));
     noTurtleBlue.setScale(config.powerupScale,config.powerupScale);
+    // Sine Green
+    sineGreen.setTexture(texture);
+    sineGreen.setTextureRect(sf::IntRect(200, 600, 100, 100));
+    sineGreen.setScale(config.powerupScale,config.powerupScale);
+    // No Turtle Blue
+    multiplierGreen.setTexture(texture);
+    multiplierGreen.setTextureRect(sf::IntRect(300, 600, 100, 100));
+    multiplierGreen.setScale(config.powerupScale,config.powerupScale);
 }

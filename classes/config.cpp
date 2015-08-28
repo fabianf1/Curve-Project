@@ -68,7 +68,9 @@ Config::Config(){
     noTurtleRadius=shift*1.5;
     noTurtlePoints=180;
     //
-    powerupSpawnChance=11; // % per powerupSpawnCheck second
+    lengthMultiplier=1.5;
+    //
+    powerupSpawnChance=12; // % per powerupSpawnCheck second
     powerupSpawnCheck=1.0;
     powerupScale=0.4; // Textures are 100x100
     powerupRadius=40/2; // 40 is full width
@@ -95,6 +97,6 @@ Config::Config(){
     attemptDuration=250;
     lagTime=1.5; // 1 would be the normal time
     //
-    majorVersion="0.4";
+    majorVersion="0.5";
     minorVersion="0";
 }

@@ -48,6 +48,7 @@ class Player{
         bool radius;
         float noTurtleTimer;
         sf::VertexArray noTurtleLine;
+        unsigned int multiplier;
         //
         unsigned int id; // Place in client vector;
         int place; // Place in player array
@@ -60,7 +61,6 @@ class Player{
         // Functions
         void New_Game();
         void newRound(const Config &config,const Game &game);
-        void draw(sf::RenderWindow &window);
         void updatePosition(const Config &config, Game &game);
         void updatePosition(const Config &config, sf::Packet &packet);
         void addLine(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &lineWidth);

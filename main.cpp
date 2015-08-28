@@ -10,6 +10,5 @@ int main(){
     #ifdef DEBUG
         sf::sleep(sf::milliseconds(2000));
     #endif // DEBUG
-    // Done
     return EXIT_SUCCESS;
 }

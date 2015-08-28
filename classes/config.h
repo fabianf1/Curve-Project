@@ -10,7 +10,6 @@ class Config{
     public:
         // Vars
         sf::String title; // Title of the game;
-        //
         int windowWidth,windowHeight; // Height and width of screen
         int windowStyle; // Style of window
         int windowAntialiasing; // Declare antialiasing level
@@ -67,6 +66,8 @@ class Config{
         float noTurtleTime;
         int noTurtleRadius;
         int noTurtlePoints;
+        //
+        float lengthMultiplier;
         //
         float powerupScale;
         int powerupRadius;

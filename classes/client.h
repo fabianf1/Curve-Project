@@ -31,7 +31,7 @@ class Client{
         void syncPackage(Game &game,std::vector<Player> &player,sf::Packet &packet);
         void shutdown(Game &game);
         // Constructor
-        Client();
+        Client(): pacer(200){}
 };
 #endif // CURVE_CLIENT
 //
