@@ -12,7 +12,7 @@ Config::Config(){
     statusWidth=200;
     windowBackgroundColor=sf::Color::Black;
     fps=60;
-    maxPlayers=6;
+    maxPlayers=8;
     // Icon
     icon = LoadImageFromResource("curveicon");
     // Line Settings
@@ -98,5 +98,5 @@ Config::Config(){
     lagTime=1.5; // 1 would be the normal time
     //
     majorVersion="0.5";
-    minorVersion="0";
+    minorVersion="1";
 }

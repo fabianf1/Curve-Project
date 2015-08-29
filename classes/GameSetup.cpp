@@ -10,7 +10,9 @@ GameSetup::GameSetup(){
     color[3]=sf::Color::Green;
     color[4]=sf::Color::Magenta;
     color[5]=sf::Color::Blue;
-    for(int i=0;i<6;i++){
+    color[6]=sf::Color::Cyan;
+    color[7]=sf::Color(255,165,0);
+    for(int i=0;i<8;i++){
         colorUsed[i]=false;
     }
 }
@@ -28,7 +30,7 @@ void GameSetup::initialize(const Config &config,Game &game,std::vector<Player> &
 void GameSetup::addPlayer(Game &game,std::vector<Player> &player){
     // Find Available color
     int new_col;
-    for(int i=0;i<6;i++){
+    for(int i=0;i<8;i++){
         if(!colorUsed[i]){
             new_col=i;
             colorUsed[i]=true;

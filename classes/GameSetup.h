@@ -14,8 +14,8 @@ class Server;
 class GameSetup{
     public:
         // Variables
-        sf::Color color[6];
-        bool colorUsed[6];
+        sf::Color color[8];
+        bool colorUsed[8];
         // Constructor
         GameSetup();
         // Functions

@@ -145,10 +145,10 @@ void RendererObjects::initGameSetup(const Config &config){
     s_multiplePlayersOff.setPosition(890,280);
     // Buttons :D
     s_start.setButton("Start Game",font,fontSize,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_start.setPosition(config.windowWidth/2-s_start.getLocalBounds().width/2,config.windowHeight-100); // Middle Bottom
+    s_start.setPosition(800-s_start.getLocalBounds().width/2,config.windowHeight-150); // Middle Bottom
     //
     s_quit.setButton("Quit",font,fontSize,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
-    s_quit.setPosition(config.windowWidth/2-s_quit.getLocalBounds().width/2,config.windowHeight-50);// Middle More-Bottom
+    s_quit.setPosition(800-s_quit.getLocalBounds().width/2,config.windowHeight-100);// Middle More-Bottom
 }
 //
 void RendererObjects::initGame(const Config &config){
@@ -178,31 +178,31 @@ void RendererObjects::initGame(const Config &config){
     g_round[0].setFont(font);
     g_round[0].setColor(sf::Color::Yellow);
     g_round[0].setString("Round:");
-    g_round[0].setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2);
+    g_round[0].setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+30);
     g_round[1].setCharacterSize(fontSize*0.75);
     g_round[1].setFont(font);
     g_round[1].setColor(sf::Color::Yellow);
-    g_round[1].setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2);
+    g_round[1].setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+30);
     // FPS
     g_fps[0].setCharacterSize(fontSize*0.75);
     g_fps[0].setFont(font);
     g_fps[0].setColor(sf::Color::Yellow);
     g_fps[0].setString("FPS:");
-    g_fps[0].setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+30);
+    g_fps[0].setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+60);
     g_fps[1].setCharacterSize(fontSize*0.75);
     g_fps[1].setFont(font);
     g_fps[1].setColor(sf::Color::Yellow);
-    g_fps[1].setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+30);
+    g_fps[1].setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+60);
     // Packet
     g_packet[0].setCharacterSize(fontSize*0.75);
     g_packet[0].setFont(font);
     g_packet[0].setColor(sf::Color::Yellow);
     g_packet[0].setString("PPS:");
-    g_packet[0].setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+60);
+    g_packet[0].setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+90);
     g_packet[1].setCharacterSize(fontSize*0.75);
     g_packet[1].setFont(font);
     g_packet[1].setColor(sf::Color::Yellow);
-    g_packet[1].setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+60);
+    g_packet[1].setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+90);
     // Quit Button
     g_quit.setButton("Quit",font,fontSize,sf::Color::Red,sf::Color::Yellow,sf::Text::Bold,sf::Text::Bold);
     g_quit.setPosition(config.windowWidth-config.statusWidth/2-g_quit.getLocalBounds().width/2,config.windowHeight-50);
