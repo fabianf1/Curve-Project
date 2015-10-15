@@ -74,7 +74,7 @@ void RendererObjects::initGameSetup(const Config &config){
     s_right.setCharacterSize(fontSize);
     s_right.setColor(sf::Color::White);
     s_right.setStyle(sf::Text::Bold);
-    s_right.setPosition(300 , 150);
+    s_right.setPosition(350 , 150);
     // Player things
     //
     s_add.setButton("Add",font,fontSize,sf::Color::Red,sf::Color::Yellow,sf::Text::Regular,sf::Text::Italic);
@@ -293,7 +293,7 @@ void RendererObjects::syncPlayers(const Config &config,Game &game, const std::ve
         //
         s_rightButton[i].setString(getKeyName(player[i].keyR));
         s_rightButton[i].setColors(player[i].color,player[i].color);
-        s_rightButton[i].setPosition(300,195+(i)*45);
+        s_rightButton[i].setPosition(350,195+(i)*45);
         if(game.keyChange[0]==-1||game.keyChange[1]!=i||game.keyChange[0]!=1){
             s_rightButton[i].setActive(false);
         }
@@ -315,7 +315,7 @@ void RendererObjects::syncPlayers(const Config &config,Game &game, const std::ve
         s_status[i].setPosition(200,195+(i)*45);
         //
         s_kick[i].setColors(player[i].color,player[i].color);
-        s_kick[i].setPosition(400,195+(i)*45);
+        s_kick[i].setPosition(500,195+(i)*45);
         //
         g_names[i].setString(player[i].name);
         g_names[i].setColor(player[i].color);
@@ -489,25 +489,25 @@ const char* RendererObjects::getKeyName( const sf::Keyboard::Key &key ) {
     case sf::Keyboard::Z:
         return "Z";
     case sf::Keyboard::Num0:
-        return "Num0";
+        return "0";
     case sf::Keyboard::Num1:
-        return "Num1";
+        return "1";
     case sf::Keyboard::Num2:
-        return "Num2";
+        return "2";
     case sf::Keyboard::Num3:
-        return "Num3";
+        return "3";
     case sf::Keyboard::Num4:
-        return "Num4";
+        return "4";
     case sf::Keyboard::Num5:
-        return "Num5";
+        return "5";
     case sf::Keyboard::Num6:
-        return "Num6";
+        return "6";
     case sf::Keyboard::Num7:
-        return "Num7";
+        return "7";
     case sf::Keyboard::Num8:
-        return "Num8";
+        return "8";
     case sf::Keyboard::Num9:
-        return "Num9";
+        return "9";
     case sf::Keyboard::Escape:
         return "Escape";
     case sf::Keyboard::LControl:

@@ -78,6 +78,7 @@ void Player::newRound(const Config &config,const Game &game){
     // Reset other vars
     left=right=false;
     line.clear();
+    noTurtleLine.clear();
     death=false;
     multiplier=0;
     circle.setPosition(x-lineWidth/2,y-lineWidth/2);
