@@ -22,6 +22,7 @@ class Player{
         bool ready;
         float gap[2];// Time to gap[0], and gap time[1];
         sf::String name;
+        sf::String nameChange;
         sf::Color color;
         sf::VertexArray line; // Stores the line
         sf::CircleShape circle;

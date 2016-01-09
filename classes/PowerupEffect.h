@@ -11,9 +11,9 @@ class PowerupEffect{
         Powerup::Type type;
         Powerup::Impact impact;
         float time;
-        int id;
+        unsigned int id;
         // Constructor
-        PowerupEffect(const Powerup::Type &Type,const float &Time,const int &ID); //  Game effects
-        PowerupEffect(const int &Player,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,const int &ID); // Player effects
+        PowerupEffect(const Powerup::Type &Type,const float &Time,const unsigned int &ID); //  Game effects
+        PowerupEffect(const int &Player,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,const unsigned int &ID); // Player effects
 };
 #endif // CURVE_POWERUP_EFFECT

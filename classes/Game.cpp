@@ -16,9 +16,15 @@ Game::Game(const Config &config): gamePacer(config.gameUpdateThreadMinRate), ran
     updateThread[0]=updateThread[1]=updateThread[2]=false;
     server[0]=server[1]=server[2]=false;
     client[0]=client[1]=client[2]=false;
+    joinGame=false;
     countdownInt=0;
     refreshPlayers=false;
     refreshOptions=false;
+    #ifdef DEBUG
+        serverIp=sf::IpAddress::getLocalAddress().toString();
+    #endif // DEBUG
+    //
+    powerupID=0;
     //
     initializePowerups(config);
     // Random
@@ -48,7 +54,9 @@ void Game::initialize(const Config &config, std::vector<Player> &player){
     }
     round=0;
     packetNumber=0;
+    packetNumber2=0;
     paused=true;
+    gameFrame=0;
     // start update thread
     gameThread = std::thread(&Game::thread,this,std::cref(config),std::ref(player));
     // At last toggle to game screen
@@ -86,7 +94,7 @@ void Game::initializePowerups(const Config &config){
     // ?
     powerups.emplace_back(Powerup::Type::QuestionMark,Powerup::Impact::Other,25,0,0);
     // Darkness
-    powerups.emplace_back(Powerup::Type::Darkness,Powerup::Impact::All,25,7.5,5000);
+    powerups.emplace_back(Powerup::Type::Darkness,Powerup::Impact::All,0,7.5,5000); // Disabled for now, was 25
     // Gap
     powerups.emplace_back(Powerup::Type::Gap,Powerup::Impact::Other,75,5,5000);
     // Bomb
@@ -192,6 +200,10 @@ void Game::thread(const Config &config,std::vector<Player> &player){
         }
         // Pacer
         gamePacer.pace();
+        gameFrame++;
+        if(gameFrame%config.gameUpdateThreadMinRate==0){
+            frameTime=config.gameUpdateThreadMinRate/gameFrameClock.restart().asSeconds();
+        }
     }
     // shutdown
     updateThread[0]=false;
@@ -559,7 +571,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
             // Calculate disappear time
             float D=config.powerupMinDisappear + ( ( rand() % (config.powerupRandDisappear+1) ) / 1000.0 ); // Disappear Time
             // Set ID so it easier to identify
-            int id=std::time(nullptr);
+            unsigned int id=powerupID++;
             // Store powerup
             powerupField.emplace_back(X,Y,type,impact,D,id,place);
             //
@@ -587,8 +599,6 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
                     D*=config.lengthMultiplier;
                     player[i].multiplier--;
                 }
-                //
-                int id=powerupField[j].id;
                 // Question Mark
                 while(powerupField[j].type==Powerup::Type::QuestionMark){
                     choosePowerUp(powerupField[j].type,powerupField[j].impact,powerupField[j].place);
@@ -607,7 +617,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
                     case Powerup::Type::Gap:
                     case Powerup::Type::Glitch:
                     case Powerup::Type::Radius:
-                        playerPowerupEffect.emplace_back(i,powerupField[j].type,powerupField[j].impact,D,id);
+                        playerPowerupEffect.emplace_back(i,powerupField[j].type,powerupField[j].impact,D,powerupField[j].id);
                         for(unsigned int k=0;k<player.size();k++){
                             player[k].calculatePowerupEffect(config,*this);
                         }
@@ -628,7 +638,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
                         wallsAway=true;
                         break;
                     case Powerup::Type::MorePowerups:
-                        powerupEffect.emplace_back(Powerup::Type::MorePowerups,D,id);
+                        powerupEffect.emplace_back(Powerup::Type::MorePowerups,D,powerupField[j].id);
                         break;
                     case Powerup::Type::Darkness:
                         darknessTimer+=D;
@@ -647,7 +657,7 @@ void Game::powerUpManager(const Config &config,std::vector<Player> &player){
                 //
                 if(server[1]){
                     Pending pending;
-                    pending.packet << Packet::PowerupHit << i << id;
+                    pending.packet << Packet::PowerupHit << i << powerupField[j].id;
                     queuePacket(pending);
                 }
                 // Remove powerup!
@@ -733,13 +743,12 @@ void Game::pause(const bool &pause){
     }
 }
 //
-void Game::optionsChanged(RendererObjects &objects){
+void Game::optionsChanged(){
     if(server[1]){
         Pending pending;
         pending.packet << Packet::Options << maxPoints << powerupEnabled << multiplePlayersEnabled;
         queuePacket(pending);
     }
-    objects.setOptions(*this);
 }
 //
 void Game::queuePacket(Pending &packet){

@@ -96,7 +96,7 @@ void Server::serverListener(const Config &config,GameSetup &gameSetup,Game &game
         }
     }
     // shutdown
-    sf::sleep(sf::seconds(1));
+    //sf::sleep(sf::seconds(1));
     selector.clear();
     clients.clear();
     listener.close();
@@ -159,6 +159,13 @@ void Server::serverSender(const Config &config,Game &game,std::vector<Player> &p
             } // End Send id for loop
             // Remove empty packets
             if(game.packets[i].sendID.size()==0){
+                // Check type; If update package update game.packetTime.
+                Packet type;
+                game.packets[i].packet >> type;
+                if(type==Packet::Update&&++game.packetNumber2%config.gameUpdateThreadMinRate==0){
+                    game.packetTime=game.packetClock.restart().asSeconds();
+                }
+                //
                 game.packetMutex.lock();
                 game.packets.erase(game.packets.begin()+i);
                 game.packetMutex.unlock();
@@ -185,13 +192,15 @@ void Server::newClient(const Config &config,GameSetup &gameSetup,Game &game,std:
     sf::sleep(sf::milliseconds(250)); // Fixes some errors
     if(new_client){
         Pending pending;
-        pending.packet << Packet::ID << (player.size()-1);
+        unsigned int temp=player.size()-1; // Needed for some reason. Problem with int's?; Should change to fixed size int's
+        pending.packet << Packet::ID << temp;
         pending.sendID.push_back(n);
         game.queuePacket(pending);
     }
     else{
         Pending pending;
-        pending.packet << Packet::RequestPlayer << (player.size()-1);
+        unsigned int temp=player.size()-1;
+        pending.packet << Packet::RequestPlayer << temp;
         pending.sendID.push_back(n);
         game.queuePacket(pending);
     }

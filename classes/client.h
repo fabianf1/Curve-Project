@@ -4,6 +4,7 @@
 // Headers
 #include <iostream>
 #include <thread>
+#include <time.h>
 #include <SFML/Network.hpp>
 #include "Config.h"
 #include "Game.h"

@@ -16,14 +16,14 @@
 #include "Pacer.h"
 #include "Packet.h"
 //
-class RendererObjects;
-//
 class Game{
     public:
         // thread Var
         std::thread gameThread; // Stores thread
         //
         unsigned int frame; // Keeps track of current render frame
+        unsigned int gameFrame; // Keeps track of current gamee frame
+        int frameTime;
         enum class Mode : int {mainMenu,setup,Play} mode; // Keeps track of current modus
         int keyChange[2]; // Keeps track of keychanges, 1 is player, 0 is key(left=0 or right=1)
         int nameChange;
@@ -46,6 +46,7 @@ class Game{
         bool refreshPlayers;
         bool refreshOptions;
         //
+        int powerupID;
         bool wallsAway;
         float wallsAwayTimer;
         bool darkness;
@@ -64,8 +65,10 @@ class Game{
         bool server[3];
         bool client[3];
         unsigned int id;
-        sf::IpAddress serverIp;
+        std::string serverIp;
+        bool joinGame;
         int packetNumber;
+        int packetNumber2;
         float packetTime;
         //
         std::vector<Pending> packets;
@@ -73,6 +76,7 @@ class Game{
         // Clocks
         sf::Clock fpsClock; // For calculating fps
         sf::Clock gameClock; // For game update
+        sf::Clock gameFrameClock;
         sf::Clock packetClock; // Measuring time between packets;
         //
         Pacer gamePacer;
@@ -97,11 +101,9 @@ class Game{
         void choosePowerUp(Powerup::Type &type, Powerup::Impact &impact, int &place);
         void powerUpBomb(const Config &config,std::vector<Player> &player, const int &i, const unsigned int &bombNumber);
         void pause(const bool &pause);
-        void optionsChanged(RendererObjects &objects);
+        void optionsChanged();
         void queuePacket(Pending &packet);
         void shutdown();
 };
-//
-#include "rendererObjects.h"
 //
 #endif // CURVE_GAME

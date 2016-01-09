@@ -79,7 +79,6 @@ void Client::thread(const Config &config,Game &game,std::vector<Player> &player)
                     break;
             } // End toggle case
         }
-        //
         pacer.pace();
     }
     socket.disconnect();
@@ -238,7 +237,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         game.endMessageSet=false;
     }
     else if(type==Packet::PowerupDeleteField){
-        int id;
+        unsigned int id;
         packet >> id;
         for(unsigned int i=0;i<game.powerupField.size();i++){
             if(game.powerupField[i].id==id){
@@ -248,7 +247,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         }
     }
     else if(type==Packet::PowerupDeletePlayer){
-        int id;
+        unsigned int id;
         packet >> id;
         for(unsigned int i=0;i<game.playerPowerupEffect.size();i++){
             if(game.playerPowerupEffect[i].id==id){
@@ -261,7 +260,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         }
     }
     else if(type==Packet::PowerupSpawn){
-        int id;
+        unsigned int id;
         packet >> id;
         float D;
         int X,Y;
@@ -279,7 +278,7 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         int id;
         packet >> id;
         // Powerup ID
-        int ID;
+        unsigned int ID;
         packet >> ID;
         // Find and process
         for(unsigned int i=0;i<game.powerupField.size();i++){

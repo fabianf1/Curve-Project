@@ -12,10 +12,10 @@ class PowerupField{
         Powerup::Impact impact; // Self, enemy or all(0,1,2)
         float time1; // Time since appearance
         float time2; // Time before disappearing
-        int id;
+        unsigned int id; // ID to IDentify
         int place; // Place in powerup vector
         // Constructors
-        PowerupField(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID);
-        PowerupField(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,int &ID,const int &Place);
+        PowerupField(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,unsigned int &ID);
+        PowerupField(const int &X,const int &Y,const Powerup::Type &Type,const Powerup::Impact &Impact,const float &Time,unsigned int &ID,const int &Place);
 };
 #endif // CURVE_POWERUP_FIELD

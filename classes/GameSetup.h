@@ -24,7 +24,7 @@ class GameSetup{
         void removePlayer(Game &game,std::vector<Player> &player, const int &i);
         bool keyAvailable(const std::vector<Player> &player,const sf::Keyboard::Key &key);
         void quit(const Config &config,Game &game,std::vector<Player> &player);
-        void startGame(const Config &config,Game &game,std::vector<Player> &player,const Server &server);
+        bool startGame(const Config &config,Game &game,std::vector<Player> &player,const Server &server);
         void autoAddPlayers(const Config &config,Game &game,std::vector<Player> &player);
 };
 // Class headers

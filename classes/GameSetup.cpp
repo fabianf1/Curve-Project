@@ -89,32 +89,34 @@ void GameSetup::quit(const Config &config,Game &game,std::vector<Player> &player
     game.switchMode(Game::Mode::mainMenu);
 }
 //
-void GameSetup::startGame(const Config &config,Game &game,std::vector<Player> &player,const Server &server){
+bool GameSetup::startGame(const Config &config,Game &game,std::vector<Player> &player,const Server &server){
     // check if there are at least two players
     if(player.size()<2){
         std::cout << "Not enough players!" << std::endl;
-        return;
+        return false;
     }
     // check keys
     for(unsigned int i=0;i<player.size();i++){
         if( (player[i].local&&(player[i].keyL==sf::Keyboard::Unknown||player[i].keyR==sf::Keyboard::Unknown))){
             std::cout << "Keys not set!" << std::endl;
-            return;
+            return false;
         }
     }
     // check ready
     for(unsigned int i=0;i<server.clients.size();i++){
         if(!server.clients[i].ready){
             std::cout << "Someone is not ready!" << std::endl;
-            return;
+            return false;
         }
+        game.countdownEnabled=true;
     }
-    // shutdown server if no clients
+    // Shutdown server if no clients
     if(server.clients.size()==0&&game.server[1]){
         game.server[2]=true;
     }
-    // If they are start init
+    // Start game
     game.initialize(config,player);
+    return true;
 }
 //
 void GameSetup::autoAddPlayers(const Config &config,Game &game,std::vector<Player> &player){

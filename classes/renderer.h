@@ -5,33 +5,23 @@
 #include <thread>
 #include <iostream>
 #include <vector>
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include "Config.h"
 #include "Game.h"
 #include "Player.h"
 #include "Client.h"
-#include "rendererObjects.h"
-#include "PowerupSprite.h"
-//
-#include "../functions/general.h"
-
+#include "Object.h"
 //
 class Renderer{
     public:
         // Vars
         sf::RenderWindow window;
         std::thread renderThread;
-        RendererObjects objects;
-        PowerupSprite sprite;
-        // Constructor
-        Renderer(const Config &config) : objects(config), sprite(config){};
+        float fps;
         // Functions
-        void start(const Config &config,Game &game,const std::vector<Player> &player);
-        void thread(const Config &config,Game &game,const std::vector<Player> &player);
-        void mainMenu();
-        void setup(const Config &config,const Game &game,const std::vector<Player> &player);
-        void play(const Config &config,const Game &game,const std::vector<Player> &player);
-        void powerUp(const Config &config,const Game &game,const std::vector<Player> &player);
+        void start(Main &main, const Config &config,Game &game,std::vector<std::unique_ptr<ObjectBase>> &objects, const std::vector<Player> &player);
+        void thread(Main &main, const Config &config,Game &game,std::vector<std::unique_ptr<ObjectBase>> &objects, const std::vector<Player> &player);
         void shutdown();
 };
 

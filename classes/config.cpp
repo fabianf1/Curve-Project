@@ -97,6 +97,6 @@ Config::Config(){
     attemptDuration=250;
     lagTime=1.5; // 1 would be the normal time
     //
-    majorVersion="0.5";
-    minorVersion="1";
+    majorVersion="0.6";
+    minorVersion="0";
 }

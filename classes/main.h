@@ -11,6 +11,7 @@
 #include "Client.h"
 #include "Renderer.h"
 #include "Pacer.h"
+#include "ObjectStorage.h"
 
 //
 class Main{
@@ -23,19 +24,20 @@ class Main{
         Server server;
         Client client;
         Renderer renderer;
+        ObjectStorage storage;
         sf::Event event;
         Pacer threadPacer;
         // Constructor
-        Main() :game(config), renderer(config),threadPacer(config.mainThreadMinRate) {};
+        Main() :game(config), storage(config), threadPacer(config.mainThreadMinRate) {};
         // Functions
         void curveProject();
         void eventHandler();
-        void mainMenuHandler();
-        void gameSetupHandler();
-        void changeButton(const int &button,unsigned const int &pl);
-        void gameHandler();
+        //void mainMenuHandler();
+        //void gameSetupHandler();
+        //void changeButton(const int &button,unsigned const int &pl);
+        //void gameHandler();
 };
-
+//
 #endif // CURVE_MAIN
 
 
