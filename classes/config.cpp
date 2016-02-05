@@ -33,7 +33,7 @@ Config::Config(){
     // Slow
     slowScaling=0.5; // How fast it will go to the minimum speed;
     slowMinMultiplier=0.01; // The minimum multiplier it can reach
-    slowTurnScaling=0.25;
+    slowTurnScaling=0.25; // If TurnScaling<Scaling then turning will get slower
     slowTurnMinMultiplier=0.01;
     // Fast
     fastScaling=0.4;
@@ -70,7 +70,7 @@ Config::Config(){
     //
     lengthMultiplier=1.5;
     //
-    powerupSpawnChance=12; // % per powerupSpawnCheck second
+    powerupSpawnChance=12; // % per powerupSpawnCheck
     powerupSpawnCheck=1.0;
     powerupScale=0.4; // Textures are 100x100
     powerupRadius=40/2; // 40 is full width
@@ -91,7 +91,8 @@ Config::Config(){
     //
     mainThreadMinRate=30;
     gameUpdateThreadMinRate=60;
-    maxElapsed=0.1;
+    maxElapsed=1.0/30.0;
+    clientWaitTime=1.0/60.0;
     //
     port=55003;
     attemptDuration=250;

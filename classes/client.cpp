@@ -10,24 +10,25 @@ void Client::start(const Config &config, Game &game,std::vector<Player> &player)
     if(game.client[0]){
         shutdown(game);
     }
-    socket.setBlocking(true);
-    sf::Socket::Status status= socket.connect(game.serverIp,config.port,sf::milliseconds(config.attemptDuration));
-    if(status==sf::Socket::Error){
-        std::cout << "Server connection Error!" << std::endl;
-    }
-    else if(status==sf::Socket::NotReady){
-        // When the client tries to reconnect this always occurs for some reason. Trying again results in a succeeded connection attempt.
-        // This was fixed by making the socket block again
-        std::cout << "No response from server." << std::endl;
-    }
-    else{
-        std::cout << "Connected to server! Checking version..." << std::endl;
-        socket.setBlocking(false);
-        sync=false;
-        ready=false;
-        // start server connection thread
-        clientThread = std::thread(&Client::thread,this,std::cref(config),std::ref(game),std::ref(player));
-        game.client[1]=true;
+
+    switch(socket.connect(game.serverIp,config.port,sf::milliseconds(config.attemptDuration))){
+        case sf::Socket::Error:
+            std::cout << "Server connection Error!" << std::endl;
+            break;
+        case sf::Socket::NotReady:
+            // When the client tries to reconnect this always occurs for some reason. Trying again results in a succeeded connection attempt.
+            // This was fixed by making the socket block again
+            std::cout << "No response from server." << std::endl;
+            break;
+        default:
+            std::cout << "Connected to server! Checking version..." << std::endl;
+            selector.add(socket);
+            sync=false;
+            ready=false;
+            // start server connection thread
+            clientThread = std::thread(&Client::thread,this,std::cref(config),std::ref(game),std::ref(player));
+            game.client[1]=true;
+        break;
     }
 }
 //
@@ -40,25 +41,27 @@ void Client::thread(const Config &config,Game &game,std::vector<Player> &player)
     // Main loop
     while(!game.client[2]){
         // check if receiving something
-        switch(socket.receive(packet)){
-            case sf::Socket::Done:
-                processPacket(config,game,player,packet);
-                packet.clear();
-                break;
-            case sf::Socket::Disconnected:
-            case sf::Socket::Error:
-                if(!sync){
-                    std::cout << "Server full!" << std::endl;
-                }
-                else{
-                    std::cout << "Disconnected from server!" << std::endl;
-                }
-                // Break connection!
-                game.client[2]=true;
-                game.mode=Game::Mode::mainMenu;
-                break;
-            default:
-                break;
+        if(selector.wait( sf::seconds(config.clientWaitTime) )){
+            switch(socket.receive(packet)){
+                case sf::Socket::Done:
+                    processPacket(config,game,player,packet);
+                    packet.clear();
+                    break;
+                case sf::Socket::Disconnected:
+                case sf::Socket::Error:
+                    if(!sync){
+                        std::cout << "Server full!" << std::endl;
+                    }
+                    else{
+                        std::cout << "Disconnected from server!" << std::endl;
+                    }
+                    // Break connection!
+                    game.client[2]=true;
+                    game.mode=Game::Mode::mainMenu;
+                    break;
+                default:
+                    break;
+            }
         }
         // Send
         for(int i=game.packets.size()-1;i>=0;i--){
@@ -79,9 +82,9 @@ void Client::thread(const Config &config,Game &game,std::vector<Player> &player)
                     break;
             } // End toggle case
         }
-        pacer.pace();
     }
     socket.disconnect();
+    selector.remove(socket);
     game.client[1]=game.client[2]=false;
     game.client[0]=true;
     player.clear();

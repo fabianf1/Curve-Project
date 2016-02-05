@@ -20,10 +20,10 @@ class Client{
         // Vars
         std::thread clientThread;
         sf::TcpSocket socket;
+        sf::SocketSelector selector;
         bool sync;
         bool ready;
         sf::Packet packet;
-        Pacer pacer;
         // Functions
         void start(const Config &config, Game &game,std::vector<Player> &player);
         void thread(const Config &config,Game &game,std::vector<Player> &player);
@@ -31,8 +31,6 @@ class Client{
         void processPacket(const Config &config,Game &game,std::vector<Player> &player,sf::Packet &packet);
         void syncPackage(Game &game,std::vector<Player> &player,sf::Packet &packet);
         void shutdown(Game &game);
-        // Constructor
-        Client(): pacer(200){}
 };
 #endif // CURVE_CLIENT
 //

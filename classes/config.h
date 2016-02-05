@@ -91,6 +91,7 @@ class Config{
         int mainThreadMinRate;
         int gameUpdateThreadMinRate;
         float maxElapsed; // Maximum game update time difference;
+        float clientWaitTime; // Time to wait for incoming connection
         //
         int port;
         int attemptDuration;
