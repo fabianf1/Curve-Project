@@ -17,6 +17,7 @@ class ClientInfo{
         ClientInfo();
         // Function
         bool checkID(const unsigned int &n);
+        void updateID(const unsigned int &n);
 };
 
 #endif // CURVE_CLIENTINFO

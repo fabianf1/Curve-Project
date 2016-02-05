@@ -51,7 +51,7 @@ void Server::serverListener(const Config &config,GameSetup &gameSetup,Game &game
                 }
                 else{
                     // Check if new Clients can be added
-                    if(player.size()<6&&game.mode!=Game::Mode::Play){
+                    if(player.size()<config.maxPlayers&&game.mode!=Game::Mode::Play){
                         selector.add(*clients.back().socket);
                         std::cout << "Remote client " + clients.back().socket->getRemoteAddress().toString() + " has connected to the server. \n";
                     }
@@ -83,7 +83,7 @@ void Server::serverListener(const Config &config,GameSetup &gameSetup,Game &game
                                 std::cout << "Remote client disconnected." << std::endl;
                                 disconnectClient(gameSetup, game, player, i);
                                 // Find out if all players left
-                                if(player.size()<=1){
+                                if(player.size()==1){
                                     // Return to setup screen
                                     game.quit(config);
                                 }
@@ -223,10 +223,11 @@ void Server::disconnectClient(GameSetup &gameSetup, Game &game,std::vector<Playe
     // Remove out of list
     selector.remove(*clients[n].socket);
     clients.erase(clients.begin()+n);
-    // Update id in player
+    // Update id in player and clientInfo
     for(unsigned int j=1;j<player.size();j++){
         if(!player[j].local&&player[j].id>n){
             player[j].id--;
+            clients[player[j].id].updateID(j+1);
         }
     }
     // Pend Packed
