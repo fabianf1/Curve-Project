@@ -17,6 +17,10 @@ class Config{
         sf::Color windowBackgroundColor;
         sf::Image icon;
         //
+        int fontTitleSize;
+        int fontSize;
+        int fontSmallSize;
+        //
         int fps; // Maximum number of fps
         unsigned int maxPlayers;
         //
@@ -59,6 +63,8 @@ class Config{
         int glitchSpeedChance;
         float glitchMaxSpeedIncrease;
         float glitchMaxSpeedDecrease;
+        int glitchAngleChance;
+        int glitchMaxAngle;
         //
         float radiusMinScale;
         float radiusScaleFactor;

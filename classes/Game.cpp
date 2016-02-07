@@ -18,11 +18,10 @@ Game::Game(const Config &config): gamePacer(config.gameUpdateThreadMinRate), ran
     client[0]=client[1]=client[2]=false;
     joinGame=false;
     countdownInt=0;
-    refreshPlayers=false;
-    refreshOptions=false;
     #ifdef DEBUG
-        serverIp=sf::IpAddress::getLocalAddress().toString();
+    serverIp=sf::IpAddress::getLocalAddress().toString();
     #endif // DEBUG
+    packetTime=1.0;
     //
     powerupID=0;
     //
@@ -94,7 +93,7 @@ void Game::initializePowerups(const Config &config){
     // ?
     powerups.emplace_back(Powerup::Type::QuestionMark,Powerup::Impact::Other,25,0,0);
     // Darkness
-    powerups.emplace_back(Powerup::Type::Darkness,Powerup::Impact::All,0,7.5,5000); // Disabled for now, was 25
+    powerups.emplace_back(Powerup::Type::Darkness,Powerup::Impact::All,25,7.5,5000);
     // Gap
     powerups.emplace_back(Powerup::Type::Gap,Powerup::Impact::Other,75,5,5000);
     // Bomb
@@ -103,13 +102,13 @@ void Game::initializePowerups(const Config &config){
     powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Self,50,(1/config.sineFrequency)*5,0);
     powerups.emplace_back(Powerup::Type::Sine,Powerup::Impact::Other,75,(1/config.sineFrequency)*5,0);
     // Glitch
-    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::All,15,5,5000);
-    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::Other,10,5,5000);
+    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::All,15,5,0);
+    powerups.emplace_back(Powerup::Type::Glitch,Powerup::Impact::Other,10,5,0);
     // Radius
     powerups.emplace_back(Powerup::Type::Radius,Powerup::Impact::All,25,5,0);
     // NoTurtle
     powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::All,25,5,0);
-    powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::Other,40,5,0);
+    powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::Other,40000,5,0);
     // Multiplier
     powerups.emplace_back(Powerup::Type::Multiplier,Powerup::Impact::Self,20,5,0);
     // Calculate total chance
@@ -139,17 +138,17 @@ void Game::thread(const Config &config,std::vector<Player> &player){
             }
         }
         else if( !client[1] && !paused && !roundFinished ){
-            // Get elapsed time since last iteration. If the time is too long it will be set to a fixed value.
+            // Get elapsed time since last iteration. If the time is too long it will be set to a fixed value and a message will be displayed in the console.
             elapsed=gameClock.restart().asSeconds();
             if(elapsed>config.maxElapsed){
                 elapsed=config.maxElapsed;
                 std::cout << "Slow execution!" << std::endl;
             }
-            // Powerup
+            // Handle powerups
             if(powerupEnabled){
                 powerUpManager(config,player);
             }
-            // Update
+            // Update positions and send data over if server
             Pending pending;
             if(server[1]){
                 packetNumber++;
@@ -166,15 +165,14 @@ void Game::thread(const Config &config,std::vector<Player> &player){
             if(server[1]){
                 queuePacket(pending);
             }
-            // End Update
             // Hit detection
             hitDetector(config,player);
         }
-        else if(client[1]&&!roundFinished){
+        else if( client[1] && !roundFinished){
             // check key states and send if changed
             for(unsigned int i=0;i<player.size();i++){
                 if(player[i].local){
-                    // KeyL changed
+                    // Left key changed
                     if( (!player[i].left&&sf::Keyboard::isKeyPressed(player[i].keyL)) || (player[i].left&&!sf::Keyboard::isKeyPressed(player[i].keyL)) ){
                         player[i].left=sf::Keyboard::isKeyPressed(player[i].keyL);
                         // Send package
@@ -182,7 +180,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
                         pending.packet << Packet::KeyL << i << player[i].left;
                         queuePacket(pending);
                     }
-                    // KeyR changed
+                    // Right key changed
                     if( (!player[i].right&&sf::Keyboard::isKeyPressed(player[i].keyR)) || (player[i].right&&!sf::Keyboard::isKeyPressed(player[i].keyR)) ){
                         player[i].right=sf::Keyboard::isKeyPressed(player[i].keyR);
                         // Send package
@@ -192,7 +190,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
                     }
                 }
             }
-            // Powerup
+            // Process powerups
             if(!paused){
                 elapsed=gameClock.restart().asSeconds();
                 powerUpManager(config);
@@ -233,7 +231,6 @@ void Game::newRound(const Config &config,std::vector<Player> &player){
     deathCount=0;
     roundFinished=false;
     gameFinished=false;
-    endMessageSet=false;
     paused=true;
     round++;
     powerupField.clear();
@@ -260,7 +257,7 @@ void Game::newRound(const Config &config,std::vector<Player> &player){
 }
 //
 void Game::hitDetector(const Config &config,std::vector<Player> &player){
-    // Initializer vector to store death people
+    // Initialize vector to store the dead
     std::vector<unsigned int> death_vec;
     // Do the magic
     for(unsigned int i=0;i<player.size();i++){
@@ -365,7 +362,7 @@ void Game::playerDeath(std::vector<Player> &player,const std::vector<unsigned in
         }
         queuePacket(pending);
     }
-    // Declare people death. This is done after the points are given so this is done correctly
+    // Declare people dead. This is done after the points are given so this is done correctly
     for(unsigned int i=0;i<death_vec.size();i++){
         deathCount++;
         player[death_vec[i]].death=true;
@@ -373,28 +370,26 @@ void Game::playerDeath(std::vector<Player> &player,const std::vector<unsigned in
 }
 //
 void Game::endRound(const Config &config,std::vector<Player> &player){
-    // Show everything again
-    darkness=false;
-    // Round is always finished so set the var
-    roundFinished=true;
+    darkness=false; // Show everything again
+    roundFinished=true; // Round is always finished so set the var
     // Check if someone won the game
     int points=0; // Numer of points winner has
-    roundWinner=-1; // The player number
+    roundWinner=-1; // The player that won the round
+    // Check if someone won the game
     for(unsigned int i=0;i<player.size();i++){
-        // check if player has the needed points to win
         if(player[i].points>=maxPoints){
-            // check if player has more points then someone other that has more then maxPoints
+            // Check if player has more points then someone other that has more then maxPoints
             if(player[i].points>points){
                 points=player[i].points;
                 roundWinner=i;
             }
-            // If two people have the same amount of points revert winner to -1 to let see that there is no winner yet
+            // If two people have the same amount of points revert to -1 to show that there is now winner yet
             else if(player[i].points==points){
                 roundWinner=-1;
             }
         }
     }
-    // Game finshes
+    // If someone won end game
     if(roundWinner>-1){
         gameFinished=true;
         if(updateThread[1]){
@@ -409,13 +404,13 @@ void Game::endRound(const Config &config,std::vector<Player> &player){
     }
     // Game continues, someone has just won a round;
     else{
+        // Try to find a player that is not dead. If none is found it means that the round ended in a draw.
         for(unsigned int i=0;i<player.size();i++){
             if(!player[i].death){
                 roundWinner=i;
                 break;
             }
         }
-        // Server Part :D
         if(server[1]){
             Pending pending;
             pending.packet << Packet::RoundEnd << roundWinner;

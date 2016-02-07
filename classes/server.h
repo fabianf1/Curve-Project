@@ -15,8 +15,6 @@
 #include "ClientInfo.h"
 #include "Color.h"
 #include "Pacer.h"
-
-#include "../functions/general.h"
 //
 class Server{
     public:
@@ -35,7 +33,7 @@ class Server{
         void serverListener(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player);
         void serverSender(const Config &config,Game &game,std::vector<Player> &player);
         void newClient(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player, const unsigned int &n, const bool &new_client);
-        void disconnectClient(GameSetup &gameSetup, Game &game,std::vector<Player> &player, const unsigned int &n);
+        void disconnectClient(const Config &config, GameSetup &gameSetup, Game &game,std::vector<Player> &player, const unsigned int &n);
         void processPackage(const Config &config,GameSetup &gameSetup,Game &game,std::vector<Player> &player,sf::Packet &packet,const unsigned int &n);
         void shutdown(Game &game);
         void syncClients(Game &game,const std::vector<Player> &player);

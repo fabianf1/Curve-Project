@@ -52,6 +52,9 @@ void GameSetup::removePlayer(Game &game,std::vector<Player> &player, const int &
     sf::Color col=player[i].color;
     // Remove player
     player.erase(player.begin()+i);
+    for(unsigned int j=i; j<player.size(); j++){
+        player[j].place--;
+    }
     // Set Color Available
     for(int i=0;i<6;i++){
         if(col==color[i]){

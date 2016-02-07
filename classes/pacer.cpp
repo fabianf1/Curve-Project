@@ -2,12 +2,12 @@
 // Needed Header
 #include "Pacer.h"
 // Constructor
-Pacer::Pacer(const unsigned int &i_minRunTime){
-    setPace(i_minRunTime);
+Pacer::Pacer(const unsigned int &i_minPace){
+    setPace(i_minPace);
 }
 // Functions
-void Pacer::setPace(const unsigned int &i_minRunTime){
-    minRunTime=sf::seconds(1.f/i_minRunTime);
+void Pacer::setPace(const unsigned int &i_minPace){
+    minRunTime=sf::seconds(1.f/i_minPace);
 }
 unsigned int Pacer::getPace(){
     return 1.f/minRunTime.asSeconds();

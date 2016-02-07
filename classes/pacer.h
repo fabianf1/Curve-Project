@@ -1,5 +1,5 @@
 // Contains Pacer class declaration
-// minRunTime is the minimum run time in milliseconds
+// minPace is the number of iterations per second
 #ifndef CURVE_PACER
 #define CURVE_PACER
 // Headers
@@ -11,12 +11,12 @@ class Pacer{
     sf::Time minRunTime;
     public:
         // Functions
-        void setPace(const unsigned int &i_minRunRate);
+        void setPace(const unsigned int &i_minPace);
         unsigned int getPace();
         void resetClock();
         void pace();
         // Constructor
-        Pacer(const unsigned int &i_minRunRate);
+        Pacer(const unsigned int &i_minPace);
 };
 
 #endif // CURVE_PACER

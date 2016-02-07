@@ -1,12 +1,6 @@
 //
 #include "General.h"
-// Converts integers to a string
-std::string int2str(const int &x){
-    std::stringstream type;
-    type << x;
-    return type.str();
-}
-// Thank https://github.com/LaurentGomila/SFML/wiki/Source:-Load-Image-From-Resource
+// Source: https://github.com/LaurentGomila/SFML/wiki/Source:-Load-Image-From-Resource
 sf::Image LoadImageFromResource(const std::string& name){
     HRSRC rsrcData = FindResource(NULL, name.c_str(), RT_RCDATA);
     if (!rsrcData)

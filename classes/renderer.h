@@ -11,14 +11,14 @@
 #include "Game.h"
 #include "Player.h"
 #include "Client.h"
-#include "Object.h"
+#include "ObjectBase.h"
 //
 class Renderer{
     public:
         // Vars
         sf::RenderWindow window;
         std::thread renderThread;
-        float fps;
+        int fps;
         // Functions
         void start(Main &main, const Config &config,Game &game,std::vector<std::unique_ptr<ObjectBase>> &objects, const std::vector<Player> &player);
         void thread(Main &main, const Config &config,Game &game,std::vector<std::unique_ptr<ObjectBase>> &objects, const std::vector<Player> &player);

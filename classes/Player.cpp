@@ -10,14 +10,10 @@ Player::Player(){
     local=server=false;
 }
 //
-Player::Player(const sf::String &Name,const sf::Color &Color){
+Player::Player(const sf::String &Name,const sf::Color &Color): Player(){
     name=Name;
     color=Color;
     circle.setFillColor(color);
-    line.setPrimitiveType(sf::Quads);
-    noTurtleLine.setPrimitiveType(sf::Quads);
-    keyL=keyR=sf::Keyboard::Unknown;
-    local=server=false;
 }
 // Functions
 void Player::New_Game(){
@@ -149,6 +145,12 @@ void Player::updatePosition(const Config &config, Game &game){
             else if(randomChance>=config.glitchWidthChance && randomChance<2*config.glitchWidthChance){
                 // Smaller
                 glitchSpeedScale=1.0 - ( (rand() % (100+1) ) /100.0*config.glitchMaxWidthDecrease);
+            }
+            // Do Angle
+            randomChance = rand() % (100+1);
+            if(randomChance<config.glitchAngleChance){
+                // On way
+                heading += (rand() % ((2 * config.glitchMaxAngle) + 1) ) - config.glitchMaxAngle;
             }
         }
         // Set Linewidth and speed
@@ -445,7 +447,7 @@ void Player::calculatePowerupEffect(const Config &config,const Game &game){
 }
 //
 void Player::calculateNoTurtleEffect(const Config &config, const int &i, const Powerup::Impact &Impact){
-    if(Impact==Powerup::Impact::Other&&i==place){
+    if(Impact==Powerup::Impact::Other && i==place){
         return;
     }
     noTurtleTimer=config.noTurtleTime;
@@ -454,26 +456,21 @@ void Player::calculateNoTurtleEffect(const Config &config, const int &i, const P
     int angle=0;
     int angle2=360/config.noTurtlePoints;
     for(int j=0;j<config.noTurtlePoints;j++){
-        // Calculater center
-        posX=x+cos(angle*PI/180.0)*config.noTurtleRadius;
-        posY=y+sin(angle*PI/180.0)*config.noTurtleRadius;
-        posX2=x+cos(angle2*PI/180.0)*config.noTurtleRadius;
-        posY2=y+sin(angle2*PI/180.0)*config.noTurtleRadius;
         // Add quads
         sf::Vertex quad;
         quad.color=color;
         quad.color.a=128;
-        //
-        quad.position = sf::Vector2f( posX+sin((angle+90)*PI/180.0)*lineWidth/2.0, posY-cos((angle+90)*PI/180.0)*lineWidth/2.0);
+        // Point far from player
+        quad.position = sf::Vector2f( x+cos(angle*PI/180.0)*(config.noTurtleRadius+lineWidth/2), y+sin(angle*PI/180.0)*(config.noTurtleRadius+lineWidth/2));
         noTurtleLine.append(quad);
-        //
-        quad.position = sf::Vector2f( posX-sin((angle+90)*PI/180.0)*lineWidth/2.0, posY+cos((angle+90)*PI/180.0)*lineWidth/2.0);
+        // Point close to player
+        quad.position = sf::Vector2f( x+cos(angle*PI/180.0)*(config.noTurtleRadius-lineWidth/2), y+sin(angle*PI/180.0)*(config.noTurtleRadius-lineWidth/2));
         noTurtleLine.append(quad);
-        //
-        quad.position = sf::Vector2f( posX2-sin((angle+90)*PI/180.0)*lineWidth/2.0, posY2+cos((angle+90)*PI/180.0)*lineWidth/2.0);
+        // Point close from player rotated further
+        quad.position = sf::Vector2f( x+cos(angle2*PI/180.0)*(config.noTurtleRadius-lineWidth/2), y+sin(angle2*PI/180.0)*(config.noTurtleRadius-lineWidth/2));
         noTurtleLine.append(quad);
-        //
-        quad.position = sf::Vector2f( posX2+sin((angle+90)*PI/180.0)*lineWidth/2.0, posY2-cos((angle+90)*PI/180.0)*lineWidth/2.0);
+        // Point far from player rotated further
+        quad.position = sf::Vector2f( x+cos(angle2*PI/180.0)*(config.noTurtleRadius+lineWidth/2), y+sin(angle2*PI/180.0)*(config.noTurtleRadius+lineWidth/2));
         noTurtleLine.append(quad);
         // Increment angle
         angle=angle2;

@@ -37,14 +37,10 @@ class Game{
         unsigned int deathCount;
         bool roundFinished;
         bool gameFinished;
-        bool endMessageSet;
         int roundWinner;
         int countdownInt;
         sf::Clock countdownClock;
         std::recursive_mutex modeMutex;
-        //
-        bool refreshPlayers;
-        bool refreshOptions;
         //
         int powerupID;
         bool wallsAway;
@@ -67,8 +63,8 @@ class Game{
         unsigned int id;
         std::string serverIp;
         bool joinGame;
-        int packetNumber;
-        int packetNumber2;
+        int packetNumber; // Keep track of packet number to prevent mixups
+        int packetNumber2; // To check if packets are send on time
         float packetTime;
         //
         std::vector<Pending> packets;
@@ -76,7 +72,7 @@ class Game{
         // Clocks
         sf::Clock fpsClock; // For calculating fps
         sf::Clock gameClock; // For game update
-        sf::Clock gameFrameClock;
+        sf::Clock gameFrameClock; // Measuring game updates
         sf::Clock packetClock; // Measuring time between packets;
         //
         Pacer gamePacer;

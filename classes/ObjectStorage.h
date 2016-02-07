@@ -6,18 +6,23 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <mutex>
 #include "config.h"
-#include "Object.h"
-
-// Circles
+#include "game.h"
+#include "ObjectStatic.h"
+#include "ObjectButton.h"
+#include "ObjectHead.h"
+#include "ObjectLine.h"
+#include "ObjectPowerups.h"
+#include "TextBox.h"
+// Forward declaration
 class Main;
-
+//
 class ObjectStorage{
 public:
     // Variables
     std::vector<std::unique_ptr<ObjectBase>> objects;
     const sf::Font font;
-    std::recursive_mutex modeMutex; // Safety Reasons
     Game::Mode mode;
     // Constructor
     ObjectStorage(const Config &config);
@@ -37,17 +42,14 @@ public:
     template<class T>
     void addToVector(T &object,std::function<bool(Main&,ObjectStatic<T>&)> &visible,std::function<void(Main&,ObjectStatic<T>&)> &update);
     template<class T>
-    void addToVector(T &object,std::function<bool(Main&,ObjectStatic<T>&)> &visible,std::function<void(Main&,ObjectStatic<T>&)> &update, unsigned int &updateInfo);
+    void addToVector(T &object,std::function<bool(Main&,ObjectStatic<T>&)> &visible,std::function<void(Main&,ObjectStatic<T>&)> &update, unsigned int &id);
     // Button without update action
     template<class T>
     void addToVector(T &object, std::function<bool(Main&,ObjectButton<T>&)> &visible, std::function<void(Main&,ObjectButton<T>&)> &action,const sf::Color &selectedColor,const unsigned int &selectedStyle);
     // Complete button
     template<class T>
-    void addToVector(T object, std::function<bool(Main&,ObjectButton<T>&)> &visible, std::function<void(Main&,ObjectButton<T>&)> &action, std::function<void(Main&,ObjectButton<T>&)> &update, unsigned int &updateInfo,const sf::Color &selectedColor,const unsigned int &selectedStyle);
+    void addToVector(T object, std::function<bool(Main&,ObjectButton<T>&)> &visible, std::function<void(Main&,ObjectButton<T>&)> &action, std::function<void(Main&,ObjectButton<T>&)> &update, unsigned int &id,const sf::Color &selectedColor,const unsigned int &selectedStyle);
     // TextBox
-    void addToVector2(sf::Text object, std::function<bool(Main&,ObjectButton<sf::Text>&)> &visible, std::function<void(Main&,ObjectButton<sf::Text>&)> &action, std::function<void(Main&,ObjectButton<sf::Text>&)> &update, unsigned int &updateInfo,const sf::Color &selectedColor,const unsigned int &selectedStyle);
+    void addToVector2(sf::Text object, std::function<bool(Main&,ObjectButton<sf::Text>&)> &visible, std::function<void(Main&,ObjectButton<sf::Text>&)> &action, std::function<void(Main&,ObjectButton<sf::Text>&)> &update, unsigned int &id,const sf::Color &selectedColor,const unsigned int &selectedStyle);
 };
-
-
 #endif // CURVE_OBJECTSTORAGE
-

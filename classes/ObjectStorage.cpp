@@ -17,29 +17,27 @@ void ObjectStorage::initMainMenu(const Config &config){
     std::function<bool(Main&, ObjectButton<sf::Text>&)> visible;
     std::function<void(Main&, ObjectButton<sf::Text>&)> action;
     std::function<void(Main&, ObjectButton<sf::Text>&)> update;
-    int fontTitleSize=50;
-    int fontSize=30;
     // Title
     tempText.setString("Curve Project");
-    tempText.setCharacterSize(fontTitleSize);
+    tempText.setCharacterSize(config.fontTitleSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Bold);
-    tempText.setPosition( (config.windowWidth/2)-(tempText.getLocalBounds().width/2) ,10); // Middle Top
+    tempText.setPosition( (config.windowWidth / 2) - (tempText.getLocalBounds().width / 2), 10); // Middle Top
     addToVector(tempText);
     // Version
     tempText.setString(config.majorVersion + "." + config.minorVersion);
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     //tempText.setColor(sf::Color::White);
     //tempText.setStyle(sf::Text::Bold);
-    tempText.setPosition( (config.windowWidth/2)-(tempText.getLocalBounds().width/2) ,60); // Middle top
+    tempText.setPosition( (config.windowWidth / 2) - (tempText.getLocalBounds().width/2), 60); // Middle top
     addToVector(tempText);
     // Buttons
     // Start
     tempText.setString("Create Game");
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     tempText.setColor(sf::Color::Red);
     //tempText.setStyle(sf::Text::Bold);
-    tempText.setPosition( 50 , config.windowHeight/2); // Left middle
+    tempText.setPosition(50, config.windowHeight / 2); // Left middle
     action = [](Main &main, ObjectButton<sf::Text> &button){
         main.gameSetup.initialize(main.config,main.game,main.player);
         main.storage.initGameSetup(main.config);
@@ -62,7 +60,6 @@ void ObjectStorage::initMainMenu(const Config &config){
     };
     tempText.setPosition( 50 , config.windowHeight/2+40); // Left ~middle
     unsigned int random = 0; // Need to fix not accepting non unsigned
-    //addToVector(tempText, trueFunction, action, update, fontSize, sf::Color::Yellow, sf::Text::Italic|sf::Text::Bold);
     addToVector(tempText, trueFunction, action, update, random, sf::Color::Yellow, sf::Text::Italic);
     // Quit
     tempText.setString("Quit");
@@ -92,7 +89,7 @@ void ObjectStorage::initMainMenu(const Config &config){
     addToVector2(tempText, visible, action, update, random, sf::Color::Yellow, sf::Text::Italic);
     // Join button
     tempText.setString("Join");
-    tempText.setPosition(400, config.windowHeight/2+40); // Left ~middle
+    tempText.setPosition(470, config.windowHeight/2+40); // Left ~middle
     action = [](Main &main, ObjectButton<sf::Text> &button){
         if(main.game.serverIp.size()>6){
             main.client.start(main.config,main.game,main.player);
@@ -113,14 +110,11 @@ void ObjectStorage::initGameSetup(const Config &config){
     std::function<bool(Main&, ObjectButton<sf::Text>&)> visible;
     std::function<void(Main&, ObjectButton<sf::Text>&)> action;
     unsigned int random=0;
-    //std::function<void(Main&)> update;
-    int fontTitleSize=50;
-    int fontSize=30;
     sf::Text drawable;
     // Title
     tempText.setString("Game setup");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontTitleSize);
+    tempText.setCharacterSize(config.fontTitleSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Bold);
     tempText.setPosition( (config.windowWidth/2)-(tempText.getLocalBounds().width/2) ,10); // Middle Top
@@ -128,7 +122,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     // Name
     tempText.setString("Name");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Bold);
     tempText.setPosition(40 , 150); // Left Semi-top
@@ -136,7 +130,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     // Left
     tempText.setString("Left");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Bold);
     tempText.setPosition(200 , 150);
@@ -144,7 +138,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     // Right
     tempText.setString("Right");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Bold);
     tempText.setPosition(350 , 150);
@@ -152,7 +146,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     // Add player
     tempText.setString("Add");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(40 , 150+30*1.5);
@@ -189,7 +183,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     // Start Game
     tempText.setString("Start Game");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(800-tempText.getLocalBounds().width/2,config.windowHeight-150);
@@ -222,7 +216,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     // Return to main menu
     tempText.setString("Quit");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(800-tempText.getLocalBounds().width/2,config.windowHeight-100);
@@ -236,71 +230,71 @@ void ObjectStorage::initGameSetup(const Config &config){
         // Name
         tempText.setString("Player");
         tempText.setFont(font);
-        tempText.setCharacterSize(fontSize);
+        tempText.setCharacterSize(config.fontSize);
         tempText.setColor(sf::Color::Red);
         tempText.setStyle(sf::Text::Regular);
         tempText.setPosition(40,195+(i)*45);
-        unsigned int updateInfo=i;
+        unsigned int id=i;
         visible=[](Main &main,ObjectButton<sf::Text> &button){
-            if(main.player.size()>button.updateInfo){
+            if(main.player.size()>button.id){
                 return true;
             }
             return false;
         };
         action = [](Main &main, ObjectButton<sf::Text> &button){
             // Action if local and not ready
-            if(main.player[button.updateInfo].local && (!main.game.client[1] || (main.game.client[1]&&!main.client.ready) ) ){
+            if(main.player[button.id].local && (!main.game.client[1] || (main.game.client[1]&&!main.client.ready) ) ){
                 // Disable change
-                if(main.game.nameChange==button.updateInfo){
-                    if(main.player[button.updateInfo].nameChange.getSize()>0){
-                        main.player[button.updateInfo].name=main.player[button.updateInfo].nameChange;
+                if(main.game.nameChange==button.id){
+                    if(main.player[button.id].nameChange.getSize()>0){
+                        main.player[button.id].name=main.player[button.id].nameChange;
                         if(main.game.server[1]||main.game.client[1]){
                             Pending pending;
-                            pending.packet << Packet::Name << button.updateInfo << main.player[button.updateInfo].name;
+                            pending.packet << Packet::Name << button.id << main.player[button.id].name;
                             main.game.queuePacket(pending);
                         }
                     }
                     main.game.nameChange=-1;
                 }
                 else{
-                    main.game.nameChange=button.updateInfo;
+                    main.game.nameChange=button.id;
                     main.game.keyChange[0]=-1;
-                    main.player[button.updateInfo].nameChange=main.player[button.updateInfo].name;
+                    main.player[button.id].nameChange=main.player[button.id].name;
                 }
             }
         };
         std::function<void(Main&,ObjectButton<sf::Text>&)> update = [](Main &main, ObjectButton<sf::Text> &button){
-            if(main.game.nameChange==button.updateInfo){
+            if(main.game.nameChange==button.id){
                 button.activated=true;
-                button.drawable.setString(main.player[button.updateInfo].nameChange); // Edit name
+                button.drawable.setString(main.player[button.id].nameChange); // Edit name
             }
             else{
                 button.activated=false;
-                button.drawable.setString(main.player[button.updateInfo].name); // Edit name
+                button.drawable.setString(main.player[button.id].name); // Edit name
             }
-            button.normalColor=main.player[button.updateInfo].color;// Set Color
+            button.normalColor=main.player[button.id].color;// Set Color
         };
         addToVector2(tempText,visible,action,update,i,sf::Color::Yellow,sf::Text::Italic);
         // Left
         tempText.setString("None2");
         tempText.setFont(font);
-        tempText.setCharacterSize(fontSize);
+        tempText.setCharacterSize(config.fontSize);
         tempText.setColor(sf::Color::Red);
         tempText.setStyle(sf::Text::Regular);
         tempText.setPosition(200,195+(i)*45);
         visible=[](Main &main,ObjectButton<sf::Text> &button){
-            if(main.player.size()>button.updateInfo && main.player[button.updateInfo].local){
+            if(main.player.size()>button.id && main.player[button.id].local){
                 return true;
             }
             return false;
         };
         action = [](Main &main, ObjectButton<sf::Text> &button){
             // Only allow change if local and not ready yet
-            if( main.player[button.updateInfo].local && (!main.game.client[1] || (main.game.client[1]&&!main.client.ready) ) ){
+            if( main.player[button.id].local && (!main.game.client[1] || (main.game.client[1]&&!main.client.ready) ) ){
                 // If not active
                 if(!button.activated){
                     main.game.keyChange[0]=0; // Key
-                    main.game.keyChange[1]=button.updateInfo; // Player
+                    main.game.keyChange[1]=button.id; // Player
                 }
                 else{
                     main.game.keyChange[0]=-1; // Key
@@ -313,9 +307,9 @@ void ObjectStorage::initGameSetup(const Config &config){
             }
         };
         update = [](Main &main, ObjectButton<sf::Text> &button){
-            button.drawable.setString(getKeyName(main.player[button.updateInfo].keyL)); // Edit name
-            button.normalColor=main.player[button.updateInfo].color;// Set Color
-            if(main.game.keyChange[1]==button.updateInfo && main.game.keyChange[0]==0){
+            button.drawable.setString(getKeyName(main.player[button.id].keyL)); // Edit name
+            button.normalColor=main.player[button.id].color;// Set Color
+            if(main.game.keyChange[1]==button.id && main.game.keyChange[0]==0){
                 button.activated=true;
             }
             else{
@@ -326,17 +320,17 @@ void ObjectStorage::initGameSetup(const Config &config){
         // Right
         tempText.setString("None3");
         tempText.setFont(font);
-        tempText.setCharacterSize(fontSize);
+        tempText.setCharacterSize(config.fontSize);
         tempText.setColor(sf::Color::Red);
         tempText.setStyle(sf::Text::Regular);
         tempText.setPosition(350,195+(i)*45);
         action = [](Main &main,ObjectButton<sf::Text> &button){
             // Only allow change if local and not ready yet
-            if( main.player[button.updateInfo].local && (!main.game.client[1] || (main.game.client[1]&&!main.client.ready) ) ){
+            if( main.player[button.id].local && (!main.game.client[1] || (main.game.client[1]&&!main.client.ready) ) ){
                 // If not active
                 if(!button.activated){
                     main.game.keyChange[0]=1; // Key
-                    main.game.keyChange[1]=button.updateInfo; // Player
+                    main.game.keyChange[1]=button.id; // Player
                 }
                 else{
                     main.game.keyChange[0]=-1; // Key
@@ -348,9 +342,9 @@ void ObjectStorage::initGameSetup(const Config &config){
             }
         };
         update = [](Main &main, ObjectButton<sf::Text> &button){
-            button.drawable.setString(getKeyName(main.player[button.updateInfo].keyR)); // Edit name
-            button.normalColor=main.player[button.updateInfo].color;// Set Color
-            if(main.game.keyChange[1]==button.updateInfo && main.game.keyChange[0]==1){
+            button.drawable.setString(getKeyName(main.player[button.id].keyR)); // Edit name
+            button.normalColor=main.player[button.id].color;// Set Color
+            if(main.game.keyChange[1]==button.id && main.game.keyChange[0]==1){
                 button.activated=true;
             }
             else{
@@ -361,95 +355,95 @@ void ObjectStorage::initGameSetup(const Config &config){
         // Kick
         tempText.setString("Kick");
         tempText.setFont(font);
-        tempText.setCharacterSize(fontSize);
+        tempText.setCharacterSize(config.fontSize);
         tempText.setColor(sf::Color::Red);
         tempText.setStyle(sf::Text::Regular);
         tempText.setPosition(500,195+(i)*45);
         visible=[](Main &main,ObjectButton<sf::Text> &button){
             // Local game: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
-            // Omitted: || (main.game.server[1] && updateInfo!=0 )
-            if(main.player.size()>button.updateInfo && ( (main.game.client[1] && button.updateInfo!=main.game.id && main.player[button.updateInfo].local) || (!main.game.server[1]&&!main.game.client[1] || (main.game.server[1] && button.updateInfo!=0 ) ) )){
+            // Omitted: || (main.game.server[1] && id!=0 )
+            if(main.player.size()>button.id && ( (main.game.client[1] && button.id!=main.game.id && main.player[button.id].local) || (!main.game.server[1]&&!main.game.client[1] || (main.game.server[1] && button.id!=0 ) ) )){
                 return true;
             }
             return false;
         };
         action = [](Main &main,ObjectButton<sf::Text> &button){
-             main.game.removedPlayer=button.updateInfo;
+             main.game.removedPlayer=button.id;
             // Remove from server
             if(!main.game.client[1]){
                 if(main.game.server[1]){
-                    if(!main.player[button.updateInfo].local){
+                    if(!main.player[button.id].local){
                         // Remove from clients
                         // Loop needed to find correct one?
-                        for(unsigned int j=0;j<main.server.clients[main.player[button.updateInfo].id].id.size();j++){
-                            if(main.server.clients[main.player[button.updateInfo].id].id[j]==button.updateInfo){
-                                main.server.clients[main.player[button.updateInfo].id].id.erase(main.server.clients[main.player[button.updateInfo].id].id.begin()+j);
+                        for(unsigned int j=0;j<main.server.clients[main.player[button.id].id].id.size();j++){
+                            if(main.server.clients[main.player[button.id].id].id[j]==button.id){
+                                main.server.clients[main.player[button.id].id].id.erase(main.server.clients[main.player[button.id].id].id.begin()+j);
                                 break;
                             }
                         }
                         // Kick from server if client has no player left
-                        if(main.server.clients[main.player[button.updateInfo].id].id.size()==0){
+                        if(main.server.clients[main.player[button.id].id].id.size()==0){
                             main.server.clientMutex.lock();
-                            main.server.selector.remove(*main.server.clients[main.player[button.updateInfo].id].socket);
-                            main.server.clients.erase(main.server.clients.begin()+main.player[button.updateInfo].id);
+                            main.server.selector.remove(*main.server.clients[main.player[button.id].id].socket);
+                            main.server.clients.erase(main.server.clients.begin()+main.player[button.id].id);
                             main.server.clientMutex.unlock();
                         }
                         // Update player id's
-                        main.gameSetup.removePlayer(main.game,main.player,button.updateInfo);
-                        main.server.updatePlayerID(main.player,button.updateInfo);
+                        main.gameSetup.removePlayer(main.game,main.player,button.id);
+                        main.server.updatePlayerID(main.player,button.id);
                     }
                     else{
-                        main.gameSetup.removePlayer(main.game,main.player,button.updateInfo);
+                        main.gameSetup.removePlayer(main.game,main.player,button.id);
                     }
                     //
                     Pending pending;
-                    pending.packet << Packet::Disconnect << button.updateInfo;
+                    pending.packet << Packet::Disconnect << button.id;
                     main.game.queuePacket(pending);
                 }
                 else{
-                    main.gameSetup.removePlayer(main.game,main.player,button.updateInfo);
+                    main.gameSetup.removePlayer(main.game,main.player,button.id);
                 }
             }
             // Send to server
             else{
-                main.player[button.updateInfo].local=false; // Needed why?
+                main.player[button.id].local=false; // Needed why?
                 Pending pending;
-                pending.packet << Packet::RemovePlayer << button.updateInfo;
+                pending.packet << Packet::RemovePlayer << button.id;
                 main.game.queuePacket(pending);
             }
         };
         update = [](Main &main, ObjectButton<sf::Text> &button){
-            button.normalColor=main.player[button.updateInfo].color;// Set Color
+            button.normalColor=main.player[button.id].color;// Set Color
         };
         addToVector(tempText,visible,action,update,i,sf::Color::Yellow,sf::Text::Italic);
         // Status
         tempText.setString("Status");
         tempText.setFont(font);
-        tempText.setCharacterSize(fontSize);
+        tempText.setCharacterSize(config.fontSize);
         tempText.setColor(sf::Color::Red);
         tempText.setStyle(sf::Text::Regular);
         tempText.setPosition(200,195+(i)*45);
         std::function<bool(Main&, ObjectStatic<sf::Text>&)> visible2=[](Main &main,ObjectStatic<sf::Text> &button){
-            if(main.player.size()>button.updateInfo && !main.player[button.updateInfo].local){
+            if(main.player.size()>button.id && !main.player[button.id].local){
                 return true;
             }
             return false;
         };
         std::function<void(Main&, ObjectStatic<sf::Text>&)> update2 = [](Main &main, ObjectStatic<sf::Text> &button){
-            button.drawable.setColor(main.player[button.updateInfo].color);// Set Color
-            if( main.player[button.updateInfo].server ){
+            button.drawable.setColor(main.player[button.id].color);// Set Color
+            if( main.player[button.id].server ){
                 button.drawable.setString("Server");
             }
             else if( main.game.server[1] ){
-                if( !main.server.clients[main.player[button.updateInfo].id].ready ){
-                    button.drawable.setString("Not ready: " + int2str(main.player[button.updateInfo].id) );
+                if( !main.server.clients[main.player[button.id].id].ready ){
+                    button.drawable.setString("Not ready: " + std::to_string(main.player[button.id].id) );
                 }
                 else{
-                    button.drawable.setString("Ready: " + int2str(main.player[button.updateInfo].id) );
+                    button.drawable.setString("Ready: " + std::to_string(main.player[button.id].id) );
                 }
             }
             else{
-                if( !main.player[button.updateInfo].ready ){
+                if( !main.player[button.id].ready ){
                     button.drawable.setString("Not ready");
                 }
                 else{
@@ -457,12 +451,12 @@ void ObjectStorage::initGameSetup(const Config &config){
                 }
             }
         };
-        addToVector(tempText,visible2,update2,updateInfo);
+        addToVector(tempText,visible2,update2,id);
     }
     // Options
     tempText.setString("Options");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Bold);
     tempText.setPosition(750 , 150);
@@ -470,7 +464,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("Max Points:");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(670 , 200);
@@ -478,7 +472,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("10");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(840 , 200);
@@ -501,7 +495,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("20");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(880 , 200);
@@ -523,7 +517,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("40");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(920 , 200);
@@ -545,7 +539,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("Powerups:");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(670 , 240);
@@ -553,7 +547,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("On");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(840, 240);
@@ -575,7 +569,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("Off");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(890, 240);
@@ -597,7 +591,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("Countdown:");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(670 , 280);
@@ -611,7 +605,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("On");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(840, 280);
@@ -639,7 +633,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("Off");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(890, 280);
@@ -661,7 +655,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("Multiple players:");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::White);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(670 , 280);
@@ -675,7 +669,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("On");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(840, 280);
@@ -703,7 +697,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     //
     tempText.setString("Off");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize*0.75);
+    tempText.setCharacterSize(config.fontSmallSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(890, 280);
@@ -725,7 +719,7 @@ void ObjectStorage::initGameSetup(const Config &config){
     // Server info shizzle
     tempText.setString("Start server");
     tempText.setFont(font);
-    tempText.setCharacterSize(fontSize);
+    tempText.setCharacterSize(config.fontSize);
     tempText.setColor(sf::Color::Red);
     tempText.setStyle(sf::Text::Regular);
     tempText.setPosition(40,config.windowHeight-50);
@@ -758,9 +752,6 @@ void ObjectStorage::initGameSetup(const Config &config){
 void ObjectStorage::initGame(const Config &config, Game &game, std::vector<Player> &player){
     objects.clear();
     mode=Game::Mode::Play;
-    //
-    int fontTitleSize=50;
-    int fontSize=30;
     // Walls
     std::function<bool(Main&, ObjectStatic<sf::RectangleShape>&)> trueFunction=[](Main &main,ObjectStatic<sf::RectangleShape> &button){return true;};
     std::function<void(Main&, ObjectStatic<sf::RectangleShape>&)> wallUpdate=[](Main &main,ObjectStatic<sf::RectangleShape> &wall){
@@ -790,80 +781,80 @@ void ObjectStorage::initGame(const Config &config, Game &game, std::vector<Playe
     sf::Text temp;
     temp.setFont(font);
     temp.setString("Scores");
-    temp.setCharacterSize(fontSize);
+    temp.setCharacterSize(config.fontSize);
     temp.setPosition( config.windowWidth-config.statusWidth/2-temp.getLocalBounds().width/2,10);
     temp.setColor(sf::Color::White);
     temp.setStyle(sf::Text::Bold);
     addToVector(temp);
     // Round
-    temp.setCharacterSize(fontSize*0.75);
+    temp.setCharacterSize(config.fontSmallSize);
     temp.setFont(font);
     temp.setColor(sf::Color::Yellow);
     temp.setString("Round:");
     temp.setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+30);
     addToVector(temp);
-    temp.setCharacterSize(fontSize*0.75);
+    temp.setCharacterSize(config.fontSmallSize);
     temp.setFont(font);
     temp.setColor(sf::Color::Yellow);
     temp.setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+30);
     std::function<void(Main&, ObjectStatic<sf::Text>&)> roundUpdate=[](Main &main,ObjectStatic<sf::Text> &text){
-        text.drawable.setString(int2str(main.game.round));
+        text.drawable.setString(std::to_string(main.game.round));
     };
     std::function<bool(Main&, ObjectStatic<sf::Text>&)> trueFunction2=[](Main &main,ObjectStatic<sf::Text> &button){return true;};
     addToVector(temp,trueFunction2,roundUpdate);
     // FPS
-    temp.setCharacterSize(fontSize*0.75);
+    temp.setCharacterSize(config.fontSmallSize);
     temp.setFont(font);
     temp.setColor(sf::Color::Yellow);
     temp.setString("FPS:");
     temp.setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+60);
     addToVector(temp);
-    temp.setCharacterSize(fontSize*0.75);
+    temp.setCharacterSize(config.fontSmallSize);
     temp.setFont(font);
     temp.setColor(sf::Color::Yellow);
     temp.setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+60);
     std::function<void(Main&, ObjectStatic<sf::Text>&)> fpsUpdate=[](Main &main,ObjectStatic<sf::Text> &text){
-        text.drawable.setString(int2str(main.renderer.fps));
+        text.drawable.setString(std::to_string(main.renderer.fps));
     };
     addToVector(temp,trueFunction2,fpsUpdate);
     // gameFPS
-    temp.setCharacterSize(fontSize*0.75);
+    temp.setCharacterSize(config.fontSmallSize);
     temp.setFont(font);
     temp.setColor(sf::Color::Yellow);
     temp.setString("GPS:");
     temp.setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+90);
     addToVector(temp);
-    temp.setCharacterSize(fontSize*0.75);
+    temp.setCharacterSize(config.fontSmallSize);
     temp.setFont(font);
     temp.setColor(sf::Color::Yellow);
     temp.setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+90);
     std::function<void(Main&, ObjectStatic<sf::Text>&)> gamefpsUpdate=[](Main &main,ObjectStatic<sf::Text> &text){
-        text.drawable.setString(int2str(main.game.frameTime));
+        text.drawable.setString(std::to_string(main.game.frameTime));
     };
     addToVector(temp,trueFunction2,gamefpsUpdate);
     // Packet
-    temp.setCharacterSize(fontSize*0.75);
+    temp.setCharacterSize(config.fontSmallSize);
     temp.setFont(font);
     temp.setColor(sf::Color::Yellow);
     temp.setString("PPS:");
     temp.setPosition(config.windowWidth-config.statusWidth+5,config.windowHeight/2+120);
     std::function<bool(Main&, ObjectStatic<sf::Text>&)> ppsVisible=[](Main &main,ObjectStatic<sf::Text> &button){
-        if(main.game.client[1]){
+        if(main.game.client[1] || main.game.server[1]){
             return true;
         }
         return false;
     };
     addToVector(temp,ppsVisible);
-    temp.setCharacterSize(fontSize*0.75);
+    temp.setCharacterSize(config.fontSmallSize);
     temp.setFont(font);
     temp.setColor(sf::Color::Yellow);
     temp.setPosition(config.windowWidth-config.statusWidth+100,config.windowHeight/2+120);
     std::function<void(Main&, ObjectStatic<sf::Text>&)> packetUpdate=[](Main &main,ObjectStatic<sf::Text> &text){
-        text.drawable.setString(int2str(main.config.gameUpdateThreadMinRate/main.game.packetTime));
+        text.drawable.setString(std::to_string( static_cast<int>(main.config.gameUpdateThreadMinRate/main.game.packetTime) ));
     };
     addToVector(temp,ppsVisible,packetUpdate);
     // Quit Button
-    temp.setCharacterSize(fontSize);
+    temp.setCharacterSize(config.fontSize);
     temp.setStyle(sf::Text::Bold);
     temp.setFont(font);
     temp.setColor(sf::Color::Red);
@@ -914,7 +905,7 @@ void ObjectStorage::initGame(const Config &config, Game &game, std::vector<Playe
     temp.setFont(font);
     std::function<void(Main&, ObjectStatic<sf::Text>&)> countdownUpdate=[](Main &main,ObjectStatic<sf::Text> &text){
         if(main.game.countdownInt>0){
-            text.drawable.setString(int2str(main.game.countdownInt));
+            text.drawable.setString(std::to_string(main.game.countdownInt));
             if(main.game.countdownInt==3){
                 text.drawable.setColor(sf::Color::Red);
             }
@@ -934,54 +925,44 @@ void ObjectStorage::initGame(const Config &config, Game &game, std::vector<Playe
       return false;
     };
     addToVector(temp,visible,countdownUpdate);
-    // Size is known. Send player through?
-    for(unsigned int i=0;i<config.maxPlayers;i++){
-        // What a mess. Buttons that don't button; Add id to static too to fix it
+    // Player things
+    for(unsigned int i=0;i<player.size();i++){
+        //
         temp.setString("Player");
         temp.setFont(font);
-        temp.setCharacterSize(fontSize*0.75);
+        temp.setCharacterSize(config.fontSmallSize);
         temp.setStyle(sf::Text::Regular);
         temp.setPosition(config.windowWidth-config.statusWidth+5,50+i*30);
-        std::function<bool(Main&, ObjectButton<sf::Text>&)> visible = [](Main &main,ObjectButton<sf::Text> &button){
-            if(main.player.size()>button.updateInfo){
+        std::function<bool(Main&, ObjectStatic<sf::Text>&)> visible = [](Main &main,ObjectStatic<sf::Text> &button){
+            if(main.player.size()>button.id){
                 return true;
             }
             return false;
         };
-        std::function<void(Main&, ObjectButton<sf::Text>&)> emptyAction = [](Main &main, ObjectButton<sf::Text> &button){};
-        std::function<void(Main&, ObjectButton<sf::Text>&)> nameUpdate = [](Main &main, ObjectButton<sf::Text> &button){
-            if(main.player.size()>button.updateInfo){
-                button.drawable.setString(main.player[button.updateInfo].name);
-                button.normalColor=main.player[button.updateInfo].color;
-                button.selectedColor=main.player[button.updateInfo].color;
-            }
+        std::function<void(Main&, ObjectStatic<sf::Text>&)> nameUpdate = [](Main &main, ObjectStatic<sf::Text> &button){
+            button.drawable.setString(main.player[button.id].name);
+            button.drawable.setColor(main.player[button.id].color);
         };
-        addToVector(temp,visible,emptyAction,nameUpdate,i,sf::Color::Red,sf::Text::Regular);
+        addToVector(temp, visible, nameUpdate, i);
         //
         temp.setPosition(config.windowWidth-30,50+i*30);
-        std::function<void(Main&,ObjectButton<sf::Text>&)> scoreUpdate = [](Main &main, ObjectButton<sf::Text> &button){
-            if(main.player.size()>button.updateInfo){
-                button.drawable.setString(int2str(main.player[button.updateInfo].points));
-                button.normalColor=main.player[button.updateInfo].color;
-                button.selectedColor=main.player[button.updateInfo].color;
-            }
+        std::function<void(Main&,ObjectStatic<sf::Text>&)> scoreUpdate = [](Main &main, ObjectStatic<sf::Text> &button){
+            button.drawable.setString(std::to_string(main.player[button.id].points));
+            button.drawable.setColor(main.player[button.id].color);
         };
-        addToVector(temp,visible,emptyAction,scoreUpdate,i,sf::Color::Red,sf::Text::Regular);
-
-        // Merge these?
+        addToVector(temp, visible, scoreUpdate, i);
         // Player lines
-        std::unique_ptr<Line> temp(new Line(&player[i].line, &player[i].noTurtleLine, i ) );
+        std::unique_ptr<ObjectLine> temp(new ObjectLine(&player[i].line, &player[i].noTurtleLine, i, &player, &game.darkness, config ) );
         objects.push_back(std::move(temp));
         // Head
-        std::unique_ptr<Head> temp3(new Head(&player[i].circle, &player[i].rectangle, &player[i].death, &player[i].rightAngle, i ) );
+        std::unique_ptr<ObjectHead> temp3(new ObjectHead(&player[i].circle, &player[i].rectangle, &player[i].death, &player[i].rightAngle, i ) );
         objects.push_back(std::move(temp3));
     }
     // Powerup time
-    std::unique_ptr<PowerupObjects> temp4(new PowerupObjects(config,&game.powerupField));
+    std::unique_ptr<ObjectPowerups> temp4(new ObjectPowerups( config, &game.powerupField, &player, &game.darkness ) );
     objects.push_back(std::move(temp4));
 }
-
-// Font Loader; Funny that I never catach anything
+// Font Loader; Funny that I never catch anything
 sf::Font ObjectStorage::loadFont(const std::string& name){
     HRSRC rsrcData = FindResource(NULL, name.c_str(), RT_RCDATA);
     if (!rsrcData)
@@ -1010,14 +991,14 @@ template<class T>
 void ObjectStorage::addToVector(T &object){
     // Create
     std::function<bool(Main&,ObjectStatic<T>&)> trueFunction=[](Main &main,ObjectStatic<T> &button){return true;};
-    std::unique_ptr<ObjectStatic<T>> temp(new ObjectStatic<T>( std::move(object), std::move(trueFunction) ) );
+    std::unique_ptr<ObjectStatic<T>> temp(new ObjectStatic<T>( object, std::move(trueFunction) ) );
     // Push back
     objects.push_back(std::move(temp));
 }
 //
 template<class T>
 void ObjectStorage::addToVector(T &object,std::function<bool(Main&,ObjectStatic<T>&)> &visible){
-    std::unique_ptr<ObjectStatic<T>> temp(new ObjectStatic<T>( std::move(object), std::move(visible) ) );
+    std::unique_ptr<ObjectStatic<T>> temp(new ObjectStatic<T>( object, std::move(visible) ) );
     // Push back
     objects.push_back(std::move(temp));
 }
@@ -1025,14 +1006,14 @@ void ObjectStorage::addToVector(T &object,std::function<bool(Main&,ObjectStatic<
 template<class T>
 void ObjectStorage::addToVector(T &object,std::function<bool(Main&,ObjectStatic<T>&)> &visible,std::function<void(Main&,ObjectStatic<T>&)> &update){
     // Create
-    std::unique_ptr<ObjectStatic<T>> temp(new ObjectStatic<T>( std::move(object), std::move(visible), std::move(update) ) );
+    std::unique_ptr<ObjectStatic<T>> temp(new ObjectStatic<T>( object, std::move(visible), std::move(update) ) );
     // Push back
     objects.push_back(std::move(temp));
 }
 template<class T>
-void ObjectStorage::addToVector(T &object,std::function<bool(Main&,ObjectStatic<T>&)> &visible,std::function<void(Main&,ObjectStatic<T>&)> &update, unsigned int &updateInfo){
+void ObjectStorage::addToVector(T &object,std::function<bool(Main&,ObjectStatic<T>&)> &visible,std::function<void(Main&,ObjectStatic<T>&)> &update, unsigned int &id){
     // Create
-    std::unique_ptr<ObjectStatic<T>> temp(new ObjectStatic<T>( std::move(object), std::move(visible), std::move(update), std::move(updateInfo) ) );
+    std::unique_ptr<ObjectStatic<T>> temp(new ObjectStatic<T>( object, std::move(visible), std::move(update), id ) );
     // Push back
     objects.push_back(std::move(temp));
 }
@@ -1045,15 +1026,15 @@ void ObjectStorage::addToVector(T &object, std::function<bool(Main&,ObjectButton
     objects.push_back(std::move(temp));
 }
 template<class T>
-void ObjectStorage::addToVector(T object, std::function<bool(Main&,ObjectButton<T>&)> &visible, std::function<void(Main&,ObjectButton<T>&)> &action, std::function<void(Main&,ObjectButton<T>&)> &update, unsigned int &updateInfo, const sf::Color &selectedColor,const unsigned int &selectedStyle){
+void ObjectStorage::addToVector(T object, std::function<bool(Main&,ObjectButton<T>&)> &visible, std::function<void(Main&,ObjectButton<T>&)> &action, std::function<void(Main&,ObjectButton<T>&)> &update, unsigned int &id, const sf::Color &selectedColor,const unsigned int &selectedStyle){
     // Create
-    std::unique_ptr<ObjectButton<T>> temp(new ObjectButton<T>( std::move(object), std::move(visible), std::move(action),std::move(update), updateInfo, selectedColor, selectedStyle)) ;
+    std::unique_ptr<ObjectButton<T>> temp(new ObjectButton<T>( std::move(object), std::move(visible), std::move(action),std::move(update), id, selectedColor, selectedStyle)) ;
     // Push back
     objects.push_back(std::move(temp));
 }
-void ObjectStorage::addToVector2(sf::Text object, std::function<bool(Main&,ObjectButton<sf::Text>&)> &visible, std::function<void(Main&,ObjectButton<sf::Text>&)> &action, std::function<void(Main&,ObjectButton<sf::Text>&)> &update, unsigned int &updateInfo,const sf::Color &selectedColor,const unsigned int &selectedStyle){
+void ObjectStorage::addToVector2(sf::Text object, std::function<bool(Main&,ObjectButton<sf::Text>&)> &visible, std::function<void(Main&,ObjectButton<sf::Text>&)> &action, std::function<void(Main&,ObjectButton<sf::Text>&)> &update, unsigned int &id,const sf::Color &selectedColor,const unsigned int &selectedStyle){
     // Create
-    std::unique_ptr<TextBox> temp(new TextBox( std::move(object), std::move(visible), std::move(action),std::move(update), updateInfo, selectedColor, selectedStyle)) ;
+    std::unique_ptr<TextBox> temp(new TextBox( std::move(object), std::move(visible), std::move(action),std::move(update), id, selectedColor, selectedStyle)) ;
     // Push back
     objects.push_back(std::move(temp));
 }

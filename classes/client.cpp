@@ -165,7 +165,6 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         int id;
         packet >> id;
         packet >> player[id].name;
-        game.refreshPlayers=true;
     }
     else if(type==Packet::StartGame){
         game.initialize(config,player);
@@ -237,7 +236,6 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         game.roundWinner=id;
         game.roundFinished=true;
         game.pause(true);
-        game.endMessageSet=false;
     }
     else if(type==Packet::PowerupDeleteField){
         unsigned int id;
@@ -351,8 +349,12 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
             if( (game.mode==Game::Mode::Play&&!player[id].local)||(game.mode!=Game::Mode::Play) ) {
                 // Remove from list
                 player.erase(player.begin()+id);
+                // Update ID and player place
                 if(game.id>id){
                     game.id--;
+                }
+                for(unsigned int i=id; i<player.size(); i++){
+                    player[i].place--;
                 }
             }
             counter++;
@@ -360,7 +362,6 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         if(counter==1){
             game.removedPlayer=id;
         }
-        game.refreshPlayers=true;
     }
     else if(type==Packet::Ready){
         int id;
@@ -368,11 +369,9 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
             packet >> id;
             packet >> player[id].ready;
         }
-        game.refreshPlayers=true;
     }
     else if(type==Packet::Options){
         packet >> game.maxPoints >> game.powerupEnabled >> game.multiplePlayersEnabled;
-        game.refreshOptions=true;
     }
     else if(type==Packet::Countdown){
         game.countdownClock.restart();
@@ -402,7 +401,6 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
                 player.back().ready=false;
             }
             player[id].local=true;
-            game.refreshPlayers=true;
         }
     }
     else if(type==Packet::NoTurtleFinalize){
@@ -435,7 +433,6 @@ void Client::syncPackage(Game &game,std::vector<Player> &player,sf::Packet &pack
             player[id].ready=ready;
         }
     }
-    game.refreshPlayers=true;
     sync=true;
 }
 //

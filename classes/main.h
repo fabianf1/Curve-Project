@@ -32,10 +32,6 @@ class Main{
         // Functions
         void curveProject();
         void eventHandler();
-        //void mainMenuHandler();
-        //void gameSetupHandler();
-        //void changeButton(const int &button,unsigned const int &pl);
-        //void gameHandler();
 };
 //
 #endif // CURVE_MAIN

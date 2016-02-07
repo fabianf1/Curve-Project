@@ -15,9 +15,9 @@ class Game;
 class Player{
     public:
         // Vars
-        float x,y,heading;
-        float xOLD,yOLD,hOLD;
-        sf::Keyboard::Key keyL,keyR;
+        float x, y, heading;
+        float xOLD, yOLD, hOLD;
+        sf::Keyboard::Key keyL, keyR;
         bool death;
         bool ready;
         float gap[2];// Time to gap[0], and gap time[1];

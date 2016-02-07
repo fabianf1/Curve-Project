@@ -10,7 +10,6 @@ Powerup::Powerup(const Powerup::Type &Type,const Powerup::Impact &Impact, const 
 }
 // Overloads
 sf::Packet& operator <<(sf::Packet& packet, const Powerup::Type &j){
-    //int i=static_cast<int>(j);
     return packet << static_cast<int>(j);
 }
 sf::Packet& operator >>(sf::Packet& packet, Powerup::Type &j){
@@ -20,7 +19,6 @@ sf::Packet& operator >>(sf::Packet& packet, Powerup::Type &j){
     return packet;
 }
 sf::Packet& operator <<(sf::Packet& packet, const Powerup::Impact &j){
-    //int i=static_cast<int>(j);
     return packet << static_cast<int>(j);
 }
 sf::Packet& operator >>(sf::Packet& packet, Powerup::Impact &j){

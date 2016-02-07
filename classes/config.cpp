@@ -11,6 +11,9 @@ Config::Config(){
     windowAntialiasing=8;
     statusWidth=200;
     windowBackgroundColor=sf::Color::Black;
+    fontTitleSize=50;
+    fontSize=30;
+    fontSmallSize = fontSize*0.75;
     fps=60;
     maxPlayers=8;
     // Icon
@@ -58,15 +61,17 @@ Config::Config(){
     glitchMaxWidthIncrease=2.0;
     glitchMaxWidthDecrease=0.9;
     glitchSpeedChance=30;
-    glitchMaxSpeedIncrease=2.0;
+    glitchMaxSpeedIncrease=1.5;
     glitchMaxSpeedDecrease=0.9;
+    glitchAngleChance=40; // Defined as total chance for angle move. Different then MoveChance for example.
+    glitchMaxAngle=10;
     //
     radiusMinScale=0.01;
     radiusScaleFactor= 0.0075 ; // Per unit of length. Additive;
     //
     noTurtleTime=3.0;
     noTurtleRadius=shift*1.5;
-    noTurtlePoints=180;
+    noTurtlePoints=360;
     //
     lengthMultiplier=1.5;
     //
@@ -98,6 +103,6 @@ Config::Config(){
     attemptDuration=250;
     lagTime=1.5; // 1 would be the normal time
     //
-    majorVersion="0.6";
+    majorVersion="0.7";
     minorVersion="0";
 }

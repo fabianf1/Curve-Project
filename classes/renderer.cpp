@@ -18,7 +18,7 @@ void Renderer::start(Main &main, const Config &config,Game &game,std::vector<std
 // Render thread Function
 void Renderer::thread(Main &main, const Config &config,Game &game,std::vector<std::unique_ptr<ObjectBase>> &objects, const std::vector<Player> &player){
     std::cout << "Render thread Started" << std::endl;
-    // start main loop
+    // Start main loop
     while(window.isOpen()){
         window.clear(config.windowBackgroundColor);
         // Locking the mutex when changing modes solves font rendering problems
@@ -30,11 +30,10 @@ void Renderer::thread(Main &main, const Config &config,Game &game,std::vector<st
             }
         }
         game.modeMutex.unlock();
-        // Draw everything to window and update fps
+        // Display everything to window and update fps
         window.display();
         game.frame++;
         if(game.frame%(config.fps)==0){
-            //sf::Time temp=game.fpsClock.restart();
             fps =(1.0/game.fpsClock.restart().asSeconds())*(config.fps);
         }
     }
