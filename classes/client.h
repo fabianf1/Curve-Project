@@ -24,6 +24,7 @@ class Client{
         bool sync;
         bool ready;
         sf::Packet packet;
+        float packetDelay;
         // Functions
         void start(const Config &config, Game &game,std::vector<Player> &player);
         void thread(const Config &config,Game &game,std::vector<Player> &player);

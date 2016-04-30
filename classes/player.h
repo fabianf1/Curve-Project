@@ -63,7 +63,7 @@ class Player{
         void New_Game();
         void newRound(const Config &config,const Game &game);
         void updatePosition(const Config &config, Game &game);
-        void updatePosition(const Config &config, sf::Packet &packet);
+        void updatePosition(const Config &config, Game &game, sf::Packet &packet);
         void addLine(const float &X1,const float &X2,const float &Y1,const float &Y2,const float &H1, const float &H2,const int &lineWidth);
         void calculateGap(const Config &config);
         void calculatePowerupEffect(const Config &config,const Game &game);

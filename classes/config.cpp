@@ -101,8 +101,9 @@ Config::Config(){
     //
     port=55003;
     attemptDuration=250;
-    lagTime=1.5; // 1 would be the normal time
+    lagTime=0.3; // Maximum delay between server and client
+    inputLagTime=0.3;
     //
-    majorVersion="0.7";
+    majorVersion="0.8";
     minorVersion="0";
 }

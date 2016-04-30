@@ -1,7 +1,6 @@
 // Contains functions and constructors for the client_info class
 // Needed Header
 #include "ClientInfo.h"
-#include <iostream>
 // Constructor
 ClientInfo::ClientInfo(): socket(new sf::TcpSocket), ready(false), versionCorrect(false){
 

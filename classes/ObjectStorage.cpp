@@ -360,15 +360,13 @@ void ObjectStorage::initGameSetup(const Config &config){
         tempText.setStyle(sf::Text::Regular);
         tempText.setPosition(500,195+(i)*45);
         visible=[](Main &main,ObjectButton<sf::Text> &button){
-            // Local game: Can kick all. Server: Can kick all but first player. Client: Can kick local players except first
-            // Omitted: || (main.game.server[1] && id!=0 )
-            if(main.player.size()>button.id && ( (main.game.client[1] && button.id!=main.game.id && main.player[button.id].local) || (!main.game.server[1]&&!main.game.client[1] || (main.game.server[1] && button.id!=0 ) ) )){
+            // Local game: Can kick all. Server: Can kick all. Client: Can kick local players except first
+            if(main.player.size()>button.id && ( (main.game.client[1] && button.id!=main.game.id && main.player[button.id].local) || (!main.game.client[1] ) )){
                 return true;
             }
             return false;
         };
         action = [](Main &main,ObjectButton<sf::Text> &button){
-             main.game.removedPlayer=button.id;
             // Remove from server
             if(!main.game.client[1]){
                 if(main.game.server[1]){
@@ -716,7 +714,7 @@ void ObjectStorage::initGameSetup(const Config &config){
         }
     };
     addToVector(tempText,visible,action,update,damn,sf::Color::Yellow,sf::Text::Italic);
-    // Server info shizzle
+    // Server info
     tempText.setString("Start server");
     tempText.setFont(font);
     tempText.setCharacterSize(config.fontSize);

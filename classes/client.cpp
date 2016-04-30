@@ -16,8 +16,6 @@ void Client::start(const Config &config, Game &game,std::vector<Player> &player)
             std::cout << "Server connection Error!" << std::endl;
             break;
         case sf::Socket::NotReady:
-            // When the client tries to reconnect this always occurs for some reason. Trying again results in a succeeded connection attempt.
-            // This was fixed by making the socket block again
             std::cout << "No response from server." << std::endl;
             break;
         default:
@@ -64,12 +62,13 @@ void Client::thread(const Config &config,Game &game,std::vector<Player> &player)
             }
         }
         // Send
-        for(int i=game.packets.size()-1;i>=0;i--){
+        for(int i=0;i<game.packets.size();i++){
             switch(socket.send(game.packets[i].packet)){
                 case sf::Socket::Done:
                     // Remove Send id
                     game.packetMutex.lock();
                     game.packets.erase(game.packets.begin()+i);
+                    i--;
                     game.packetMutex.unlock();
                     break;
                 case sf::Socket::NotReady:
@@ -181,26 +180,31 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
     }
     else if(type==Packet::Update){
         // Time Between packets measurement
-        if(game.packetNumber%config.gameUpdateThreadMinRate==0){
-            game.packetTime=game.packetClock.restart().asSeconds();
-            // check for lag
-            if(game.packetTime>config.lagTime){
-                // Send packet
+        if(game.packetNumber % config.gameUpdateThreadMinRate == 0){
+            game.packetTime = game.packetClock.restart().asSeconds();
+            // Check for lag
+            packetDelay += game.packetTime - 1.0; // The 1.0 should be the normal time. It is usally slightly faster though.
+            if(packetDelay<0.0){
+                packetDelay = 0.0;
+            }
+            else if(packetDelay>config.lagTime){
+                // Lag detected! Send package to server and check
                 Pending pending;
-                pending.packet << Packet::Lag << game.id;
+                pending.packet << Packet::Lag << game.id << game.packetNumber;
                 game.queuePacket(pending);
+                std::cout << "Lag detected!" << std::endl;
             }
         }
         // Unpack Basics
         int number;
         packet >> number;
-        if(number>game.packetNumber){
+        if(number > game.packetNumber){
             game.packetNumber=number;
             // Unpack Player Data
             int id;
             while(!packet.endOfPacket()){
                 packet >> id;
-                player[id].updatePosition(config,packet);
+                player[id].updatePosition(config, game, packet);
             }
         }
         // This should not happen anymore
@@ -359,9 +363,6 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
             }
             counter++;
         }
-        if(counter==1){
-            game.removedPlayer=id;
-        }
     }
     else if(type==Packet::Ready){
         int id;
@@ -407,6 +408,15 @@ void Client::processPacket(const Config &config,Game &game,std::vector<Player> &
         int id;
         packet >> id;
         player[id].finalizeTurtle(game);
+    }
+    else if(type==Packet::Lag){
+        bool answer;
+        packet >> answer;
+        if(!answer){
+            std::cout << "No lag!" << std::endl;
+            packetDelay = -1.0;
+
+        }
     }
     else{
         std::cout << "Unknown packet type!" << std::endl;

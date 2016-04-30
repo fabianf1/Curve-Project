@@ -6,7 +6,6 @@ Game::Game(const Config &config): gamePacer(config.gameUpdateThreadMinRate), ran
     frame=0;
     keyChange[0]=-1;
     nameChange=-1;
-    removedPlayer=-1;
     maxPoints=10;
     mode=Mode::mainMenu;
     powerupEnabled=true;
@@ -108,7 +107,7 @@ void Game::initializePowerups(const Config &config){
     powerups.emplace_back(Powerup::Type::Radius,Powerup::Impact::All,25,5,0);
     // NoTurtle
     powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::All,25,5,0);
-    powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::Other,40000,5,0);
+    powerups.emplace_back(Powerup::Type::NoTurtle,Powerup::Impact::Other,40,5,0);
     // Multiplier
     powerups.emplace_back(Powerup::Type::Multiplier,Powerup::Impact::Self,20,5,0);
     // Calculate total chance
@@ -123,7 +122,6 @@ void Game::thread(const Config &config,std::vector<Player> &player){
     updateThread[1]=true;
     while(!updateThread[2]){
         // Only run if not paused and not round finished
-        // I should remove the integer and only work with the float.
         if(countdownInt!=0){
             float elapsed = 3.0 - countdownClock.getElapsedTime().asSeconds();
             if(elapsed<=0.0){
@@ -137,6 +135,7 @@ void Game::thread(const Config &config,std::vector<Player> &player){
                 countdownInt=2;
             }
         }
+        // Server or local game
         else if( !client[1] && !paused && !roundFinished ){
             // Get elapsed time since last iteration. If the time is too long it will be set to a fixed value and a message will be displayed in the console.
             elapsed=gameClock.restart().asSeconds();
@@ -168,25 +167,22 @@ void Game::thread(const Config &config,std::vector<Player> &player){
             // Hit detection
             hitDetector(config,player);
         }
+        // Client
         else if( client[1] && !roundFinished){
-            // check key states and send if changed
+            // Check key states and send if changed
             for(unsigned int i=0;i<player.size();i++){
                 if(player[i].local){
-                    // Left key changed
-                    if( (!player[i].left&&sf::Keyboard::isKeyPressed(player[i].keyL)) || (player[i].left&&!sf::Keyboard::isKeyPressed(player[i].keyL)) ){
+                    // Check for key change
+                    if( (!player[i].left&&sf::Keyboard::isKeyPressed(player[i].keyL)) || (player[i].left&&!sf::Keyboard::isKeyPressed(player[i].keyL)) ||
+                       (!player[i].right&&sf::Keyboard::isKeyPressed(player[i].keyR)) || (player[i].right&&!sf::Keyboard::isKeyPressed(player[i].keyR)) ){
                         player[i].left=sf::Keyboard::isKeyPressed(player[i].keyL);
-                        // Send package
-                        Pending pending;
-                        pending.packet << Packet::KeyL << i << player[i].left;
-                        queuePacket(pending);
-                    }
-                    // Right key changed
-                    if( (!player[i].right&&sf::Keyboard::isKeyPressed(player[i].keyR)) || (player[i].right&&!sf::Keyboard::isKeyPressed(player[i].keyR)) ){
                         player[i].right=sf::Keyboard::isKeyPressed(player[i].keyR);
                         // Send package
                         Pending pending;
-                        pending.packet << Packet::KeyR << i << player[i].right;
+                        pending.packet << Packet::Key << i << player[i].left << player[i].right;
                         queuePacket(pending);
+                        //
+                        inputClock.restart();
                     }
                 }
             }

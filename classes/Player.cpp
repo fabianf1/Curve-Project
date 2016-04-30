@@ -273,13 +273,44 @@ void Player::updatePosition(const Config &config, Game &game){
     }
 }
 // Client Version of updatePosition
-void Player::updatePosition(const Config &config, sf::Packet &packet){
+void Player::updatePosition(const Config &config, Game &game, sf::Packet &packet){
     // Unpack
     xOLD=x;
     yOLD=y;
     hOLD=heading;
     packet >> x >> y >> heading >> lineWidth >> noLine;
-    //
+    // Input lag detection
+    // Only for first local player
+    if(place==game.id){
+        // Only if not pressing both;
+        // Should also check for rightAngle
+        if( !(left&&right) && !rightAngle ){
+            if( ( (left&&!inverted) || (right&&inverted) )){
+                if(heading>=hOLD){
+                    // Check if too long
+                    if(game.inputClock.getElapsedTime().asSeconds() >= config.inputLagTime ){
+                        std::cout << "Input lag detected!" << std::endl;
+                    }
+                }
+                else{
+                    game.inputClock.restart();
+                }
+            }
+            // Move right
+            if( ( (right&&!inverted) || (left&&inverted) ) ){
+                if(heading<=hOLD){
+                    // Check if too long
+                    if(game.inputClock.getElapsedTime().asSeconds() >= config.inputLagTime ){
+                        std::cout << "Input lag detected!" << std::endl;
+                    }
+                }
+                else{
+                    game.inputClock.restart();
+                }
+            }
+        }
+    }
+    // Don't display line if player moved through wall
     int maxdiffw=config.windowWidth-config.statusWidth-4*config.wallWidth;
     int maxdiffh=config.windowHeight-4*config.wallWidth;
     if(!noLine&& abs(x-xOLD)<maxdiffw && abs(y-yOLD)<maxdiffh){

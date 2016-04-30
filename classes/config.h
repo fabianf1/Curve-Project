@@ -102,6 +102,7 @@ class Config{
         int port;
         int attemptDuration;
         float lagTime;
+        float inputLagTime;
         //
         std::string majorVersion;
         std::string minorVersion;

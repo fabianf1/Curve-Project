@@ -3,7 +3,6 @@
 #define CURVE_CLIENTINFO
 // SFML headers
 #include <vector>
-#include <memory>
 #include <SFML/Network.hpp>
 
 class ClientInfo{

@@ -218,9 +218,6 @@ void Server::disconnectClient(const Config &config, GameSetup &gameSetup, Game &
         pending.packet << clients[n].id[j];
         gameSetup.removePlayer(game,player,clients[n].id[j]);
     }
-    if(clients[n].id.size()==1){
-        game.removedPlayer=clients[n].id[0];
-    }
     // Remove out of list
     selector.remove(*clients[n].socket);
     clients.erase(clients.begin()+n);
@@ -307,7 +304,7 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
             game.queuePacket(pending);
         }
     }
-    else if(type==Packet::KeyL){
+    else if(type==Packet::Key){
         int id;
         packet >> id;
         // Data check
@@ -315,28 +312,26 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
             return;
         }
         //
-        packet >> player[id].left;
-    }
-    else if(type==Packet::KeyR){
-        int id;
-        packet >> id;
-        // Data check
-        if(!clients[n].checkID(id)){
-            return;
-        }
-        //
-        packet >> player[id].right;
+        packet >> player[id].left >> player[id].right;
     }
     else if(type==Packet::Lag){
-        int id;
-        packet >> id;
-        // Data check
-        if(!clients[n].checkID(id)){
-            return;
+        int packetNumber, id;
+        packet >> id >> packetNumber;
+        // Check if packetNumber is really far behing
+        int lagNumber  = game.packetNumber - config.gameUpdateThreadMinRate * (config.lagTime*2/3); // 2/3 to compensate for travel time and such
+        if(packetNumber <= lagNumber){
+            // Really lagging
+            std::cout << player[id].name.toAnsiString() << "(" << id << ") " << " lags" << std::endl;
+            game.pause(true);
         }
-        //
-        std::cout << player[id].name.toAnsiString() << "(" << id << ") " << " lags";
-        game.pause(true);
+        else{
+            std::cout << player[id].name.toAnsiString() << "(" << id << ") " << " does not lag" << std::endl;
+            // Respond
+            Pending pending;
+            pending.packet << Packet::Lag << false;
+            pending.sendID.push_back(n);
+            game.queuePacket(pending);
+        }
     }
     else if(type==Packet::RequestPlayer){
         // check if there are free players
@@ -360,7 +355,6 @@ void Server::processPackage(const Config &config,GameSetup &gameSetup,Game &game
         }
         // Remove
         gameSetup.removePlayer(game,player,id);
-        game.removedPlayer=id;
         //
         // Remove from clients
         for(unsigned int j=0;j<clients[n].id.size();j++){

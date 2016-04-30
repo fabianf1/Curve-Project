@@ -27,7 +27,6 @@ class Game{
         enum class Mode : int {mainMenu,setup,Play} mode; // Keeps track of current modus
         int keyChange[2]; // Keeps track of keychanges, 1 is player, 0 is key(left=0 or right=1)
         int nameChange;
-        int removedPlayer;
         int maxPoints;
         bool powerupEnabled;
         bool countdownEnabled;
@@ -60,7 +59,7 @@ class Game{
         bool updateThread[3];// 0=Cleanup required,1=running,2=shutdown;
         bool server[3];
         bool client[3];
-        unsigned int id;
+        unsigned int id; // Position in player vector for first local player
         std::string serverIp;
         bool joinGame;
         int packetNumber; // Keep track of packet number to prevent mixups
@@ -74,6 +73,7 @@ class Game{
         sf::Clock gameClock; // For game update
         sf::Clock gameFrameClock; // Measuring game updates
         sf::Clock packetClock; // Measuring time between packets;
+        sf::Clock inputClock; // Clock to detect input lag
         //
         Pacer gamePacer;
         // Random
