@@ -3,7 +3,7 @@
 #include "PowerupSprite.h"
 // Constructor
 PowerupSprite::PowerupSprite(const Config &config){
-    sf::Image tempImage = LoadImageFromResource("texture");
+    sf::Image tempImage = Resource::loadImage("texture");
     texture.loadFromImage(tempImage);
     texture.setSmooth(true);
     // Fast sprites

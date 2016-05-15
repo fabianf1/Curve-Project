@@ -14,7 +14,9 @@
 #include "ObjectHead.h"
 #include "ObjectLine.h"
 #include "ObjectPowerups.h"
+#include "Resource.h"
 #include "TextBox.h"
+#include "../functions/General.h"
 // Forward declaration
 class Main;
 //
@@ -30,8 +32,6 @@ public:
     void initMainMenu(const Config &config);
     void initGameSetup(const Config &config);
     void initGame(const Config &config, Game &game, std::vector<Player> &player);
-    // Helpers
-    sf::Font loadFont(const std::string& name);
     // Super Static
     template<class T>
     void addToVector(T &object);

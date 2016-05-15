@@ -17,7 +17,7 @@ Config::Config(){
     fps=60;
     maxPlayers=8;
     // Icon
-    icon = LoadImageFromResource("curveicon");
+    icon = Resource::loadImage("curveicon");
     // Line Settings
     lineWidth=8;
     //

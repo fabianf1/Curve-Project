@@ -36,6 +36,3 @@ obj/
 *.save
 *.layout
 *.depend
-
-# Font
-*.ttf

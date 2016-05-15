@@ -3,10 +3,8 @@
 #define CURVE_GENERAL
 
 // Needed Headers
-#include <Windows.h> // I really should test on linux
-#include <SFML/Graphics.hpp>
-//
-sf::Image LoadImageFromResource(const std::string& name);
+#include <SFML/Window.hpp>
+
 // Needs better place maybe?
 const char* getKeyName(const sf::Keyboard::Key &key );
 

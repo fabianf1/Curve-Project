@@ -3,7 +3,7 @@
 #include "ObjectStorage.h"
 #include "main.h"
 // Constructor
-ObjectStorage::ObjectStorage(const Config &config): font(loadFont("fontdata")){
+ObjectStorage::ObjectStorage(const Config &config): font(Resource::loadFont("fontdata")){
     // Initialize main menu
     initMainMenu(config);
 }
@@ -959,30 +959,6 @@ void ObjectStorage::initGame(const Config &config, Game &game, std::vector<Playe
     // Powerup time
     std::unique_ptr<ObjectPowerups> temp4(new ObjectPowerups( config, &game.powerupField, &player, &game.darkness ) );
     objects.push_back(std::move(temp4));
-}
-// Font Loader; Funny that I never catch anything
-sf::Font ObjectStorage::loadFont(const std::string& name){
-    HRSRC rsrcData = FindResource(NULL, name.c_str(), RT_RCDATA);
-    if (!rsrcData)
-        throw std::runtime_error("Failed to find resource.");
-
-    DWORD rsrcDataSize = SizeofResource(NULL, rsrcData);
-    if (rsrcDataSize <= 0)
-        throw std::runtime_error("Size of resource is 0.");
-
-    HGLOBAL grsrcData = LoadResource(NULL, rsrcData);
-    if (!grsrcData)
-        throw std::runtime_error("Failed to load resource.");
-
-    LPVOID firstByte = LockResource(grsrcData);
-    if (!firstByte)
-        throw std::runtime_error("Failed to lock resource.");
-
-    sf::Font font;
-    if (!font.loadFromMemory(firstByte, rsrcDataSize))
-        throw std::runtime_error("Failed to load font from memory.");
-
-    return font;
 }
 //
 template<class T>

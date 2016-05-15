@@ -4,7 +4,7 @@
 // Headers
 #include <SFML/Graphics.hpp>
 #include "Config.h"
-#include "../functions/general.h"
+#include "Resource.h"
 //
 class PowerupSprite{
     sf::Texture texture;// The texture that has all powerups

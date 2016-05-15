@@ -4,7 +4,7 @@
 // Headers
 #include <string>
 #include <SFML/Graphics.hpp>
-#include "../functions/General.h"
+#include "Resource.h"
 //
 class Config{
     public:
